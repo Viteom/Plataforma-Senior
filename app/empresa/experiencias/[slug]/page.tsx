@@ -59,7 +59,7 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
         <h2 id="cotizar" className="text-xl">
           Pedir cotización
         </h2>
-        <form className="flex flex-col gap-5">
+        <form method="post" className="flex flex-col gap-5">
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-2 text-lg font-bold">¿Dónde?</legend>
             {exp.formatos.map((f, i) => (

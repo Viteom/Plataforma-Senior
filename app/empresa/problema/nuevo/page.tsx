@@ -16,7 +16,7 @@ export default function ProblemaNuevo() {
         titulo="Buscar por un problema"
         intro="Cuéntenos qué necesita resolver. Lo convertimos en requisitos y le proponemos hasta 5 perfiles revisados por nuestro equipo."
       >
-        <form className="flex flex-col gap-8">
+        <form method="post" className="flex flex-col gap-8">
           <Campo
             id="problema"
             etiqueta="¿Qué problema necesita resolver?"

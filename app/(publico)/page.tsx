@@ -87,7 +87,7 @@ export default function Portada() {
           Busque por el problema que necesita resolver y conozca a quien ya lo resolvió antes.
         </p>
         <Button asChild variant="secundario" ancho="completo">
-          <Link href="/empresa/explorar">Explorar perfiles</Link>
+          <Link href={MODO_DEMO ? "/empresa/explorar" : "/entrar?para=empresa"}>Explorar perfiles</Link>
         </Button>
       </section>
 

@@ -20,7 +20,7 @@ export default function CurarProblema() {
       titulo="Elegir talento para este problema"
       intro="“Abrir una segunda planta y cumplir con INVIMA en 6 meses.” Elija máximo 5 y escriba por qué."
     >
-      <form className="flex flex-col gap-6">
+      <form method="post" className="flex flex-col gap-6">
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-2 text-lg font-bold">10 propuestos por el sistema</legend>
           {propuestos.map((p, i) => (

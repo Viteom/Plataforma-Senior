@@ -8,6 +8,7 @@ import { estaActivo, navEmpresa } from "@/lib/navegacion";
 import { cn } from "@/lib/utils";
 
 import { BotonAyuda } from "./boton-ayuda";
+import { BotonSalir } from "./boton-salir";
 
 // Empresa trabaja en escritorio: barra superior. En pantallas pequeñas los destinos
 // pasan a una cuadrícula de 2 × 2 debajo de la marca (por debajo de 1280 px no caben en una fila).
@@ -45,7 +46,10 @@ export function BarraEmpresa() {
             })}
           </ul>
         </nav>
-        <BotonAyuda className="ml-auto xl:ml-0" />
+        <div className="ml-auto flex items-center gap-3 xl:ml-0">
+          <BotonSalir />
+          <BotonAyuda />
+        </div>
       </div>
     </header>
   );

@@ -1,7 +1,10 @@
-// Datos de ejemplo SOLO para revisar el diseño en el hito 1. Se borran en el hito 2,
-// cuando las pantallas leen de Supabase. Ningún dato de ejemplo incluye edad.
+import { supabaseConfigurado } from "@/lib/supabase/config";
 
-export const MODO_DEMO = true;
+// Datos de ejemplo para revisar el diseño mientras las pantallas no leen de Supabase
+// (hitos 3 y 4). Ningún dato de ejemplo incluye edad.
+
+// Sin Supabase configurado no hay inicio de sesión: la portada muestra accesos a cada área.
+export const MODO_DEMO = !supabaseConfigurado;
 
 export type FormaContratar =
   | "horas"
