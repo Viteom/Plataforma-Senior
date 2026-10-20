@@ -25,6 +25,9 @@ el anterior se haya probado en un celular real.
 7. **RLS desde el primer día** y llaves de API solo en el servidor.
 8. **Marca en tokens.** Colores y tipografía en variables: el brandbook llega después. Mientras
    tanto, fuente Atkinson Hyperlegible y escala de grises como en los wireframes.
+9. **Solo empresas verificadas llegan al talento.** Una empresa sin NIT verificado puede explorar,
+   pero no pedir conexiones ni aparecer en las oportunidades. Cada oportunidad y cada SMS
+   recuerdan que nadie de la plataforma ni de una empresa le va a pedir dinero.
 
 ## Cómo se aplican en el código
 
@@ -33,5 +36,11 @@ el anterior se haya probado en un celular real.
 - `talent_private` (fecha de nacimiento, autorización, pensión) solo la leen curador y admin.
 - Ningún color, tamaño de letra o radio literal en componentes: usa los tokens de `app/globals.css`.
 - Textos de interfaz en español; un test revisa que no aparezcan las palabras prohibidas.
+- Una conexión solo pasa a "enviada al talento" si `companies.verificada` tiene fecha; lo
+  garantiza la base (no solo la interfaz) y un test lo comprueba.
+- Las evidencias que ve una empresa salen de una vista: solo verificadas y autorizadas por la
+  persona. Las referencias (nombre y teléfono) nunca salen del equipo.
+- Los SMS de aviso no dicen el nombre de la empresa y respetan el horario y el tope diario del
+  brief ("Avisos al talento").
 - Llaves (`SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, Twilio, Resend, ElevenLabs) solo en
   variables de entorno del servidor; nunca con prefijo `NEXT_PUBLIC_`.
