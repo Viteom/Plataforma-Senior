@@ -163,10 +163,10 @@ Registro asistido (gestor): pensado para celular y conexión intermitente. El ge
 La persona cuenta un problema difícil que resolvió (escrito, dictado, por llamada o con el gestor). El servidor envía la historia a la API de Claude con la taxonomía y un esquema JSON obligatorio; las etiquetas llegan sin confirmar y la persona quita las que no son suyas. Etiquetas nuevas fuera de la taxonomía van a revisión del equipo.
 
 ```
-{  "situaciones": ["Apertura de una planta nueva"],  "contexto": ["Empresa familiar", "Alimentos", "Antioquia"],  "escala": ["Equipo de 40 personas"],  "oficio": ["Producción de alimentos"],  "normas": ["INVIMA", "SG-SST"],  "transferir": ["Formó a los supervisores"],  "dudas": ["¿En qué año fue?"]}
+{  "situaciones": ["Apertura de una planta nueva"],  "contexto": ["Empresa familiar", "Alimentos", "Antioquia"],  "escala": ["Equipo de 40 personas"],  "oficio": ["Producción de alimentos"],  "normas": ["INVIMA", "SG-SST"],  "transferir": ["Formó a los supervisores"],  "dudas": ["¿Cuántas personas tenía a cargo?"]}
 ```
 
-Reglas del prompt: extraer solo lo dicho, nunca inventar cifras ni normas; nunca inferir edad, salud ni estado civil; preferir etiquetas canónicas; español sencillo, máximo 6 palabras por etiqueta. El mismo contrato traduce el problema de una empresa en requisitos obligatorios y deseables.
+Reglas del prompt: extraer solo lo dicho, nunca inventar cifras ni normas; nunca inferir edad, salud ni estado civil; las "dudas" precisan qué pasó, nunca preguntan por años, fechas ni edad, y las fechas de la historia se reemplazan antes de enviarla (ver `docs/ia-desde-moai.md`); preferir etiquetas canónicas; español sencillo, máximo 6 palabras por etiqueta. El mismo contrato traduce el problema de una empresa en requisitos obligatorios y deseables.
 
 ### Formas de contratar y tarifas (A4 y A5)
 
