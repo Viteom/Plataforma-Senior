@@ -1,0 +1,131 @@
+import "server-only";
+
+import { redirect } from "next/navigation";
+
+import {
+  conexionesEjemplo,
+  empresaEjemplo,
+  MODO_DEMO,
+  necesidadEjemplo,
+  oportunidadesEjemplo,
+  perfilesEjemplo,
+} from "@/lib/demo";
+import type { FormaContratar } from "@/lib/formas";
+import { ordenarPorBusqueda } from "@/lib/matching/busqueda";
+import { crearClienteServidor } from "@/lib/supabase/server";
+
+import type { ConexionEmpresa, EvidenciaVista, MiEmpresa, NecesidadVista, Oportunidad, PerfilVista } from "./tipos";
+
+// Lecturas para las pantallas. En modo demostración devuelven los ejemplos de lib/demo.ts con la
+// misma forma; con Supabase leen solo de las vistas pensadas para cada rol.
+
+async function cliente() {
+  const supabase = await crearClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/entrar");
+  return { supabase, user };
+}
+
+// ── Empresa ─────────────────────────────────────────────────────────────────
+
+export async function obtenerMiEmpresa(): Promise<MiEmpresa | null> {
+  if (MODO_DEMO) return empresaEjemplo;
+  const { supabase, user } = await cliente();
+  const { data } = await supabase.from("companies").select("id, nombre, nit, verificada_en, estado").eq("owner_id", user.id).maybeSingle();
+  if (!data) return null;
+  return { id: data.id, nombre: data.nombre, nit: data.nit, verificada: data.verificada_en !== null, estado: data.estado };
+}
+
+export async function listarPerfiles(busqueda: string, formas: FormaContratar[]): Promise<PerfilVista[]> {
+  let perfiles: PerfilVista[];
+  if (MODO_DEMO) {
+    perfiles = perfilesEjemplo;
+  } else {
+    const { supabase } = await cliente();
+    const { data } = await supabase.from("company_talent_view").select("*").limit(300);
+    perfiles = (data ?? []) as PerfilVista[];
+  }
+  const filtrados = formas.length ? perfiles.filter((p) => p.ofertas.some((o) => formas.includes(o.tipo))) : perfiles;
+  return ordenarPorBusqueda(filtrados, busqueda);
+}
+
+export async function obtenerPerfil(id: string): Promise<{ perfil: PerfilVista; evidencias: EvidenciaVista[]; conexion: ConexionEmpresa | null } | null> {
+  if (MODO_DEMO) {
+    const perfil = perfilesEjemplo.find((p) => p.id === id);
+    if (!perfil) return null;
+    const evidencias: EvidenciaVista[] = perfil.evidencias
+      ? [{ id: "ev1", tipo: "referencia", descripcion: "Fue su jefe en la planta", nota_equipo: "Confirmó que lideró la certificación de la planta." }]
+      : [];
+    return { perfil, evidencias, conexion: conexionesEjemplo.find((c) => c.talent_id === id) ?? null };
+  }
+  const { supabase } = await cliente();
+  const [{ data: perfil }, { data: evidencias }, { data: conexiones }] = await Promise.all([
+    supabase.from("company_talent_view").select("*").eq("id", id).maybeSingle(),
+    supabase.from("company_evidence_view").select("id, tipo, descripcion, nota_equipo").eq("talent_id", id),
+    supabase.from("company_connections_view").select("*").eq("talent_id", id).order("actualizado_en", { ascending: false }).limit(1),
+  ]);
+  if (!perfil) return null;
+  return {
+    perfil: perfil as PerfilVista,
+    evidencias: (evidencias ?? []) as EvidenciaVista[],
+    conexion: ((conexiones ?? [])[0] as ConexionEmpresa) ?? null,
+  };
+}
+
+export async function listarConexiones(): Promise<{ conexiones: ConexionEmpresa[]; perfiles: Map<string, PerfilVista>; necesidades: NecesidadVista[] }> {
+  if (MODO_DEMO) {
+    return { conexiones: conexionesEjemplo, perfiles: new Map(perfilesEjemplo.map((p) => [p.id, p])), necesidades: [necesidadEjemplo] };
+  }
+  const { supabase } = await cliente();
+  const [{ data: conexiones }, { data: necesidades }] = await Promise.all([
+    supabase.from("company_connections_view").select("*").order("actualizado_en", { ascending: false }),
+    supabase.from("needs").select("id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en").order("creado_en", { ascending: false }),
+  ]);
+  const ids = [...new Set((conexiones ?? []).map((c) => c.talent_id as string))];
+  const { data: perfiles } = ids.length
+    ? await supabase.from("company_talent_view").select("*").in("id", ids)
+    : { data: [] };
+  return {
+    conexiones: (conexiones ?? []) as ConexionEmpresa[],
+    perfiles: new Map(((perfiles ?? []) as PerfilVista[]).map((p) => [p.id, p])),
+    necesidades: ((necesidades ?? []) as NecesidadVista[]).map((n) => ({ ...n, requisitos: [] })),
+  };
+}
+
+export async function obtenerNecesidad(id: string): Promise<{ necesidad: NecesidadVista; conexiones: ConexionEmpresa[]; perfiles: Map<string, PerfilVista> } | null> {
+  if (MODO_DEMO) {
+    if (id !== necesidadEjemplo.id) return null;
+    return {
+      necesidad: necesidadEjemplo,
+      conexiones: conexionesEjemplo.filter((c) => c.need_id === id),
+      perfiles: new Map(perfilesEjemplo.map((p) => [p.id, p])),
+    };
+  }
+  const { supabase } = await cliente();
+  const { data: necesidad } = await supabase
+    .from("needs")
+    .select("id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, need_requirements(capa, etiqueta, obligatorio)")
+    .eq("id", id)
+    .maybeSingle();
+  if (!necesidad) return null;
+  const { data: conexiones } = await supabase.from("company_connections_view").select("*").eq("need_id", id);
+  const ids = (conexiones ?? []).map((c) => c.talent_id as string);
+  const { data: perfiles } = ids.length ? await supabase.from("company_talent_view").select("*").in("id", ids) : { data: [] };
+  const { need_requirements, ...resto } = necesidad as NecesidadVista & { need_requirements: NecesidadVista["requisitos"] };
+  return {
+    necesidad: { ...resto, requisitos: need_requirements ?? [] },
+    conexiones: (conexiones ?? []) as ConexionEmpresa[],
+    perfiles: new Map(((perfiles ?? []) as PerfilVista[]).map((p) => [p.id, p])),
+  };
+}
+
+// ── Talento ─────────────────────────────────────────────────────────────────
+
+export async function listarOportunidades(): Promise<Oportunidad[]> {
+  if (MODO_DEMO) return oportunidadesEjemplo;
+  const { supabase } = await cliente();
+  const { data } = await supabase.from("talent_opportunities_view").select("*").order("creado_en", { ascending: false });
+  return (data ?? []) as Oportunidad[];
+}

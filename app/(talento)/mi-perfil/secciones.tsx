@@ -1,12 +1,13 @@
 "use client";
 
 import { Download, Eye, EyeOff, FileText, Pencil, Phone, Trash2, X } from "lucide-react";
-import { useActionState, useState } from "react";
+import { useState } from "react";
 
 import { Tarifas } from "@/components/perfil/tarifas";
 import { Button } from "@/components/ui/button";
 import { Campo, Input, Textarea } from "@/components/ui/campo";
 import { Opcion } from "@/components/ui/opcion";
+import { useAccion } from "@/components/ui/use-accion";
 import { etiquetaForma, formasContratar, modalidades, pesos, type FormaContratar, type GuiaTarifa } from "@/lib/formas";
 
 import {
@@ -42,7 +43,7 @@ type Datos = { nombre: string; ubicacion: string; oficio: string; resumen: strin
 
 export function SeccionDatos({ datos }: { datos: Datos }) {
   const [editando, setEditando] = useState(false);
-  const [estado, guardar, guardando] = useActionState<Estado, FormData>(async (p, d) => {
+  const { estado, enviar: guardar, pendiente: guardando, alEnviar } = useAccion<Estado>(async (p, d) => {
     const r = await actualizarDatos(p, d);
     if (!r.error) setEditando(false);
     return r;
@@ -68,7 +69,7 @@ export function SeccionDatos({ datos }: { datos: Datos }) {
 
   return (
     <Seccion titulo="Mis datos">
-      <form action={guardar} className="flex flex-col gap-5">
+      <form action={guardar} onSubmit={alEnviar} className="flex flex-col gap-5">
         <Campo id="nombre" etiqueta="Nombre">
           {(p) => <Input {...p} name="nombre" defaultValue={datos.nombre} autoComplete="name" />}
         </Campo>
@@ -128,7 +129,7 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
     Object.fromEntries(ofertas.map((o) => [o.tipo, o.tarifa_esperada ? String(o.tarifa_esperada) : ""])),
   );
   const [orientacion, setOrientacion] = useState(ofertas.some((o) => o.quiere_orientacion));
-  const [estado, guardar, guardando] = useActionState<Estado, FormData>(async (p, d) => {
+  const { estado, enviar: guardar, pendiente: guardando, alEnviar } = useAccion<Estado>(async (p, d) => {
     const r = await actualizarFormas(p, d);
     if (!r.error) setEditando(false);
     return r;
@@ -167,7 +168,7 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
 
   return (
     <Seccion titulo="Cómo me pueden contratar">
-      <form action={guardar} className="flex flex-col gap-6">
+      <form action={guardar} onSubmit={alEnviar} className="flex flex-col gap-6">
         <fieldset className="flex flex-col gap-3">
           <legend className="mb-3 text-lg font-bold">¿Cómo le gustaría trabajar?</legend>
           {formasContratar.map(({ valor, etiqueta, descripcion }) => (
@@ -241,12 +242,12 @@ const ESTADO_EVIDENCIA = {
 
 export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
   const [agregando, setAgregando] = useState<null | "referencia" | "archivo">(null);
-  const [estadoRef, guardarRef, guardandoRef] = useActionState<Estado, FormData>(async (p, d) => {
+  const { estado: estadoRef, enviar: guardarRef, pendiente: guardandoRef, alEnviar: alEnviarRef } = useAccion<Estado>(async (p, d) => {
     const r = await agregarReferencia(p, d);
     if (!r.error) setAgregando(null);
     return r;
   }, {});
-  const [estadoArch, guardarArch, guardandoArch] = useActionState<Estado, FormData>(async (p, d) => {
+  const { estado: estadoArch, enviar: guardarArch, pendiente: guardandoArch, alEnviar: alEnviarArch } = useAccion<Estado>(async (p, d) => {
     const r = await subirArchivo(p, d);
     if (!r.error) setAgregando(null);
     return r;
@@ -311,7 +312,7 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
       )}
 
       {agregando === "referencia" && (
-        <form action={guardarRef} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
+        <form action={guardarRef} onSubmit={alEnviarRef} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
           <h3 className="text-lg">Una persona que conozca su trabajo</h3>
           <p className="text-base text-text-muted">Solo el equipo ve su nombre y su teléfono. Nunca se los damos a una empresa.</p>
           <Campo id="ref-nombre" etiqueta="Nombre">
@@ -332,7 +333,7 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
       )}
 
       {agregando === "archivo" && (
-        <form action={guardarArch} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
+        <form action={guardarArch} onSubmit={alEnviarArch} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
           <h3 className="text-lg">Una foto o un documento</h3>
           <p className="text-base text-text-muted">
             Por ejemplo, un certificado o una foto de su trabajo. Que no se vean fechas de nacimiento ni documentos de identidad.
@@ -367,7 +368,7 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
 export function SeccionMisDatos() {
   const [descargando, setDescargando] = useState(false);
   const [confirmando, setConfirmando] = useState(false);
-  const [estado, borrar, borrando] = useActionState<Estado>(borrarCuenta, {});
+  const { estado, enviar: borrar, pendiente: borrando } = useAccion<Estado>(borrarCuenta, {});
 
   async function descargar() {
     setDescargando(true);

@@ -7,6 +7,7 @@ import { BotonSalir } from "@/components/layout/boton-salir";
 import { Pantalla } from "@/components/layout/pantalla";
 import { Button } from "@/components/ui/button";
 import { nombreCapa } from "@/lib/capas";
+import { listarOportunidades } from "@/lib/datos/consultas";
 import { MODO_DEMO } from "@/lib/demo";
 import type { GuiaTarifa } from "@/lib/formas";
 import { CAPAS, type Capa } from "@/lib/ia/tipos";
@@ -46,6 +47,7 @@ export default async function MiPerfil() {
   ]);
 
   const reservado = perfil.visibilidad === "reservado";
+  const buscaron = (await listarOportunidades()).filter((o) => o.estado !== "enviada_talento" && o.estado !== "descarta");
 
   return (
     <Pantalla titulo="Mi perfil">
@@ -120,7 +122,17 @@ export default async function MiPerfil() {
       <SeccionEvidencias evidencias={evidencias ?? []} />
 
       <Seccion titulo="Empresas que me buscaron">
-        <p className="text-text-muted">Todavía ninguna. Aquí verá las empresas que quisieron conocerle.</p>
+        {buscaron.length ? (
+          <ul className="flex flex-col gap-2">
+            {buscaron.map((o) => (
+              <li key={o.id} className="rounded-md bg-surface px-4 py-3 font-bold">
+                {o.empresa}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-text-muted">Todavía ninguna. Aquí verá las empresas que quisieron conocerle.</p>
+        )}
       </Seccion>
 
       <SeccionMisDatos />
