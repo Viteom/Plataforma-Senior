@@ -47,6 +47,13 @@ export function BarraEmpresa() {
           </ul>
         </nav>
         <div className="ml-auto flex items-center gap-3 xl:ml-0">
+          <Link
+            href="/empresa/datos"
+            aria-current={estaActivo(pathname, "/empresa/datos") ? "page" : undefined}
+            className="inline-flex min-h-tap items-center px-1 text-base font-bold underline underline-offset-4 hover:decoration-2"
+          >
+            Mi empresa
+          </Link>
           <BotonSalir />
           <BotonAyuda />
         </div>
