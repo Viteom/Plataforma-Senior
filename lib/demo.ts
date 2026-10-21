@@ -6,22 +6,9 @@ import { supabaseConfigurado } from "@/lib/supabase/config";
 // Sin Supabase configurado no hay inicio de sesión: la portada muestra accesos a cada área.
 export const MODO_DEMO = !supabaseConfigurado;
 
-export type FormaContratar =
-  | "horas"
-  | "proyecto"
-  | "mentoria"
-  | "fraccional"
-  | "medio_tiempo"
-  | "experiencia";
-
-export const formasContratar: { valor: FormaContratar; etiqueta: string }[] = [
-  { valor: "horas", etiqueta: "Por horas" },
-  { valor: "proyecto", etiqueta: "Por proyecto" },
-  { valor: "mentoria", etiqueta: "Mentoría" },
-  { valor: "fraccional", etiqueta: "Fraccional" },
-  { valor: "medio_tiempo", etiqueta: "Medio tiempo" },
-  { valor: "experiencia", etiqueta: "Experiencia o taller" },
-];
+// Las formas de contratar viven en lib/formas.ts; se reexportan para las pantallas de ejemplo.
+export { formasContratar, type FormaContratar } from "@/lib/formas";
+import type { FormaContratar } from "@/lib/formas";
 
 export type PerfilEjemplo = {
   id: string;
@@ -92,3 +79,19 @@ export const experienciaEjemplo = {
   grupo: null as string | null,
   precioDesde: null as string | null,
 };
+
+// Taxonomía mínima para el modo demostración (la real vive en la migración de taxonomía semilla).
+export const taxonomiaEjemplo: { id: string; capa: "situaciones" | "contexto" | "escala" | "oficio" | "normas" | "transferir"; etiqueta: string; sinonimos: string[] }[] = [
+  { id: "00000000-0000-4000-9000-000000000001", capa: "situaciones", etiqueta: "Apertura de una planta nueva", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000002", capa: "situaciones", etiqueta: "Certificación sanitaria", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000003", capa: "situaciones", etiqueta: "Formación de personal nuevo", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000004", capa: "contexto", etiqueta: "Empresa familiar", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000005", capa: "contexto", etiqueta: "Alimentos", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000006", capa: "escala", etiqueta: "Equipo de 10 a 50 personas", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000007", capa: "oficio", etiqueta: "Producción de alimentos", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000008", capa: "oficio", etiqueta: "Calidad", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000009", capa: "normas", etiqueta: "INVIMA", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000010", capa: "normas", etiqueta: "SG-SST", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000011", capa: "transferir", etiqueta: "Formó a supervisores", sinonimos: [] },
+  { id: "00000000-0000-4000-9000-000000000012", capa: "transferir", etiqueta: "Escribió manuales de trabajo", sinonimos: [] },
+];

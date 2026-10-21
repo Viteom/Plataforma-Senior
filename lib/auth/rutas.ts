@@ -16,7 +16,7 @@ export function inicioDe(rol: Rol): string {
 }
 
 // Rutas abiertas sin sesión. Ayuda está siempre disponible (regla 6).
-const PUBLICAS = ["/", "/entrar", "/ayuda", "/sin-conexion"];
+const PUBLICAS = ["/", "/entrar", "/ayuda", "/sin-conexion", "/privacidad"];
 
 const AREAS: { prefijos: string[]; roles: Rol[] }[] = [
   { prefijos: ["/empresa"], roles: ["empresa", "admin"] },

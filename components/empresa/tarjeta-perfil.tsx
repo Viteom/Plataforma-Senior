@@ -1,11 +1,10 @@
 import { Eye, EyeOff, MapPin } from "lucide-react";
 import Link from "next/link";
 
-import { formasContratar, type PerfilEjemplo } from "@/lib/demo";
+import type { PerfilEjemplo } from "@/lib/demo";
+import { etiquetaForma } from "@/lib/formas";
 
-export function etiquetaForma(valor: string) {
-  return formasContratar.find((f) => f.valor === valor)?.etiqueta ?? valor;
-}
+export { etiquetaForma };
 
 // Tarjeta de perfil para empresas. Un perfil reservado se presenta por su oficio,
 // sin nombre ni foto. Nunca muestra edad.
