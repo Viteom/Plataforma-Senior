@@ -8,6 +8,7 @@ import { estaActivo, navEquipo } from "@/lib/navegacion";
 import { cn } from "@/lib/utils";
 
 import { BotonAyuda } from "./boton-ayuda";
+import { BotonSalir } from "./boton-salir";
 
 // Equipo: barra lateral en escritorio, bloque superior en celular.
 export function BarraEquipo() {
@@ -47,7 +48,10 @@ export function BarraEquipo() {
             })}
           </ul>
         </nav>
-        <BotonAyuda className="mt-auto hidden lg:inline-flex" />
+        <div className="mt-auto flex flex-col gap-2">
+          <BotonAyuda className="hidden self-start lg:inline-flex" />
+          <BotonSalir />
+        </div>
       </div>
     </aside>
   );

@@ -70,7 +70,7 @@ export default function PerfilNuevo() {
         </div>
       }
     >
-      <form onSubmit={continuar} className="flex flex-col gap-8" noValidate>
+      <form method="post" onSubmit={continuar} className="flex flex-col gap-8" noValidate>
         <h2 ref={tituloRef} tabIndex={-1} className="text-xl focus-visible:outline-none">
           {titulos[paso - 1]}
         </h2>

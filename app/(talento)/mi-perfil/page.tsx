@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Pantalla } from "@/components/layout/pantalla";
+import { BotonSalir } from "@/components/layout/boton-salir";
 import { Pendiente } from "@/components/layout/pendiente";
 import { Button } from "@/components/ui/button";
 import { Etiqueta } from "@/components/ui/etiqueta";
@@ -59,6 +60,8 @@ export default function MiPerfil() {
           </Button>
         </div>
       </Seccion>
+
+      <BotonSalir />
 
       <Pendiente hito={3}>
         Editar perfil, formas de trabajar y visibilidad; descargar o borrar los datos.

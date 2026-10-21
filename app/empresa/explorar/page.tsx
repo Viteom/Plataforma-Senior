@@ -26,7 +26,7 @@ export default function Explorar() {
       titulo="Explorar perfiles"
       intro="Personas que ya resolvieron problemas como el suyo. Filtre por cómo quiere contratar."
     >
-      <form role="search" onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-3 sm:flex-row">
+      <form role="search" method="get" onSubmit={(e) => e.preventDefault()} className="flex flex-col gap-3 sm:flex-row">
         <label htmlFor="buscar" className="sr-only">
           Buscar por oficio, situación o norma
         </label>

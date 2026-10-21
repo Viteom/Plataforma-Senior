@@ -43,7 +43,7 @@ export default function Huella() {
       </fieldset>
 
       {modo === "escribir" && (
-        <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+        <form method="post" className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
           <Campo
             id="historia"
             etiqueta="Su historia"

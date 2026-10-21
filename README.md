@@ -13,7 +13,7 @@ PWA que conecta talento con trayectoria con empresas. Nombre de trabajo hasta el
 |---|---|
 | `npm run dev` | Desarrollo en http://localhost:3000 (sin service worker) |
 | `npm run build` y `npm start` | Versión de producción, con PWA |
-| `npm test` | Pruebas (incluye palabras prohibidas en la interfaz) |
+| `npm test` | Pruebas: acceso a datos por rol (Postgres en memoria), rutas, formularios y palabras prohibidas |
 | `npm run lint` | Revisión de código |
 | `npm run iconos` | Regenera los íconos provisionales |
 | `npm run db:start` | Supabase local (requiere Docker Desktop) |
@@ -21,6 +21,9 @@ PWA que conecta talento con trayectoria con empresas. Nombre de trabajo hasta el
 
 ## Estado
 
-Hito 1 (base): pantallas navegables de los tres roles con datos de ejemplo, tokens de diseño,
+Hito 1 (base, en `main`): pantallas navegables de los tres roles con datos de ejemplo, tokens de diseño,
 PWA y migración inicial con RLS activada. El acceso con código y las políticas por rol llegan en
 el hito 2.
+
+Hito 2 (acceso y roles, rama `hito-2-acceso`): roles, reglas por fila, vista anónima para
+empresas y entrada con código lista para conectar. Ver [docs/hito-2.md](docs/hito-2.md).

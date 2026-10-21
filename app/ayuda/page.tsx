@@ -34,7 +34,7 @@ export default function Ayuda() {
               </h2>
             </div>
             <p>Déjenos su número y una persona del equipo le llama.</p>
-            <form className="flex flex-col gap-5">
+            <form method="post" className="flex flex-col gap-5">
               <Campo id="tel-ayuda" etiqueta="Número de celular">
                 {(p) => <Input {...p} type="tel" inputMode="numeric" autoComplete="tel-national" />}
               </Campo>

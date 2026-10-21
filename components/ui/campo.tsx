@@ -43,7 +43,7 @@ function Campo({ id, etiqueta, ayuda, error, className, children }: CampoProps) 
         className: controlBase,
       })}
       {error && (
-        <p id={errorId} className="flex items-start gap-2 text-base font-bold text-danger">
+        <p id={errorId} role="alert" className="flex items-start gap-2 text-base font-bold text-danger">
           <CircleAlert aria-hidden className="mt-0.5 size-5 shrink-0" />
           {error}
         </p>
