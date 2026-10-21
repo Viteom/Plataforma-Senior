@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 
 // Regla 2 y 5 del CLAUDE.md: palabras que no pueden aparecer en la interfaz.
 const PROHIBIDAS = [/adulto[s]? mayor(es)?/i, /tercera edad/i, /\babuel[oa]s?\b/i, /\bvacantes?\b/i];
-const CARPETAS = ["app", "components", "lib"];
+const CARPETAS = ["app", "components", "lib", "supabase/templates"];
 
 function archivos(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
     const ruta = join(dir, n);
     if (statSync(ruta).isDirectory()) return archivos(ruta);
-    return /\.(tsx?|mdx?)$/.test(n) ? [ruta] : [];
+    return /\.(tsx?|mdx?|html)$/.test(n) ? [ruta] : [];
   });
 }
 

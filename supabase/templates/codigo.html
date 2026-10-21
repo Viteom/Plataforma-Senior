@@ -1,0 +1,115 @@
+<!--
+  Correo con el código para entrar. Va en dos plantillas de Supabase: «Magic Link» (personas que
+  ya entraron antes) y «Confirm signup» (primera vez). Asunto: «Su código para entrar a Plataforma Senior».
+
+  MARCA: cuando llegue el brandbook, cambie solo esto.
+  - Nombre: busque y reemplace «Plataforma Senior» (también en el asunto y en el nombre del
+    remitente de Supabase, Authentication → Emails → SMTP Settings).
+  - Colores: son los tokens de app/globals.css.
+      #141414 texto y bordes fuertes · #4d4d4d texto secundario
+      #f4f4f4 fondos suaves · #d4d4d4 bordes suaves · #ffffff fondo de la tarjeta
+  - Logo: vea el comentario LOGO, más abajo.
+
+  No cambie la etiqueta .Token entre llaves dobles: ahí Supabase pone el código de 6 números.
+  Sin enlaces ni botones a propósito: así no se parece a un correo engañoso.
+-->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <meta name="supported-color-schemes" content="light" />
+    <title>Su código para entrar</title>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #f4f4f4">
+    <!-- Lo que muestra la notificación del celular antes de abrir el correo. -->
+    <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
+      Su código es {{ .Token }}. Vence en 10 minutos.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f4f4">
+      <tr>
+        <td align="center" style="padding: 24px 12px">
+          <table
+            role="presentation"
+            width="100%"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="max-width: 560px; background-color: #ffffff; border: 2px solid #d4d4d4; border-radius: 12px"
+          >
+            <!-- LOGO: para usar el logo, reemplace el texto de esta celda por
+                 <img src="https://…/logo.png" alt="Plataforma Senior" width="200" style="display: block; border: 0; height: auto" />
+                 La imagen debe estar publicada en internet (https). Muchos correos bloquean imágenes,
+                 por eso el código y el aviso nunca dependen de ella. -->
+            <tr>
+              <td
+                style="padding: 28px 28px 20px; border-bottom: 2px solid #d4d4d4; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 22px; line-height: 1.3; font-weight: bold; color: #141414"
+              >
+                Plataforma Senior
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 28px 28px 8px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; color: #141414">
+                <h1 style="margin: 0 0 16px; font-size: 28px; line-height: 1.25; font-weight: bold">Su código para entrar</h1>
+                <p style="margin: 0 0 20px; font-size: 18px; line-height: 1.6">Escriba estos números en la pantalla donde los pidió:</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 0 28px">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td
+                      align="center"
+                      style="padding: 20px 12px; background-color: #f4f4f4; border: 2px solid #141414; border-radius: 12px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 44px; line-height: 1.2; font-weight: bold; letter-spacing: 10px; color: #141414"
+                    >
+                      {{ .Token }}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 20px 28px 8px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; color: #141414">
+                <p style="margin: 0 0 24px; font-size: 18px; line-height: 1.6">
+                  <strong>Vence en 10 minutos.</strong> Si se le pasa el tiempo, pida otro código en la misma pantalla.
+                </p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 0 28px 28px">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td
+                      style="padding: 16px 20px; background-color: #f4f4f4; border-left: 6px solid #141414; border-radius: 4px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; color: #141414"
+                    >
+                      <p style="margin: 0 0 6px; font-size: 18px; line-height: 1.5; font-weight: bold">No comparta este código con nadie.</p>
+                      <p style="margin: 0; font-size: 18px; line-height: 1.6">
+                        Ni Plataforma Senior ni ninguna empresa le van a pedir este código ni dinero, por teléfono, WhatsApp o
+                        correo. Si alguien se lo pide, no lo entregue.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                style="padding: 20px 28px 28px; border-top: 2px solid #d4d4d4; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #4d4d4d"
+              >
+                <p style="margin: 0 0 12px">¿No pidió este código? Ignore este correo: nadie puede entrar a su cuenta sin él.</p>
+                <p style="margin: 0">¿Necesita ayuda? En Plataforma Senior toque «Ayuda» y pida que le llamemos.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

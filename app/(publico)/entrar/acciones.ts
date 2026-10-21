@@ -21,7 +21,11 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
   const { data: permitido, error: errorLimite } = await supabase.rpc("registrar_intento_codigo", {
     destino_hash: hash,
   });
-  if (errorLimite) return { error: ERROR_GENERAL };
+  // En los registros va solo el motivo técnico, nunca el correo ni el celular.
+  if (errorLimite) {
+    console.error("[entrar] límite de códigos:", errorLimite.code, errorLimite.message);
+    return { error: ERROR_GENERAL };
+  }
   if (!permitido) {
     return {
       error:
@@ -40,6 +44,7 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
     if (error.status === 429) {
       return { error: "Debe esperar 45 segundos antes de pedir otro código." };
     }
+    console.error("[entrar] envío del código:", error.status, error.code, error.message);
     return { error: ERROR_GENERAL };
   }
   return null;
