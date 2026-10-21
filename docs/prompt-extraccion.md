@@ -1,8 +1,12 @@
-# Prompt de extracción de la huella: para revisión
+# Prompt de extracción de la huella
+
+> **Aprobado el 21 de octubre de 2026**, versión `huella-v1`, tal como aparece aquí. Decisiones:
+> modelo `claude-opus-5-5`, y los nombres de otras personas solo se señalan. Cualquier cambio a las
+> instrucciones sube la versión (`VERSION_PROMPT` en `lib/ia/huella.ts`) y vuelve a revisión.
 
 El mensaje del hito 3 en el brief pide: "Muéstrame el prompt de extracción antes de conectarlo a
-la API de Claude". Este documento es esa revisión. **La IA está apagada** (`IA_PROVEEDOR=apagado`)
-y no procesa ninguna historia, inventada ni real, hasta que lo apruebes.
+la API de Claude". Este documento es esa revisión. La IA sigue apagada en el código
+(`IA_PROVEEDOR=apagado` por defecto): se enciende con las variables del servidor (sección 8).
 
 La fuente de verdad es el código: [`lib/ia/huella.ts`](../lib/ia/huella.ts) (instrucciones, versión
 `huella-v1`) y [`lib/ia/preparar.ts`](../lib/ia/preparar.ts) (lo que se quita antes de enviar).
@@ -129,20 +133,26 @@ la descarta.
   npx tsx --conditions=react-server --env-file=.env.local scripts/probar-ia.ts
   ```
 
-## 8. Decisiones que necesito de ti
+## 8. Decisiones
 
-1. **Modelo.** Por defecto queda `claude-opus-5-5`, que es lo que recomienda Anthropic. Para esta
-   tarea un modelo más pequeño puede bastar: `claude-haiku-5-5` cuesta 40 veces menos por token
-   (USD 0,10 frente a 4,00 por millón de tokens de entrada). La decisión es tuya; se cambia con
-   `CLAUDE_MODEL`, sin tocar código.
+1. **Modelo: `claude-opus-5-5`** (decidido el 21 de octubre de 2026). Si el costo pesa,
+   `claude-haiku-5-5` cuesta 40 veces menos por token (USD 0,10 frente a 4,00 por millón de tokens
+   de entrada) y se cambia con `CLAUDE_MODEL`, sin tocar código.
    - Estimación con Opus, sin medir: cerca de USD 0,03 por historia, unos USD 15 por cada 500
      historias.
    - Conviene medirlo con el script antes del piloto.
-2. **Nombres de otras personas.** Hoy se le señalan a la persona y, si los deja, llegan al modelo
-   (que tiene prohibido usarlos en etiquetas). La otra opción es reemplazarlos solos por
-   `[otra persona]`, a costa de que a veces se borre algo que no era un nombre.
-3. **Autorización.** El texto de autorización de datos (versión `v0-borrador-2026-10`) y
-   `/privacidad` dicen que la historia se procesa con un proveedor fuera de Colombia. Falta que el
-   abogado los apruebe y verificar por escrito que el proveedor no entrena con los datos.
-4. **Aprobación.** Cuando apruebes este prompt (o me pidas cambios), se enciende con
-   `IA_PROVEEDOR=claude` y `ANTHROPIC_API_KEY` en Vercel, solo en el servidor.
+2. **Nombres de otras personas: solo se señalan** (decidido el 21 de octubre de 2026). Si la
+   persona los deja, llegan al modelo, que tiene prohibido usarlos en etiquetas. Reemplazarlos
+   automáticamente queda descartado por ahora.
+3. **Autorización: pendiente.** El texto de autorización de datos (versión `v0-borrador-2026-10`)
+   y `/privacidad` dicen que la historia se procesa con un proveedor fuera de Colombia. Falta que
+   el abogado los apruebe y verificar por escrito que el proveedor no entrena con los datos. Esto
+   bloquea las historias reales, no las inventadas.
+4. **Cómo encenderla.** En Vercel → Settings → Environment Variables, solo en el servidor (nunca
+   con prefijo `NEXT_PUBLIC_`):
+   - `IA_PROVEEDOR` = `claude`
+   - `ANTHROPIC_API_KEY` = la llave, de tipo *Sensitive*
+   - `CLAUDE_MODEL` puede quedar vacía: usa `claude-opus-5-5`.
+
+   Después, Redeploy. Primero con historias inventadas (`scripts/probar-ia.ts`); con historias
+   reales, solo cuando el punto 3 esté resuelto.

@@ -2,8 +2,9 @@
 
 Rama `hito-3-perfil-huella`. Criterios de listo del brief:
 
-- [ ] **Una historia real produce etiquetas que la persona reconoce.** Falta: la IA está apagada
-      hasta que se apruebe el prompt (`docs/prompt-extraccion.md`) y haya llave y cuentas.
+- [ ] **Una historia real produce etiquetas que la persona reconoce.** El prompt quedó aprobado
+      el 21 de octubre de 2026 (`docs/prompt-extraccion.md`). Falta la llave de Claude, las cuentas
+      de Supabase y el visto bueno del abogado a la autorización de datos.
 - [ ] **La persona elige su tarifa viendo el rango sin pedir ayuda.** Falta que el equipo defina
       los rangos en `rate_guides`. Mientras tanto la pantalla lo dice y ofrece la orientación del
       equipo.
@@ -87,6 +88,9 @@ Rama `hito-3-perfil-huella`. Criterios de listo del brief:
 
 ## Antes del hito 4
 
-1. Aprobar el prompt o pedir cambios (`docs/prompt-extraccion.md`, sección 8).
+1. ~~Aprobar el prompt~~: aprobado el 21 de octubre de 2026, con `claude-opus-5-5` y los nombres
+   de otras personas solo señalados.
 2. Que el equipo revise la taxonomía semilla y defina los rangos de tarifa.
 3. Cuentas de Supabase, Twilio y Resend para probar los hitos 2 y 3 de punta a punta.
+4. Llave de Claude y prueba con historias inventadas (`scripts/probar-ia.ts`).
+5. Visto bueno del abogado a la autorización de datos, antes de procesar historias reales.
