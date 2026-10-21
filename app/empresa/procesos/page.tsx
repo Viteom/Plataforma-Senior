@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EstadoConexion } from "@/components/empresa/estado";
+import { TEXTO_FORMATO, TEXTO_SOLICITUD } from "@/components/experiencias/textos";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { listarConexiones } from "@/lib/datos/consultas";
+import { listarSolicitudes } from "@/lib/datos/experiencias";
 import { MODO_DEMO } from "@/lib/demo";
+import { pesos } from "@/lib/formas";
 
 import { cerrarConexion } from "../acciones";
 
@@ -20,11 +23,11 @@ const ESTADO_NECESIDAD = {
 const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-CO", { day: "numeric", month: "long" });
 
 export default async function Procesos() {
-  const { conexiones, perfiles, necesidades } = await listarConexiones();
+  const [{ conexiones, perfiles, necesidades }, solicitudes] = await Promise.all([listarConexiones(), listarSolicitudes()]);
   const directas = conexiones.filter((c) => c.origen === "exploracion");
 
   return (
-    <Pantalla titulo="Mis procesos" intro="Sus búsquedas por problema y los perfiles que pidió conocer.">
+    <Pantalla titulo="Mis procesos" intro="Sus búsquedas, los perfiles que pidió conocer y sus experiencias.">
       <section aria-labelledby="busquedas" className="flex flex-col gap-3">
         <h2 id="busquedas" className="text-xl">
           Búsquedas por problema
@@ -67,7 +70,7 @@ export default async function Procesos() {
               return (
                 <li key={c.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <Link href={`/empresa/perfil/${c.talent_id}`} className="text-lg font-bold underline-offset-4 hover:underline">
+                    <Link href={`/empresa/perfil/${c.talent_id}`} className="inline-flex min-h-tap items-center text-lg font-bold underline underline-offset-4">
                       {nombre}
                     </Link>
                     <span className="text-base text-text-muted">{fecha(c.actualizado_en)}</span>
@@ -103,6 +106,44 @@ export default async function Procesos() {
             Todavía no ha pedido conocer a nadie.{" "}
             <Link href="/empresa/explorar" className="font-bold text-text underline underline-offset-4">
               Explorar perfiles
+            </Link>
+          </p>
+        )}
+      </section>
+      <section aria-labelledby="experiencias" className="flex flex-col gap-3">
+        <h2 id="experiencias" className="text-xl">
+          Experiencias con saberes
+        </h2>
+        {solicitudes.length ? (
+          <ul className="flex flex-col gap-3">
+            {solicitudes.map((s) => (
+              <li key={s.id} className="flex flex-col gap-2 rounded-md border-2 border-border-subtle p-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <span className="text-lg font-bold">{s.experiencia}</span>
+                  <span className="text-base text-text-muted">{fecha(s.creado_en)}</span>
+                </div>
+                <p className="text-base">
+                  {TEXTO_FORMATO[s.formato]} · {s.personas} personas · {s.mes}
+                </p>
+                <p className="font-bold">{TEXTO_SOLICITUD[s.estado]}</p>
+                {s.valor_cotizado !== null && <p>Valor cotizado: {pesos(s.valor_cotizado)}</p>}
+                {s.impacto && (
+                  <div className="rounded-md bg-surface p-4">
+                    <p className="font-bold">Reporte de impacto</p>
+                    <p>
+                      {s.impacto.personas_impactadas} personas de su equipo participaron durante {s.impacto.horas} horas. La sabedora o
+                      el sabedor recibió {pesos(s.impacto.pago_persona)}.
+                    </p>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-text-muted">
+            Todavía no ha pedido una experiencia.{" "}
+            <Link href="/empresa/experiencias" className="font-bold text-text underline underline-offset-4">
+              Ver experiencias
             </Link>
           </p>
         )}

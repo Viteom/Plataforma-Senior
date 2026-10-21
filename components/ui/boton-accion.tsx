@@ -16,12 +16,13 @@ type Props = {
   ancho?: "completo" | "auto";
   className?: string;
   children?: React.ReactNode; // campos visibles adicionales
+  repetible?: boolean; // el botón sigue visible después de guardar (editores)
 };
 
 // Un botón que ejecuta una acción del servidor (POST) y muestra el resultado en palabras.
-export function BotonAccion({ accion, campos, texto, textoEnviando = "Guardando…", variant, size, ancho, className, children }: Props) {
+export function BotonAccion({ accion, campos, texto, textoEnviando = "Guardando…", variant, size, ancho, className, children, repetible }: Props) {
   const { estado, enviar, pendiente: enviando, alEnviar } = useAccion<EstadoAccion>(accion, {});
-  const hecho = Boolean(estado.aviso);
+  const hecho = Boolean(estado.aviso) && !repetible;
 
   return (
     <form action={enviar} onSubmit={alEnviar} className={cn("flex flex-col gap-3", className)}>

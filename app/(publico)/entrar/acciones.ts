@@ -98,8 +98,10 @@ export async function verificarCodigo(_previo: EstadoEntrar, datos: FormData): P
   const { data: fila } = await supabase.from("user_roles").select("rol").eq("user_id", data.user.id).maybeSingle();
   const rol = (fila?.rol as Rol | undefined) ?? "talento";
 
-  // Primera vez: perfil en 3 pasos. Ya registrado: inicio.
+  // Primera vez: perfil en 3 pasos. Ya registrado: inicio. Si un gestor la registró en campo con
+  // este celular, recibe ese perfil (reclamar_perfil) en vez de empezar de cero.
   if (rol === "talento") {
+    await supabase.rpc("reclamar_perfil");
     const { data: perfil } = await supabase
       .from("talent_profiles")
       .select("id")

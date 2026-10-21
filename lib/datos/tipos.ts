@@ -71,3 +71,43 @@ export type Oportunidad = {
   modalidad: string | null;
   creado_en: string;
 };
+
+// Fila de experiences (lo público; el equipo ve además el estado y la aprobación).
+export type ExperienciaVista = {
+  id: string;
+  slug: string;
+  nombre: string;
+  proposito: string;
+  sabedora_nombre: string | null;
+  sabedora_pueblo: string | null;
+  temas: string[];
+  para_quien: string | null;
+  beneficios: string[];
+  momentos: { titulo: string; descripcion: string }[];
+  formatos: ("territorio" | "sede")[];
+  lugar: string | null;
+  duracion: string | null;
+  grupo_min: number | null;
+  grupo_max: number | null;
+  precio_desde: number | null;
+  porcentaje_sabedora: number | null;
+  testimonio: string | null;
+  estado: "borrador" | "publicada" | "pausada";
+  aprobada_por_sabedora_en: string | null;
+};
+
+export type EstadoSolicitud = "recibida" | "cotizada" | "confirmada" | "realizada" | "reporte_enviado";
+
+export type SolicitudExperiencia = {
+  id: string;
+  experiencia: string;
+  empresa: string;
+  formato: "territorio" | "sede";
+  personas: number;
+  mes: string;
+  nota: string | null;
+  estado: EstadoSolicitud;
+  valor_cotizado: number | null;
+  creado_en: string;
+  impacto: { personas_impactadas: number; horas: number; pago_persona: number } | null;
+};

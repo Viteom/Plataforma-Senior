@@ -8,6 +8,11 @@ const withSerwist = withSerwistInit({
   disable: process.env.NODE_ENV === "development",
 });
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  experimental: {
+    // El registro asistido envía foto, audio de la historia y firma juntos.
+    serverActions: { bodySizeLimit: "25mb" },
+  },
+};
 
 export default withSerwist(nextConfig);

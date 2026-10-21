@@ -7,6 +7,7 @@ create role authenticated nologin;
 create schema auth;
 create table auth.users (
   id uuid primary key,
+  phone text, -- Supabase lo guarda sin "+": 573001234567
   raw_user_meta_data jsonb not null default '{}'::jsonb
 );
 
