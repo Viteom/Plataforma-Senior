@@ -4,7 +4,10 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
-    alias: { "@": fileURLToPath(new URL("./", import.meta.url)) },
+    alias: {
+      "@": fileURLToPath(new URL("./", import.meta.url)),
+      "server-only": fileURLToPath(new URL("./tests/vacio.ts", import.meta.url)),
+    },
   },
   test: {
     // PGlite arranca Postgres en memoria: la primera vez tarda unos segundos.
