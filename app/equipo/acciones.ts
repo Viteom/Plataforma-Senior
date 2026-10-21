@@ -213,3 +213,139 @@ export async function avisadoPorLlamada(_p: Estado, datos: FormData): Promise<Es
   revalidatePath("/equipo/ayuda");
   return { aviso: "Anotado." };
 }
+
+// ── Experiencias con saberes ────────────────────────────────────────────────
+
+const lineas = (v: FormDataEntryValue | null) =>
+  String(v ?? "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+
+const numero = (v: FormDataEntryValue | null) => {
+  const n = Number(String(v ?? "").replace(/[^\d.]/g, ""));
+  return String(v ?? "").trim() && Number.isFinite(n) ? n : null;
+};
+
+const aSlug = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+
+export async function guardarExperiencia(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = String(datos.get("id") ?? "");
+  const nombre = texto(datos.get("nombre"), 120);
+  const proposito = texto(datos.get("proposito"), 2000);
+  const formatos = datos.getAll("formatos").map(String).filter((f) => f === "territorio" || f === "sede");
+  if (nombre.length < 3) return { error: "Escriba el nombre de la experiencia." };
+  if (proposito.length < 20) return { error: "Cuente el propósito en al menos una frase." };
+  if (!formatos.length) return { error: "Elija al menos un formato." };
+
+  // "Título: descripción" por línea.
+  const momentos = lineas(datos.get("momentos")).map((l) => {
+    const [titulo, ...resto] = l.split(":");
+    return { titulo: titulo.trim(), descripcion: resto.join(":").trim() };
+  });
+  const grupoMin = numero(datos.get("grupo_min"));
+  const grupoMax = numero(datos.get("grupo_max"));
+  if (grupoMin && grupoMax && grupoMax < grupoMin) return { error: "El grupo máximo no puede ser menor que el mínimo." };
+  const porcentaje = numero(datos.get("porcentaje_sabedora"));
+  if (porcentaje !== null && (porcentaje < 0 || porcentaje > 100)) return { error: "El porcentaje para la sabedora va de 0 a 100." };
+
+  const campos = {
+    nombre,
+    proposito,
+    sabedora_nombre: texto(datos.get("sabedora_nombre"), 120) || null,
+    sabedora_pueblo: texto(datos.get("sabedora_pueblo"), 120) || null,
+    para_quien: texto(datos.get("para_quien"), 200) || null,
+    temas: String(datos.get("temas") ?? "").split(",").map((t) => t.trim()).filter(Boolean),
+    beneficios: lineas(datos.get("beneficios")),
+    momentos,
+    formatos,
+    lugar: texto(datos.get("lugar"), 200) || null,
+    duracion: texto(datos.get("duracion"), 80) || null,
+    grupo_min: grupoMin,
+    grupo_max: grupoMax,
+    precio_desde: numero(datos.get("precio_desde")),
+    porcentaje_sabedora: porcentaje,
+    testimonio: texto(datos.get("testimonio"), 1000) || null,
+    // Se guarda la fecha de la aprobación: sin ella la base no deja publicar.
+    aprobada_por_sabedora_en: datos.get("aprobada") === "si" ? new Date().toISOString() : null,
+  };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+
+  if (UUID.test(id)) {
+    const { data: actual } = await supabase.from("experiences").select("estado, aprobada_por_sabedora_en").eq("id", id).single();
+    // Conserva la fecha original si ya estaba aprobada; si se quita la aprobación, deja de estar publicada.
+    const aprobada = campos.aprobada_por_sabedora_en ? (actual?.aprobada_por_sabedora_en ?? campos.aprobada_por_sabedora_en) : null;
+    const estado = !aprobada && actual?.estado === "publicada" ? "borrador" : actual?.estado;
+    const { error } = await supabase.from("experiences").update({ ...campos, aprobada_por_sabedora_en: aprobada, estado }).eq("id", id);
+    if (error) return { error: "No pudimos guardar la experiencia." };
+  } else {
+    const { error } = await supabase.from("experiences").insert({ ...campos, slug: `${aSlug(nombre)}-${crypto.randomUUID().slice(0, 4)}` });
+    if (error) return { error: "No pudimos crear la experiencia." };
+  }
+  revalidatePath("/equipo/experiencias");
+  revalidatePath("/empresa/experiencias");
+  return { aviso: "Guardada." };
+}
+
+export async function cambiarEstadoExperiencia(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = String(datos.get("id") ?? "");
+  const estado = ["borrador", "publicada", "pausada"].includes(String(datos.get("estado"))) ? String(datos.get("estado")) : null;
+  if (!UUID.test(id) || !estado) return { error: "Datos no válidos." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const { error } = await supabase.from("experiences").update({ estado }).eq("id", id);
+  if (error) {
+    return { error: /check/.test(error.message) ? "Falta la aprobación de la sabedora: márquela al editar la experiencia." : "No pudimos cambiar el estado." };
+  }
+  revalidatePath("/equipo/experiencias");
+  revalidatePath("/empresa/experiencias");
+  return { aviso: estado === "publicada" ? "Publicada: ya la ven las empresas." : "Listo." };
+}
+
+const SIGUIENTE_SOLICITUD: Record<string, string> = { recibida: "cotizada", cotizada: "confirmada", confirmada: "realizada" };
+
+export async function avanzarSolicitud(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = String(datos.get("id") ?? "");
+  const actual = String(datos.get("actual") ?? "");
+  const siguiente = SIGUIENTE_SOLICITUD[actual];
+  if (!UUID.test(id) || !siguiente) return { error: "Datos no válidos." };
+  const valor = numero(datos.get("valor"));
+  if (siguiente === "cotizada" && !(valor && valor > 0)) return { error: "Escriba el valor de la cotización." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const cambios = siguiente === "cotizada" ? { estado: siguiente, valor_cotizado: valor } : { estado: siguiente };
+  const { error } = await supabase.from("experience_requests").update(cambios).eq("id", id).eq("estado", actual);
+  if (error) return { error: "No pudimos actualizar la solicitud." };
+  revalidatePath("/equipo/experiencias");
+  return { aviso: "Actualizada. Recuerde avisarle a la empresa por correo o teléfono." };
+}
+
+export async function registrarImpacto(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = String(datos.get("id") ?? "");
+  const personas = numero(datos.get("personas"));
+  const horas = numero(datos.get("horas"));
+  const pago = numero(datos.get("pago"));
+  if (!UUID.test(id)) return { error: "Solicitud no válida." };
+  if (personas === null || horas === null || pago === null) return { error: "Complete personas, horas y pago a la sabedora." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const { error } = await supabase.from("impact_records").insert({
+    experience_request_id: id,
+    personas_impactadas: personas,
+    horas,
+    pago_persona: pago,
+    notas: texto(datos.get("notas"), 1000) || null,
+  });
+  if (error) return { error: "No pudimos guardar el impacto." };
+  await supabase.from("experience_requests").update({ estado: "reporte_enviado" }).eq("id", id);
+  revalidatePath("/equipo/experiencias");
+  return { aviso: "Impacto registrado. La empresa ya ve su reporte en Mis procesos." };
+}

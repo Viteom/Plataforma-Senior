@@ -1,18 +1,21 @@
 import { BookOpenText, MessageCircle, MessagesSquare, Phone } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { BotonVolver } from "@/components/layout/boton-volver";
 import { Pantalla } from "@/components/layout/pantalla";
-import { Pendiente } from "@/components/layout/pendiente";
-import { Button } from "@/components/ui/button";
+import { BotonAccion } from "@/components/ui/boton-accion";
 import { Campo, Input } from "@/components/ui/campo";
-import { Tarjeta } from "@/components/ui/tarjeta";
+
+import { pedirLlamada } from "./acciones";
+import { ChatAyuda } from "./chat";
 
 export const metadata: Metadata = { title: "Ayuda" };
 
-const franjas = ["Mañana (8 a 12)", "Tarde (2 a 6)"];
+// Número público del equipo (no es un dato privado). Sin configurar, se dice que está por definir.
+const WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_EQUIPO ?? "").replace(/\D/g, "");
 
-// Accesible para todos los roles. Sin botón "Ayuda" en el encabezado: ya estamos aquí.
+// Accesible para todos los roles y sin sesión. Sin botón "Ayuda" en el encabezado: ya estamos aquí.
 export default function Ayuda() {
   return (
     <>
@@ -33,56 +36,66 @@ export default function Ayuda() {
                 Llámeme
               </h2>
             </div>
-            <p>Déjenos su número y una persona del equipo le llama.</p>
-            <form method="post" className="flex flex-col gap-5">
+            <p>Déjenos su número y una persona del equipo le llama. No necesita cuenta.</p>
+            <BotonAccion accion={pedirLlamada} campos={{}} texto="Pedir que me llamen" ancho="completo">
               <Campo id="tel-ayuda" etiqueta="Número de celular">
-                {(p) => <Input {...p} type="tel" inputMode="numeric" autoComplete="tel-national" />}
+                {(p) => <Input {...p} name="celular" type="tel" inputMode="numeric" autoComplete="tel-national" />}
               </Campo>
               <fieldset className="flex flex-col gap-2">
                 <legend className="mb-2 text-lg font-bold">¿A qué hora le queda bien?</legend>
-                {franjas.map((f, i) => (
-                  <label key={f} className="flex min-h-tap items-center gap-3 text-lg">
-                    <input type="radio" name="franja" defaultChecked={i === 0} className="size-6 accent-[var(--color-primary)]" />
-                    {f}
+                {[
+                  ["manana", "Mañana (8 a 12)"],
+                  ["tarde", "Tarde (2 a 6)"],
+                ].map(([valor, texto], i) => (
+                  <label key={valor} className="flex min-h-tap items-center gap-3 text-lg">
+                    <input type="radio" name="franja" value={valor} defaultChecked={i === 0} className="size-6 accent-[var(--color-primary)]" />
+                    {texto}
                   </label>
                 ))}
               </fieldset>
-              <Button type="button" ancho="completo">
-                Pedir que me llamen
-              </Button>
-            </form>
+              <Campo id="motivo-ayuda" etiqueta="¿Sobre qué? (opcional)">
+                {(p) => <Input {...p} name="motivo" maxLength={300} />}
+              </Campo>
+            </BotonAccion>
+          </section>
+
+          <section aria-labelledby="titulo-chat" className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <MessagesSquare aria-hidden className="size-7" />
+              <h2 id="titulo-chat" className="text-xl">
+                Escribir en el chat
+              </h2>
+            </div>
+            <ChatAyuda />
           </section>
 
           <section aria-labelledby="otras" className="flex flex-col gap-3">
             <h2 id="otras" className="text-xl">
               Otras formas
             </h2>
-            <Canal icono={<MessagesSquare aria-hidden className="size-7" />} titulo="Escribir en el chat">
-              Le respondemos paso a paso. Si no le entendemos, le pasamos con una persona.
-            </Canal>
-            <Canal icono={<MessageCircle aria-hidden className="size-7" />} titulo="WhatsApp del equipo">
-              Número por definir.
-            </Canal>
-            <Canal icono={<BookOpenText aria-hidden className="size-7" />} titulo="Guía paso a paso">
-              Cómo entrar, crear su perfil y contar su historia.
-            </Canal>
+            <div className="flex items-start gap-4 rounded-md border-2 border-border-subtle p-5">
+              <MessageCircle aria-hidden className="size-7 shrink-0" />
+              <div className="flex flex-col gap-1">
+                <h3 className="text-lg">WhatsApp del equipo</h3>
+                {WHATSAPP ? (
+                  <a href={`https://wa.me/${WHATSAPP}`} className="inline-flex min-h-tap items-center font-bold underline underline-offset-4">
+                    Escribir por WhatsApp
+                  </a>
+                ) : (
+                  <p className="text-text-muted">Número por definir.</p>
+                )}
+              </div>
+            </div>
+            <Link href="/ayuda/guia" className="flex items-start gap-4 rounded-md border-2 border-border-subtle p-5 transition-colors duration-150 hover:border-text">
+              <BookOpenText aria-hidden className="size-7 shrink-0" />
+              <span className="flex flex-col gap-1">
+                <span className="text-lg font-bold">Guía paso a paso</span>
+                <span className="text-text-muted">Cómo entrar, crear su perfil, contar su historia y cuidarse de estafas.</span>
+              </span>
+            </Link>
           </section>
-
-          <Pendiente hito={5}>Chat con asistente, solicitudes de llamada y guía.</Pendiente>
         </Pantalla>
       </main>
     </>
-  );
-}
-
-function Canal({ icono, titulo, children }: { icono: React.ReactNode; titulo: string; children: React.ReactNode }) {
-  return (
-    <Tarjeta className="flex-row items-start gap-4">
-      {icono}
-      <div className="flex flex-col gap-1">
-        <h3 className="text-lg">{titulo}</h3>
-        <p className="text-text-muted">{children}</p>
-      </div>
-    </Tarjeta>
   );
 }

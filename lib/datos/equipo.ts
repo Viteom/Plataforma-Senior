@@ -20,30 +20,31 @@ async function cliente() {
   return supabase;
 }
 
-export type Conteos = { necesidades: number; empresas: number; evidencias: number; reportes: number; ayuda: number; avisos: number };
+export type Conteos = { necesidades: number; empresas: number; evidencias: number; reportes: number; ayuda: number; avisos: number; cotizaciones: number };
 export type NecesidadEnCola = { id: string; problema: string; empresa: string; creado_en: string };
 
 export async function panelEquipo(): Promise<{ conteos: Conteos; cola: NecesidadEnCola[] }> {
   if (MODO_DEMO) {
     return {
-      conteos: { necesidades: 1, empresas: 1, evidencias: 2, reportes: 0, ayuda: 3, avisos: 1 },
+      conteos: { necesidades: 1, empresas: 1, evidencias: 2, reportes: 0, ayuda: 3, avisos: 1, cotizaciones: 1 },
       cola: [{ id: necesidadEjemplo.id, problema: necesidadEjemplo.problema, empresa: "Alimentos del Oriente SAS", creado_en: necesidadEjemplo.creado_en }],
     };
   }
   const supabase = await cliente();
   const cuenta = { count: "exact" as const, head: true };
-  const [r1, r2, r3, r4, r5, r6, { data: cola }] = await Promise.all([
+  const [r1, r2, r3, r4, r5, r6, r7, { data: cola }] = await Promise.all([
     supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
     supabase.from("companies").select("*", cuenta).is("verificada_en", null),
     supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
     supabase.from("company_reports").select("*", cuenta).eq("estado", "abierto"),
     supabase.from("help_requests").select("*", cuenta).eq("estado", "abierta"),
     supabase.from("notifications").select("*", cuenta).in("estado", ["pendiente", "omitido"]),
+    supabase.from("experience_requests").select("*", cuenta).eq("estado", "recibida"),
     supabase.from("needs").select("id, problema, creado_en, companies(nombre)").eq("estado", "en_curaduria").order("creado_en"),
   ]);
-  const [necesidades, empresas, evidencias, reportes, ayuda, avisos] = [r1, r2, r3, r4, r5, r6].map((r) => r.count ?? 0);
+  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones] = [r1, r2, r3, r4, r5, r6, r7].map((r) => r.count ?? 0);
   return {
-    conteos: { necesidades, empresas, evidencias, reportes, ayuda, avisos },
+    conteos: { necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones },
     cola: (cola ?? []).map((n) => ({
       id: n.id as string,
       problema: n.problema as string,

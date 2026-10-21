@@ -8,7 +8,15 @@ export const MODO_DEMO = !supabaseConfigurado;
 
 // Las formas de contratar viven en lib/formas.ts; se reexportan para las pantallas de ejemplo.
 export { formasContratar, type FormaContratar } from "@/lib/formas";
-import type { ConexionEmpresa, MiEmpresa, NecesidadVista, Oportunidad, PerfilVista } from "@/lib/datos/tipos";
+import type {
+  ConexionEmpresa,
+  ExperienciaVista,
+  MiEmpresa,
+  NecesidadVista,
+  Oportunidad,
+  PerfilVista,
+  SolicitudExperiencia,
+} from "@/lib/datos/tipos";
 
 // Perfiles como los ve una empresa (misma forma que company_talent_view).
 export const perfilesEjemplo: PerfilVista[] = [
@@ -163,21 +171,46 @@ export const oportunidadesEjemplo: Oportunidad[] = [
   },
 ];
 
-export const experienciaEjemplo = {
+// Primera experiencia del brief, como borrador: los datos que faltan se muestran "Por definir".
+export const experienciaEjemplo: ExperienciaVista = {
+  id: "00000000-0000-4000-9400-000000000001",
   slug: "ceremonia-del-cuidado",
   nombre: "Ceremonia del cuidado",
-  estado: "borrador" as const,
   proposito:
     "A través del tejido, encarna el cuidado y abre la conversación sobre cómo esa labor ha recaído históricamente en las mujeres y sobre la importancia de que quienes cuidan también sean cuidadas.",
-  paraQuien: "Equipos de enfermería y cuidado",
+  sabedora_nombre: null,
+  sabedora_pueblo: null,
   temas: ["Cuidado", "Tejido", "Bienestar de equipos"],
-  formatos: ["En el territorio", "En su sede"],
-  // Lo que el brief marca como pendiente se muestra como "Por definir".
-  sabedora: null as string | null,
-  duracion: null as string | null,
-  grupo: null as string | null,
-  precioDesde: null as string | null,
+  para_quien: "Equipos de enfermería y cuidado",
+  beneficios: ["Conversación sobre el cuidado de quienes cuidan", "Un espacio de pausa para el equipo"],
+  momentos: [],
+  formatos: ["territorio", "sede"],
+  lugar: null,
+  duracion: null,
+  grupo_min: null,
+  grupo_max: null,
+  precio_desde: null,
+  porcentaje_sabedora: null,
+  testimonio: null,
+  estado: "borrador",
+  aprobada_por_sabedora_en: null,
 };
+
+export const solicitudesEjemplo: SolicitudExperiencia[] = [
+  {
+    id: "00000000-0000-4000-9500-000000000001",
+    experiencia: "Ceremonia del cuidado",
+    empresa: "Clínica del Oriente",
+    formato: "sede",
+    personas: 20,
+    mes: "Noviembre",
+    nota: "Para el equipo de enfermería del turno de la noche.",
+    estado: "cotizada",
+    valor_cotizado: 2_800_000,
+    creado_en: "2026-10-20T15:00:00Z",
+    impacto: null,
+  },
+];
 
 // Taxonomía mínima para el modo demostración (la real vive en la migración de taxonomía semilla).
 export const taxonomiaEjemplo: { id: string; capa: "situaciones" | "contexto" | "escala" | "oficio" | "normas" | "transferir"; etiqueta: string; sinonimos: string[] }[] = [

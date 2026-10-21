@@ -126,3 +126,27 @@ export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estad
   }
   redirect(`/empresa/problema/${necesidad.id}`);
 }
+
+// Solicitud de cotización de una experiencia. En v1 no hay pagos en línea: el equipo cotiza y
+// confirma por fuera, y lo registra en su panel.
+export async function pedirCotizacion(_p: Estado, datos: FormData): Promise<Estado> {
+  const experiencia = String(datos.get("experiencia") ?? "");
+  const formato = datos.get("formato") === "territorio" ? "territorio" : "sede";
+  const personas = Number(datos.get("personas"));
+  const mes = texto(datos.get("mes"), 20);
+  const nota = texto(datos.get("nota"), 1000) || null;
+  if (!UUID.test(experiencia)) return { error: "Experiencia no válida." };
+  if (!Number.isInteger(personas) || personas < 1 || personas > 500) return { error: "Escriba cuántas personas, de 1 a 500." };
+  if (!mes) return { error: "Elija el mes." };
+  if (MODO_DEMO) return DEMO;
+
+  const { supabase } = await sesion();
+  const { data: empresa } = await supabase.rpc("mi_empresa");
+  if (!empresa) return { error: "Primero registre los datos de su empresa en «Mi empresa»." };
+  const { error } = await supabase
+    .from("experience_requests")
+    .insert({ experience_id: experiencia, company_id: empresa, formato, personas, mes, nota });
+  if (error) return { error: mensaje(error) };
+  revalidatePath("/empresa/procesos");
+  return { aviso: "Listo. Le enviamos la cotización en los próximos días hábiles. La verá en Mis procesos." };
+}
