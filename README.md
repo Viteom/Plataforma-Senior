@@ -29,11 +29,11 @@ el hito 2.
 Hito 2 (acceso y roles, en `main`): roles, reglas por fila, vista anónima para empresas y
 entrada con código lista para conectar. Ver [docs/hito-2.md](docs/hito-2.md).
 
-Hito 3 (perfil y huella, rama `hito-3-perfil-huella`): perfil en 3 pasos que guarda, historia
-escrita o dictada, capa de IA apagada hasta aprobar el prompt, evidencias, guía de tarifas y Mi
+Hito 3 (perfil y huella, en `main`): perfil en 3 pasos que guarda, historia
+escrita o dictada, capa de IA apagada (de pago; prompt aprobado), evidencias, guía de tarifas y Mi
 perfil. Ver [docs/hito-3.md](docs/hito-3.md) y [docs/prompt-extraccion.md](docs/prompt-extraccion.md).
 
-Hito 4 (empresa y conexiones, rama `hito-4-empresa-conexiones`, sobre el hito 3): explorar con
+Hito 4 (empresa y conexiones, en `main`): explorar con
 datos reales, buscar por un problema, puntaje v1 sin IA, curaduría, conexiones con doble
 aceptación, verificación de empresas, reportes, evidencias y cola de avisos. Ver
 [docs/hito-4.md](docs/hito-4.md).
