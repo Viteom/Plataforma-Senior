@@ -38,7 +38,7 @@ datos reales, buscar por un problema, puntaje v1 sin IA, curaduría, conexiones 
 aceptación, verificación de empresas, reportes, evidencias y cola de avisos. Ver
 [docs/hito-4.md](docs/hito-4.md).
 
-Hito 5 (experiencias, ayuda y gestor, en la rama `hito-5-experiencias-ayuda`): catálogo y
+Hito 5 (experiencias, ayuda y gestor, en `main`): catálogo y
 cotización de experiencias con saberes, registro asistido del gestor sin señal, chat de ayuda sin
 IA, «Llámeme» atendido por el equipo, Aprende y Emprende. Sin servicios de pago. Ver
 [docs/hito-5.md](docs/hito-5.md).

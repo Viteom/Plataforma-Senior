@@ -1,6 +1,6 @@
 # Hito 5: experiencias, ayuda y gestor
 
-Rama `hito-5-experiencias-ayuda`, construida sobre `main` (hitos 1 a 4). Todo funciona sin
+En `main` desde el 21 oct 2026 (rama `hito-5-experiencias-ayuda`). Todo funciona sin
 servicios de pago: no usa la API de Claude, ni SMS, ni correos automáticos. Criterios de listo
 del brief:
 
