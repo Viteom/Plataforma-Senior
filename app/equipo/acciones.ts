@@ -349,3 +349,58 @@ export async function registrarImpacto(_p: Estado, datos: FormData): Promise<Est
   revalidatePath("/equipo/experiencias");
   return { aviso: "Impacto registrado. La empresa ya ve su reporte en Mis procesos." };
 }
+
+// ── Etiquetas nuevas ────────────────────────────────────────────────────────
+
+// Aprobar deja que las empresas la vean. «Sumar a la lista» además la vuelve opción para todas
+// las personas y la conecta con la taxonomía (así cuenta en el puntaje).
+export async function revisarEtiqueta(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = String(datos.get("id") ?? "");
+  const decision = String(datos.get("decision") ?? "");
+  if (!UUID.test(id) || !["aprobar", "sumar", "quitar"].includes(decision)) return { error: "Etiqueta no válida." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+
+  if (decision === "quitar") {
+    const { error } = await supabase.from("footprint_tags").delete().eq("id", id);
+    if (error) return { error: "No pudimos quitarla." };
+    revalidatePath("/equipo/etiquetas");
+    return { aviso: "Quitada del perfil." };
+  }
+
+  const { data: etiqueta } = await supabase.from("footprint_tags").select("capa, etiqueta").eq("id", id).maybeSingle();
+  if (!etiqueta) return { error: "Esa etiqueta ya no existe." };
+  // Lo que ven las empresas no puede revelar la edad (regla 1).
+  if (/\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b|\d{5,}|@/i.test(etiqueta.etiqueta as string)) {
+    return { error: "Tiene edad, fechas o datos de contacto. Quítela." };
+  }
+
+  let taxonomyId: string | null = null;
+  if (decision === "sumar") {
+    const { data: existente } = await supabase
+      .from("taxonomy")
+      .select("id")
+      .eq("capa", etiqueta.capa)
+      .ilike("etiqueta", etiqueta.etiqueta as string)
+      .maybeSingle();
+    if (existente) {
+      taxonomyId = existente.id as string;
+    } else {
+      const { data: nueva, error } = await supabase
+        .from("taxonomy")
+        .insert({ capa: etiqueta.capa, etiqueta: etiqueta.etiqueta })
+        .select("id")
+        .single();
+      if (error || !nueva) return { error: "No pudimos sumarla a la lista." };
+      taxonomyId = nueva.id as string;
+    }
+  }
+
+  const { error } = await supabase
+    .from("footprint_tags")
+    .update({ aprobada_en: new Date().toISOString(), ...(taxonomyId ? { taxonomy_id: taxonomyId } : {}) })
+    .eq("id", id);
+  if (error) return { error: "No pudimos aprobarla." };
+  revalidatePath("/equipo/etiquetas");
+  return { aviso: decision === "sumar" ? "Aprobada y sumada a la lista." : "Aprobada." };
+}

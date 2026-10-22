@@ -155,6 +155,43 @@ export async function subirArchivo(_p: Estado, datos: FormData): Promise<Estado>
   return { aviso: "Listo. El equipo lo revisará antes de mostrarlo." };
 }
 
+// Foto del perfil. Solo la ven las empresas si el perfil es visible o si la persona aceptó
+// conocerlas; nunca entra al puntaje (regla 1).
+const TIPOS_FOTO = ["image/jpeg", "image/png", "image/webp"];
+const MAX_FOTO = 5 * 1024 * 1024;
+
+export async function subirFoto(_p: Estado, datos: FormData): Promise<Estado> {
+  const archivo = datos.get("foto");
+  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elija una foto." };
+  if (!TIPOS_FOTO.includes(archivo.type)) return { error: "Solo fotos JPG, PNG o WebP." };
+  if (archivo.size > MAX_FOTO) return { error: "La foto pesa más de 5 MB. Intente con una más liviana." };
+
+  const { supabase, perfil } = await sesion();
+  const { data: actual } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
+  const extension = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[archivo.type];
+  // Nombre nuevo en cada cambio: así ningún celular se queda mostrando la foto anterior.
+  const ruta = `${perfil.id}/foto-${crypto.randomUUID()}.${extension}`;
+  const { error: errorSubida } = await supabase.storage.from("fotos").upload(ruta, archivo, { contentType: archivo.type });
+  if (errorSubida) return { error: ERROR };
+
+  const { error } = await supabase.from("talent_profiles").update({ foto_path: ruta }).eq("id", perfil.id);
+  if (error) {
+    await supabase.storage.from("fotos").remove([ruta]);
+    return { error: ERROR };
+  }
+  if (actual?.foto_path) await supabase.storage.from("fotos").remove([actual.foto_path as string]);
+  revalidatePath("/mi-perfil");
+  return { aviso: "Foto guardada." };
+}
+
+export async function quitarFoto() {
+  const { supabase, perfil } = await sesion();
+  const { data: actual } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
+  await supabase.from("talent_profiles").update({ foto_path: null }).eq("id", perfil.id);
+  if (actual?.foto_path) await supabase.storage.from("fotos").remove([actual.foto_path as string]);
+  revalidatePath("/mi-perfil");
+}
+
 export async function borrarEvidencia(datos: FormData) {
   const id = String(datos.get("id") ?? "");
   if (!UUID.test(id)) return;
@@ -208,6 +245,8 @@ export async function borrarCuenta(): Promise<Estado> {
   const { data: archivos } = await supabase.from("evidence").select("archivo_path").eq("talent_id", perfil.id).not("archivo_path", "is", null);
   const rutas = (archivos ?? []).map((a) => a.archivo_path as string);
   if (rutas.length) await supabase.storage.from("evidencias").remove(rutas);
+  const { data: conFoto } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
+  if (conFoto?.foto_path) await supabase.storage.from("fotos").remove([conFoto.foto_path as string]);
 
   // Borra el perfil y, en cascada, ofertas, historias, huella, evidencias y datos privados.
   const { error } = await supabase.from("talent_profiles").delete().eq("id", perfil.id);

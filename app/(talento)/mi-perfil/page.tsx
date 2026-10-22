@@ -6,16 +6,15 @@ import { redirect } from "next/navigation";
 import { BotonSalir } from "@/components/layout/boton-salir";
 import { Pantalla } from "@/components/layout/pantalla";
 import { Button } from "@/components/ui/button";
-import { nombreCapa } from "@/lib/capas";
+import { nombreCapa, ORDEN_CAPAS } from "@/lib/capas";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import { MODO_DEMO } from "@/lib/demo";
 import type { GuiaTarifa } from "@/lib/formas";
-import { CAPAS, type Capa } from "@/lib/ia/tipos";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 import { cambiarEstado, cambiarVisibilidad, quitarEtiqueta } from "./acciones";
 import { MiPerfilDemo } from "./demo";
-import { Seccion, SeccionDatos, SeccionEvidencias, SeccionFormas, SeccionMisDatos, Visibilidad } from "./secciones";
+import { Seccion, SeccionDatos, SeccionEvidencias, SeccionFormas, SeccionFoto, SeccionMisDatos, Visibilidad } from "./secciones";
 
 export const metadata: Metadata = { title: "Mi perfil" };
 
@@ -30,14 +29,14 @@ export default async function MiPerfil() {
 
   const { data: perfil } = await supabase
     .from("talent_profiles")
-    .select("id, nombre, ubicacion, oficio, resumen, visibilidad, estado")
+    .select("id, nombre, ubicacion, oficio, resumen, visibilidad, estado, foto_path")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!perfil) redirect("/perfil/nuevo");
 
   const [{ data: ofertas }, { data: etiquetas }, { data: evidencias }, { data: guias }] = await Promise.all([
     supabase.from("talent_offers").select("tipo, horas_semana, modalidad, tarifa_esperada, quiere_orientacion").eq("talent_id", perfil.id),
-    supabase.from("footprint_tags").select("id, capa, etiqueta").eq("talent_id", perfil.id).eq("confirmada", true).order("etiqueta"),
+    supabase.from("footprint_tags").select("id, capa, etiqueta, taxonomy_id, aprobada_en").eq("talent_id", perfil.id).eq("confirmada", true).order("etiqueta"),
     supabase
       .from("evidence")
       .select("id, tipo, descripcion, referencia_nombre, estado, autorizada_empresas")
@@ -47,6 +46,10 @@ export default async function MiPerfil() {
   ]);
 
   const reservado = perfil.visibilidad === "reservado";
+  // Enlace firmado por 10 minutos: el bucket es privado y solo la persona y el equipo lo leen.
+  const fotoUrl = perfil.foto_path
+    ? ((await supabase.storage.from("fotos").createSignedUrl(perfil.foto_path, 600)).data?.signedUrl ?? null)
+    : null;
   const buscaron = (await listarOportunidades()).filter((o) => o.estado !== "enviada_talento" && o.estado !== "descarta");
 
   return (
@@ -82,21 +85,24 @@ export default async function MiPerfil() {
         )}
       </Seccion>
 
+      <SeccionFoto fotoUrl={fotoUrl} reservado={reservado} />
+
       <SeccionDatos datos={{ nombre: perfil.nombre, ubicacion: perfil.ubicacion ?? "", oficio: perfil.oficio ?? "", resumen: perfil.resumen }} />
 
       <Seccion titulo="Mi huella de experiencia">
         {etiquetas?.length ? (
-          CAPAS.map((capa) => {
+          ORDEN_CAPAS.map((capa) => {
             const deCapa = (etiquetas ?? []).filter((e) => e.capa === capa);
             if (!deCapa.length) return null;
             return (
               <div key={capa} className="flex flex-col gap-2">
-                <h3 className="text-lg">{nombreCapa[capa as Capa]}</h3>
+                <h3 className="text-lg">{nombreCapa[capa]}</h3>
                 <ul className="flex flex-wrap gap-2">
                   {deCapa.map((e) => (
                     <li key={e.id}>
                       <form action={quitarEtiqueta} className="inline-flex min-h-tap items-center gap-1 rounded-sm border-2 border-text pl-3">
                         <span className="font-bold">{e.etiqueta}</span>
+                        {!e.taxonomy_id && !e.aprobada_en && <span className="text-sm text-text-muted">(la revisa el equipo)</span>}
                         <input type="hidden" name="id" value={e.id} />
                         <button type="submit" aria-label={`Quitar ${e.etiqueta}`} className="flex size-tap items-center justify-center hover:bg-surface">
                           <X aria-hidden className="size-5" />

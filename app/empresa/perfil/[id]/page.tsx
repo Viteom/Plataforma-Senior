@@ -6,11 +6,10 @@ import { EstadoConexion } from "@/components/empresa/estado";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { Etiqueta } from "@/components/ui/etiqueta";
-import { nombreCapa } from "@/lib/capas";
+import { nombreCapaEmpresa, ORDEN_CAPAS } from "@/lib/capas";
 import { obtenerMiEmpresa, obtenerPerfil } from "@/lib/datos/consultas";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, modalidades, pesos } from "@/lib/formas";
-import { CAPAS } from "@/lib/ia/tipos";
 
 import { pedirConexion, quieroConocer } from "../../acciones";
 
@@ -62,18 +61,23 @@ export default async function FichaPerfil({ params }: { params: Promise<{ id: st
             </p>
           </div>
         )}
+        {perfil.identidad_visible && perfil.foto_url && (
+          // Enlace firmado de Storage que vence en minutos: no pasa por el optimizador de imágenes.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={perfil.foto_url} alt={`Foto de ${perfil.nombre ?? "esta persona"}`} className="size-36 rounded-full border-2 border-border-subtle object-cover" />
+        )}
         {perfil.identidad_visible && perfil.resumen && <p className="max-w-prose text-lg">{perfil.resumen}</p>}
 
         <section aria-labelledby="huella" className="flex flex-col gap-6">
           <h2 id="huella" className="text-xl">
             Huella de experiencia
           </h2>
-          {CAPAS.map((capa) => {
+          {ORDEN_CAPAS.map((capa) => {
             const etiquetas = perfil.huella.filter((h) => h.capa === capa);
             if (!etiquetas.length) return null;
             return (
               <div key={capa} className="flex flex-col gap-2">
-                <h3 className="text-lg">{nombreCapa[capa]}</h3>
+                <h3 className="text-lg">{nombreCapaEmpresa[capa]}</h3>
                 <div className="flex flex-wrap gap-2">
                   {etiquetas.map((e) => (
                     <Etiqueta key={e.etiqueta} texto={e.etiqueta} confirmada />

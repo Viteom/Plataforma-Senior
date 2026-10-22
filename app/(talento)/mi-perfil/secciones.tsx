@@ -1,6 +1,6 @@
 "use client";
 
-import { Download, Eye, EyeOff, FileText, Pencil, Phone, Trash2, X } from "lucide-react";
+import { Camera, Download, Eye, EyeOff, FileText, Pencil, Phone, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 import { Tarifas } from "@/components/perfil/tarifas";
@@ -18,7 +18,9 @@ import {
   borrarEvidencia,
   cambiarAutorizacion,
   descargarDatos,
+  quitarFoto,
   subirArchivo,
+  subirFoto,
   type Estado,
 } from "./acciones";
 
@@ -98,6 +100,76 @@ function Dato({ termino, valor }: { termino: string; valor: string }) {
       <dt className="text-base text-text-muted">{termino}</dt>
       <dd className="font-bold">{valor}</dd>
     </div>
+  );
+}
+
+// ── Foto ────────────────────────────────────────────────────────────────────
+
+export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; reservado: boolean }) {
+  const [cambiando, setCambiando] = useState(false);
+  const { estado, enviar, pendiente, alEnviar } = useAccion<Estado>(async (p, d) => {
+    const r = await subirFoto(p, d);
+    if (!r.error) setCambiando(false);
+    return r;
+  }, {});
+
+  return (
+    <Seccion titulo="Mi foto">
+      <p className="text-text-muted">
+        {reservado
+          ? "Las empresas la ven solo cuando usted acepta conocerlas."
+          : "Las empresas la ven junto con su nombre. Una foto de frente, con buena luz, ayuda a que le reconozcan."}
+      </p>
+      <div className="flex flex-wrap items-center gap-5">
+        {fotoUrl ? (
+          // Enlace firmado de Storage que vence en minutos: no pasa por el optimizador de imágenes.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={fotoUrl} alt="Su foto de perfil" className="size-32 rounded-full border-2 border-border-subtle object-cover" />
+        ) : (
+          <div className="flex size-32 items-center justify-center rounded-full border-2 border-dashed border-border bg-surface">
+            <Camera aria-hidden className="size-10 text-text-muted" />
+            <span className="sr-only">Sin foto</span>
+          </div>
+        )}
+        {!cambiando && (
+          <div className="flex flex-wrap gap-3">
+            <Button variant="secundario" size="normal" onClick={() => setCambiando(true)}>
+              <Camera aria-hidden />
+              {fotoUrl ? "Cambiar foto" : "Subir una foto"}
+            </Button>
+            {fotoUrl && (
+              <form action={quitarFoto}>
+                <Button type="submit" variant="suave" size="normal">
+                  <X aria-hidden />
+                  Quitar foto
+                </Button>
+              </form>
+            )}
+          </div>
+        )}
+      </div>
+      {!cambiando && <Mensaje estado={estado} />}
+      {cambiando && (
+        <form action={enviar} onSubmit={alEnviar} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
+          <Campo id="foto" etiqueta="Foto (JPG o PNG, hasta 5 MB)" ayuda="Puede tomarla con el celular en este momento.">
+            {(p) => (
+              <input
+                {...p}
+                name="foto"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className={`${p.className} min-h-action py-3 file:mr-3 file:min-h-tap file:rounded-sm file:border-0 file:bg-surface-strong file:px-3 file:font-bold`}
+              />
+            )}
+          </Campo>
+          <Mensaje estado={estado} />
+          <div className="flex flex-wrap gap-3">
+            <Button type="submit" disabled={pendiente}>{pendiente ? "Subiendo…" : "Guardar foto"}</Button>
+            <Button type="button" variant="enlace" size="normal" onClick={() => setCambiando(false)}>Cancelar</Button>
+          </div>
+        </form>
+      )}
+    </Seccion>
   );
 }
 

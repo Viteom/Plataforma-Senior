@@ -18,6 +18,8 @@ export type PerfilVista = {
   visibilidad: "reservado" | "visible";
   identidad_visible: boolean;
   nombre: string | null;
+  foto_path?: string | null; // la vista solo la trae si la identidad es visible
+  foto_url?: string | null; // enlace firmado de pocos minutos, solo en la ficha
   resumen: string | null;
   oficio: string | null;
   ubicacion: string | null;

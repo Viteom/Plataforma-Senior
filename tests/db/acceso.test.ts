@@ -39,8 +39,9 @@ beforeAll(async () => {
     [perfil.reservado],
   );
   await db.query(
-    `insert into footprint_tags (talent_id, capa, etiqueta, confirmada) values
-       ($1, 'normas', 'INVIMA', true), ($1, 'situaciones', 'Sin confirmar', false)`,
+    `insert into footprint_tags (talent_id, capa, etiqueta, taxonomy_id, confirmada) values
+       ($1, 'normas', 'INVIMA', (select id from taxonomy where capa = 'normas' and etiqueta = 'INVIMA'), true),
+       ($1, 'situaciones', 'Sin confirmar', null, false)`,
     [perfil.reservado],
   );
   await db.query(`insert into talent_offers (talent_id, tipo, horas_semana, modalidad, tarifa_esperada) values ($1, 'proyecto', 15, 'presencial', 90000)`, [perfil.reservado]);

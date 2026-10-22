@@ -1,4 +1,5 @@
 import {
+  Tags,
   BadgeCheck,
   BookOpen,
   Building2,
@@ -37,6 +38,7 @@ export const navEquipo: ItemNav[] = [
   { href: "/equipo", etiqueta: "Curaduría", icono: ClipboardList },
   { href: "/equipo/empresas", etiqueta: "Empresas y reportes", icono: Building2 },
   { href: "/equipo/evidencias", etiqueta: "Evidencias y tarifas", icono: BadgeCheck },
+  { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
   { href: "/equipo/experiencias", etiqueta: "Experiencias", icono: Sparkles },
   { href: "/equipo/ayuda", etiqueta: "Solicitudes de ayuda", icono: Inbox },
   { href: "/gestor/registrar", etiqueta: "Registro asistido", icono: UserRoundPlus },

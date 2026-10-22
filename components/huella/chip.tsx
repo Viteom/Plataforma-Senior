@@ -24,7 +24,7 @@ export function ChipAlternable({ texto, activo, onAlternar, nueva }: Props) {
     >
       {activo ? <Check aria-hidden className="size-5 shrink-0" /> : <Plus aria-hidden className="size-5 shrink-0" />}
       {texto}
-      {nueva && <span className="text-sm font-normal text-text-muted">(nueva)</span>}
+      {nueva && <span className="text-sm font-normal text-text-muted">(la revisa el equipo)</span>}
     </button>
   );
 }

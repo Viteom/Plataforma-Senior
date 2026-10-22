@@ -110,6 +110,17 @@ Para las próximas hay dos maneras:
   las lee directo. Se usan solo a través de funciones.
 - **Leaked password protection:** no aplica, porque la app no usa contraseñas.
 
+## Datos de prueba
+
+`supabase/datos-prueba/cargar.sql` crea:
+- 3 empresas verificadas, todas con «(prueba)» en el nombre.
+- 2 problemas publicados.
+- 3 oportunidades para el perfil de quien prueba: antes de correrlo, cambie
+  `CORREO-DE-LA-PERSONA` por el correo de esa persona.
+- 4 perfiles ficticios, para que «Explorar» tenga a quién mostrar.
+
+`borrar.sql` quita solo eso. Se cargaron el 21 oct 2026.
+
 ## 4. Primer admin
 
 Primero, la persona entra una vez por `/entrar` con su correo. Después, en el editor SQL o por

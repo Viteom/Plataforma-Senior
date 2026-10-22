@@ -6,7 +6,8 @@ import { MODO_DEMO } from "@/lib/demo";
 import { obtenerProveedor } from "@/lib/ia/entorno";
 import { extraerHuella } from "@/lib/ia/extraer";
 import type { EntradaTaxonomia } from "@/lib/ia/huella";
-import type { Capa } from "@/lib/ia/tipos";
+import { MAX_ETIQUETA_LIBRE, problemaEtiquetaLibre } from "@/lib/capas";
+import { CAPAS, type Capa } from "@/lib/ia/tipos";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 // Historia → etiquetas sin confirmar → la persona confirma (brief, "Huella de experiencia").
@@ -133,9 +134,18 @@ export async function confirmarHuella(_previo: { error?: string }, datos: FormDa
   const historiaId = UUID.test(historiaCruda) ? historiaCruda : null;
   const seleccionadas = soloUuid(datos.getAll("seleccionada"));
   const agregadas = soloUuid(datos.getAll("agregada"));
+  const libres: { capa: Capa; texto: string }[] = [];
+  for (const valor of datos.getAll("libre").map(String).slice(0, 30)) {
+    const [capa, ...resto] = valor.split("|");
+    const texto = resto.join("|").replace(/\s+/g, " ").trim();
+    if (!(CAPAS as readonly string[]).includes(capa)) continue;
+    const problema = problemaEtiquetaLibre(texto);
+    if (problema) return { error: `«${texto.slice(0, MAX_ETIQUETA_LIBRE)}»: ${problema}` };
+    libres.push({ capa: capa as Capa, texto });
+  }
 
-  if (!seleccionadas.length && !agregadas.length) {
-    return { error: "Elija al menos una etiqueta que describa su experiencia." };
+  if (!seleccionadas.length && !agregadas.length && !libres.length) {
+    return { error: "Elija o escriba al menos una etiqueta que describa su experiencia." };
   }
   if (MODO_DEMO) redirect("/mi-perfil");
 
@@ -171,6 +181,25 @@ export async function confirmarHuella(_previo: { error?: string }, datos: FormDa
         capa: t.capa,
         etiqueta: t.etiqueta,
         taxonomy_id: t.id,
+        confirmada: true,
+      })),
+    );
+    if (error) return fallo;
+  }
+
+  // Lo escrito con sus palabras: si ya existe en la lista, se usa la de la lista; si no, queda
+  // como etiqueta nueva y el equipo la aprueba antes de que la vea una empresa.
+  if (libres.length) {
+    const { data: tax } = await supabase.from("taxonomy").select("id, capa, etiqueta").in("capa", [...new Set(libres.map((l) => l.capa))]);
+    const enLista = (l: { capa: Capa; texto: string }) =>
+      (tax ?? []).find((t) => t.capa === l.capa && (t.etiqueta as string).toLowerCase() === l.texto.toLowerCase());
+    const { error } = await supabase.from("footprint_tags").insert(
+      libres.map((l) => ({
+        talent_id: perfil.id,
+        story_id: historiaId,
+        capa: l.capa,
+        etiqueta: l.texto,
+        taxonomy_id: (enLista(l)?.id as string | undefined) ?? null,
         confirmada: true,
       })),
     );

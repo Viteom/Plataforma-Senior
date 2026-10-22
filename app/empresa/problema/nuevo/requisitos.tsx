@@ -3,9 +3,8 @@
 import { Check, CircleDot, Plus } from "lucide-react";
 import { useState } from "react";
 
-import { nombreCapa } from "@/lib/capas";
+import { nombreCapaEmpresa, ORDEN_CAPAS } from "@/lib/capas";
 import type { EntradaTaxonomia } from "@/lib/ia/huella";
-import { CAPAS } from "@/lib/ia/tipos";
 import { cn } from "@/lib/utils";
 
 // Elegir requisitos de la taxonomía (sin IA). Cada toque avanza: no → deseable → obligatorio → no.
@@ -28,12 +27,12 @@ export function Requisitos({ taxonomia }: { taxonomia: EntradaTaxonomia[] }) {
       {Object.entries(niveles).map(([id, n]) =>
         n === "no" ? null : <input key={id} type="hidden" name={n} value={id} />,
       )}
-      {CAPAS.filter((c) => c !== "transferir").map((capa) => {
+      {ORDEN_CAPAS.filter((c) => c !== "transferir").map((capa) => {
         const opciones = taxonomia.filter((t) => t.capa === capa);
         if (!opciones.length) return null;
         return (
           <div key={capa} className="flex flex-col gap-2">
-            <h3 className="text-lg">{nombreCapa[capa]}</h3>
+            <h3 className="text-lg">{nombreCapaEmpresa[capa]}</h3>
             <div className="flex flex-wrap gap-2">
               {opciones.map((t) => {
                 const n = nivel(t.id);

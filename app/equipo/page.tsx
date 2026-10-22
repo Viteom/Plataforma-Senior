@@ -17,6 +17,7 @@ export default async function PanelCuraduria() {
     { cuantos: conteos.empresas, que: conteos.empresas === 1 ? "empresa por verificar" : "empresas por verificar", href: "/equipo/empresas" },
     { cuantos: conteos.reportes, que: conteos.reportes === 1 ? "reporte abierto" : "reportes abiertos", href: "/equipo/empresas" },
     { cuantos: conteos.evidencias, que: conteos.evidencias === 1 ? "evidencia por revisar" : "evidencias por revisar", href: "/equipo/evidencias" },
+    { cuantos: conteos.etiquetas, que: conteos.etiquetas === 1 ? "etiqueta nueva por revisar" : "etiquetas nuevas por revisar", href: "/equipo/etiquetas" },
     { cuantos: conteos.ayuda, que: conteos.ayuda === 1 ? "solicitud de ayuda" : "solicitudes de ayuda", href: "/equipo/ayuda" },
     { cuantos: conteos.avisos, que: conteos.avisos === 1 ? "aviso por dar" : "avisos por dar", href: "/equipo/ayuda#avisos" },
     { cuantos: conteos.cotizaciones, que: conteos.cotizaciones === 1 ? "experiencia por cotizar" : "experiencias por cotizar", href: "/equipo/experiencias" },

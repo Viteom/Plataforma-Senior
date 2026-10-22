@@ -3,6 +3,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 
 import { MODO_DEMO, necesidadEjemplo, perfilesEjemplo } from "@/lib/demo";
+import type { Capa } from "@/lib/ia/tipos";
 import { proponer, type TalentoParaMatching } from "@/lib/matching/puntaje";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
@@ -20,19 +21,19 @@ async function cliente() {
   return supabase;
 }
 
-export type Conteos = { necesidades: number; empresas: number; evidencias: number; reportes: number; ayuda: number; avisos: number; cotizaciones: number };
+export type Conteos = { necesidades: number; empresas: number; evidencias: number; reportes: number; ayuda: number; avisos: number; cotizaciones: number; etiquetas: number };
 export type NecesidadEnCola = { id: string; problema: string; empresa: string; creado_en: string };
 
 export async function panelEquipo(): Promise<{ conteos: Conteos; cola: NecesidadEnCola[] }> {
   if (MODO_DEMO) {
     return {
-      conteos: { necesidades: 1, empresas: 1, evidencias: 2, reportes: 0, ayuda: 3, avisos: 1, cotizaciones: 1 },
+      conteos: { necesidades: 1, empresas: 1, evidencias: 2, reportes: 0, ayuda: 3, avisos: 1, cotizaciones: 1, etiquetas: 1 },
       cola: [{ id: necesidadEjemplo.id, problema: necesidadEjemplo.problema, empresa: "Alimentos del Oriente SAS", creado_en: necesidadEjemplo.creado_en }],
     };
   }
   const supabase = await cliente();
   const cuenta = { count: "exact" as const, head: true };
-  const [r1, r2, r3, r4, r5, r6, r7, { data: cola }] = await Promise.all([
+  const [r1, r2, r3, r4, r5, r6, r7, r8, { data: cola }] = await Promise.all([
     supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
     supabase.from("companies").select("*", cuenta).is("verificada_en", null),
     supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
@@ -40,11 +41,12 @@ export async function panelEquipo(): Promise<{ conteos: Conteos; cola: Necesidad
     supabase.from("help_requests").select("*", cuenta).eq("estado", "abierta"),
     supabase.from("notifications").select("*", cuenta).in("estado", ["pendiente", "omitido"]),
     supabase.from("experience_requests").select("*", cuenta).eq("estado", "recibida"),
+    supabase.from("footprint_tags").select("*", cuenta).eq("confirmada", true).is("taxonomy_id", null).is("aprobada_en", null),
     supabase.from("needs").select("id, problema, creado_en, companies(nombre)").eq("estado", "en_curaduria").order("creado_en"),
   ]);
-  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones] = [r1, r2, r3, r4, r5, r6, r7].map((r) => r.count ?? 0);
+  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas] = [r1, r2, r3, r4, r5, r6, r7, r8].map((r) => r.count ?? 0);
   return {
-    conteos: { necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones },
+    conteos: { necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas },
     cola: (cola ?? []).map((n) => ({
       id: n.id as string,
       problema: n.problema as string,
@@ -264,4 +266,29 @@ export async function ayudaYAvisos(): Promise<{ solicitudes: SolicitudAyuda[]; a
       persona: ((a.talent_profiles as unknown as { nombre: string } | null)?.nombre) ?? "",
     })),
   };
+}
+
+export type EtiquetaPorRevisar = { id: string; capa: Capa; etiqueta: string; oficio: string | null };
+
+// Etiquetas escritas por la persona con sus palabras: las empresas no las ven hasta que el equipo
+// las aprueba (puede haber un celular o la edad escritos ahí).
+export async function etiquetasPorRevisar(): Promise<EtiquetaPorRevisar[]> {
+  if (MODO_DEMO) {
+    return [{ id: "00000000-0000-4000-9500-000000000001", capa: "oficio", etiqueta: "Tejido en telar de guanga", oficio: "Tejedora" }];
+  }
+  const supabase = await cliente();
+  const { data } = await supabase
+    .from("footprint_tags")
+    .select("id, capa, etiqueta, talent_profiles(oficio)")
+    .eq("confirmada", true)
+    .is("taxonomy_id", null)
+    .is("aprobada_en", null)
+    .order("capa")
+    .limit(100);
+  return (data ?? []).map((t) => ({
+    id: t.id as string,
+    capa: t.capa as Capa,
+    etiqueta: t.etiqueta as string,
+    oficio: ((t.talent_profiles as unknown as { oficio: string | null } | null)?.oficio) ?? null,
+  }));
 }

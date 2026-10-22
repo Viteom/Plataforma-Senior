@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, PenLine, Phone, ShieldCheck } from "lucide-react";
+import { Mic, PenLine, Phone, Plus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 
@@ -10,10 +10,10 @@ import { Pantalla } from "@/components/layout/pantalla";
 import { Button } from "@/components/ui/button";
 import { Campo, Textarea } from "@/components/ui/campo";
 import { Opcion } from "@/components/ui/opcion";
-import { nombreCapa } from "@/lib/capas";
+import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre } from "@/lib/capas";
 import type { EntradaTaxonomia } from "@/lib/ia/huella";
 import { prepararHistoria } from "@/lib/ia/preparar";
-import { CAPAS } from "@/lib/ia/tipos";
+import type { Capa } from "@/lib/ia/tipos";
 
 import { confirmarHuella, guardarHistoria, type EstadoHuella } from "./acciones";
 
@@ -147,15 +147,18 @@ function Contar({
 }
 
 const MENSAJE_MANUAL = {
-  apagada: "Elija las palabras que describen su experiencia.",
-  cuota: "Hoy ya usó el asistente varias veces. Su historia quedó guardada: elija sus etiquetas de la lista.",
-  error: "El asistente no respondió. Su historia quedó guardada: elija sus etiquetas de la lista.",
+  apagada: "Elija solo lo que se parezca a lo suyo. Si no lo encuentra, escríbalo con sus palabras.",
+  cuota: "Hoy ya usó el asistente varias veces. Su historia quedó guardada: elija sus etiquetas o escríbalas.",
+  error: "El asistente no respondió. Su historia quedó guardada: elija sus etiquetas o escríbalas.",
 };
+
+type Libre = { capa: Capa; texto: string };
 
 function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: EntradaTaxonomia[] }) {
   const propuestas = estado.etiquetas ?? [];
   const [seleccionadas, setSeleccionadas] = useState<string[]>(propuestas.map((e) => e.id));
   const [agregadas, setAgregadas] = useState<string[]>([]);
+  const [libres, setLibres] = useState<Libre[]>([]);
   const [resultado, confirmar, confirmando] = useActionState<{ error?: string }, FormData>(confirmarHuella, {});
   const manual = estado.modo === "manual";
 
@@ -170,7 +173,7 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
       intro={
         manual
           ? MENSAJE_MANUAL[estado.motivoManual ?? "apagada"]
-          : "Quite lo que no sea suyo tocando la etiqueta. Puede agregar otras de la lista."
+          : "Quite lo que no sea suyo tocando la etiqueta. Puede agregar otras o escribirlas con sus palabras."
       }
     >
       <form action={confirmar} className="flex flex-col gap-8">
@@ -181,16 +184,22 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
         {agregadas.map((id) => (
           <input key={id} type="hidden" name="agregada" value={id} />
         ))}
+        {libres.map((l) => (
+          <input key={`${l.capa}:${l.texto}`} type="hidden" name="libre" value={`${l.capa}|${l.texto}`} />
+        ))}
 
-        {CAPAS.map((capa) => {
+        {ORDEN_CAPAS.map((capa) => {
           const deCapa = propuestas.filter((e) => e.capa === capa);
           const opciones = taxonomia.filter((t) => t.capa === capa && !yaPropuestas.has(`${capa}:${t.etiqueta.toLowerCase()}`));
-          if (!deCapa.length && !opciones.length) return null;
+          const propias = libres.filter((l) => l.capa === capa);
           return (
             <section key={capa} aria-labelledby={`capa-${capa}`} className="flex flex-col gap-3">
-              <h2 id={`capa-${capa}`} className="text-lg">
-                {nombreCapa[capa]}
-              </h2>
+              <div>
+                <h2 id={`capa-${capa}`} className="text-lg">
+                  {nombreCapa[capa]}
+                </h2>
+                <p className="text-base text-text-muted">{ayudaCapa[capa]}</p>
+              </div>
               {deCapa.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {deCapa.map((e) => (
@@ -205,7 +214,7 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
                 </div>
               )}
               {opciones.length > 0 && (
-                <details open={manual} className="group">
+                <details open={manual && capa !== "normas"} className="group">
                   <summary className="inline-flex min-h-tap items-center font-bold underline underline-offset-4">
                     {manual ? "Opciones" : "Agregar otra"}
                   </summary>
@@ -221,9 +230,32 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
                   </div>
                 </details>
               )}
+              {propias.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {propias.map((l) => (
+                    <ChipAlternable
+                      key={l.texto}
+                      texto={l.texto}
+                      nueva
+                      activo
+                      onAlternar={() => setLibres((x) => x.filter((y) => !(y.capa === capa && y.texto === l.texto)))}
+                    />
+                  ))}
+                </div>
+              )}
+              <EscribirOtra
+                capa={capa}
+                onAgregar={(texto) =>
+                  setLibres((x) => (x.some((y) => y.capa === capa && y.texto.toLowerCase() === texto.toLowerCase()) ? x : [...x, { capa, texto }]))
+                }
+              />
             </section>
           );
         })}
+
+        <p className="text-base text-text-muted">
+          Lo que escriba con sus palabras lo revisa el equipo antes de que lo vea una empresa.
+        </p>
 
         {estado.dudas && estado.dudas.length > 0 && (
           <div className="flex flex-col gap-2 rounded-md bg-surface p-4">
@@ -251,5 +283,57 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
         </Button>
       </form>
     </Pantalla>
+  );
+}
+
+// Campo para escribir una etiqueta propia. Vive dentro del formulario principal, así que Enter
+// agrega la etiqueta en vez de enviar todo.
+function EscribirOtra({ capa, onAgregar }: { capa: Capa; onAgregar: (texto: string) => void }) {
+  const [texto, setTexto] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const id = `otra-${capa}`;
+
+  const agregar = () => {
+    const limpio = texto.replace(/\s+/g, " ").trim();
+    const problema = problemaEtiquetaLibre(limpio);
+    setError(problema);
+    if (problema) return;
+    onAgregar(limpio);
+    setTexto("");
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className="font-bold">
+        ¿No está? Escríbalo con sus palabras
+      </label>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          id={id}
+          value={texto}
+          maxLength={MAX_ETIQUETA_LIBRE}
+          autoComplete="off"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          onChange={(e) => setTexto(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              agregar();
+            }
+          }}
+          className="min-h-action flex-1 rounded-sm border-2 border-border bg-bg px-4 text-base focus-visible:border-text"
+        />
+        <Button type="button" variant="secundario" onClick={agregar}>
+          <Plus aria-hidden />
+          Agregar
+        </Button>
+      </div>
+      {error && (
+        <p id={`${id}-error`} role="alert" className="font-bold text-danger">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }

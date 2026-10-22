@@ -12,6 +12,7 @@ import {
 } from "@/lib/demo";
 import type { FormaContratar } from "@/lib/formas";
 import { ordenarPorBusqueda } from "@/lib/matching/busqueda";
+import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 import type { ConexionEmpresa, EvidenciaVista, MiEmpresa, NecesidadVista, Oportunidad, PerfilVista } from "./tipos";
@@ -67,8 +68,13 @@ export async function obtenerPerfil(id: string): Promise<{ perfil: PerfilVista; 
     supabase.from("company_connections_view").select("*").eq("talent_id", id).order("actualizado_en", { ascending: false }).limit(1),
   ]);
   if (!perfil) return null;
+  // El bucket de fotos es privado. La vista ya decidió si esta empresa puede ver la foto (perfil
+  // visible o conexión abierta); el enlace firmado lo crea el servidor y vence en 10 minutos.
+  const fotoPath = (perfil as PerfilVista).foto_path;
+  const admin = fotoPath ? crearClienteAdmin() : null;
+  const fotoUrl = admin && fotoPath ? ((await admin.storage.from("fotos").createSignedUrl(fotoPath, 600)).data?.signedUrl ?? null) : null;
   return {
-    perfil: perfil as PerfilVista,
+    perfil: { ...(perfil as PerfilVista), foto_url: fotoUrl },
     evidencias: (evidencias ?? []) as EvidenciaVista[],
     conexion: ((conexiones ?? [])[0] as ConexionEmpresa) ?? null,
   };
