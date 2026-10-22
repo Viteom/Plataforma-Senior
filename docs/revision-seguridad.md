@@ -28,7 +28,10 @@ después alguien puede cambiar sin que la base lo frene.
 Las pruebas están en [`tests/db/seguridad.test.ts`](../tests/db/seguridad.test.ts). Cada una
 describe lo que debería pasar. El 22 de octubre se arreglaron A1, A2 y A3 en `supabase/migrations/20261026000001_seguridad_altos.sql`, y sus 8 pruebas
 quedaron en verde. **Solo sigue fallando, a propósito, la de M3**, hasta que se arregle. La
-migración nueva todavía **no está aplicada en la base real**.
+migración **ya está aplicada en la base real** desde el 22 de octubre: se corrió en el SQL Editor
+y la versión `20261026000001` quedó anotada en `supabase_migrations.schema_migrations`. Después de
+aplicarla, el asesor de seguridad de Supabase mostró los mismos avisos de antes y ninguno nuevo.
+Eso era lo esperado: el asesor no revisa reglas como estas, que se comprueban con las pruebas.
 
 ---
 
