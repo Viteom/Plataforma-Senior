@@ -131,8 +131,8 @@ describe("cargar candidatos", () => {
       id: "t",
       ubicacion: "Rionegro",
       footprint_tags: [
-        { capa: "normas", etiqueta: "INVIMA", taxonomy_id: "n1", confirmada: true },
-        { capa: "normas", etiqueta: "Sin confirmar", taxonomy_id: null, confirmada: false },
+        { capa: "normas", etiqueta: "INVIMA", taxonomy_id: "n1", confirmada: true, aprobada_en: null },
+        { capa: "normas", etiqueta: "Sin confirmar", taxonomy_id: null, confirmada: false, aprobada_en: null },
       ],
       talent_offers: [{ tipo: "proyecto", modalidad: "presencial", tarifa_esperada: 100 }],
       evidence: [
@@ -142,5 +142,21 @@ describe("cargar candidatos", () => {
     });
     expect(c.etiquetas).toHaveLength(1);
     expect(c.evidencias).toEqual({ referenciaVerificada: false, archivoVerificado: false, evaluaciones: [4] });
+  });
+
+  // M3 de docs/revision-seguridad.md: las etiquetas libres pasan por el equipo, también en el puntaje.
+  it("una etiqueta escrita por la persona cuenta solo cuando el equipo la aprobó", async () => {
+    const { aCandidato } = await import("@/lib/matching/cargar");
+    const c = aCandidato({
+      id: "t",
+      ubicacion: null,
+      footprint_tags: [
+        { capa: "oficio", etiqueta: "Copia del requisito de la empresa", taxonomy_id: null, confirmada: true, aprobada_en: null },
+        { capa: "oficio", etiqueta: "Telar de guanga", taxonomy_id: null, confirmada: true, aprobada_en: "2026-10-22T12:00:00Z" },
+      ],
+      talent_offers: [],
+      evidence: [],
+    });
+    expect(c.etiquetas.map((e) => e.etiqueta)).toEqual(["Telar de guanga"]);
   });
 });

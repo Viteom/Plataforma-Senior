@@ -18,7 +18,7 @@ después alguien puede cambiar sin que la base lo frene.
 | A3 | Alta | «Llámeme» sin cuenta permite llenar la base y la cola del equipo | **Arreglado** (22 oct), prueba en verde |
 | M1 | Media | El límite de 5 códigos por hora se salta llamando directo a Supabase | Leyendo el código |
 | M2 | Media (alta al prender SMS) | Reclamar un perfil del gestor no exige que el celular esté confirmado | Leyendo el código; depende de la configuración |
-| M3 | Media | Etiquetas nuevas llegan a las empresas sin revisión del equipo (pueden llevar un celular) | Prueba que falla |
+| M3 | Media | Etiquetas nuevas llegan a las empresas sin revisión del equipo (pueden llevar un celular) | **Arreglado** en la base real (22 oct); en el repositorio falta juntarlo con `huella_inclusiva` |
 | M4 | Media | Faltan cabeceras de seguridad (CSP, antimarco, etc.) | Leyendo el código |
 | M5 | Media | El celular guarda 24 horas las pantallas con datos personales, aun después de «Salir» | Leyendo el código de Serwist |
 | M6 | Media | «Borrar cuenta» deja la foto, el audio de la historia y la autorización | Leyendo el código |
@@ -27,7 +27,8 @@ después alguien puede cambiar sin que la base lo frene.
 
 Las pruebas están en [`tests/db/seguridad.test.ts`](../tests/db/seguridad.test.ts). Cada una
 describe lo que debería pasar. El 22 de octubre se arreglaron A1, A2 y A3 en `supabase/migrations/20261026000001_seguridad_altos.sql`, y sus 8 pruebas
-quedaron en verde. **Solo sigue fallando, a propósito, la de M3**, hasta que se arregle. La
+quedaron en verde. **En esta rama solo falla la de M3**: pasa cuando llegue la migración
+`huella_inclusiva`, que ya la arregla (ver M3). La
 migración **ya está aplicada en la base real** desde el 22 de octubre: se corrió en el SQL Editor
 y la versión `20261026000001` quedó anotada en `supabase_migrations.schema_migrations`. Después de
 aplicarla, el asesor de seguridad de Supabase mostró los mismos avisos de antes y ninguno nuevo.
@@ -120,6 +121,18 @@ Eso era lo esperado: el asesor no revisa reglas como estas, que se comprueban co
 - **Prueba:** `M3 · ...`.
 - **Cómo se arregla:** en la vista, mostrar solo `taxonomy_id is not null`, o agregar una columna
   `aprobada_por_equipo` para las nuevas.
+- **Estado: arreglado en la base real; en el repositorio falta juntar dos partes.**
+  - La migración `20261025000002_huella_inclusiva.sql` es de otro trabajo, el de la huella para
+    todos los oficios. Agrega `aprobada_en`: la vista solo muestra etiquetas de la lista o
+    aprobadas por el equipo, y un trigger le pone a cada etiqueta de la lista su texto oficial
+    para que nadie se salte la revisión. Ya está aplicada en la base real (comprobado el 22 de
+    octubre), pero en `main` todavía no tiene commit.
+  - En esta rama, `lib/matching/cargar.ts` deja de contar en el puntaje las etiquetas libres sin
+    aprobar. Sin eso, a la persona le bastaba copiar el texto de un requisito de la empresa para
+    subir su puntaje. Lo vigila una prueba nueva en `tests/unit/matching.test.ts`.
+  - La prueba `M3 · ...` de `tests/db/seguridad.test.ts` pasa cuando las dos partes están juntas.
+    Se comprobó copiando por un momento esa migración a esta rama, sin commitearla. Mientras
+    `huella_inclusiva` no llegue a esta rama, esa prueba sigue fallando aquí.
 
 ---
 
