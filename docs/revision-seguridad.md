@@ -13,9 +13,9 @@ después alguien puede cambiar sin que la base lo frene.
 
 | # | Gravedad | Hallazgo | Cómo se confirmó |
 |---|---|---|---|
-| A1 | Alta | Una empresa verificada puede cambiarse el nombre y el NIT y conserva el sello | Prueba que falla |
-| A2 | Alta | La persona puede cambiar una evidencia ya verificada y borrar o mejorar la evaluación que le dejó una empresa | Prueba que falla |
-| A3 | Alta | «Llámeme» sin cuenta permite llenar la base y la cola del equipo | Prueba que falla |
+| A1 | Alta | Una empresa verificada puede cambiarse el nombre y el NIT y conserva el sello | **Arreglado** (22 oct), prueba en verde |
+| A2 | Alta | La persona puede cambiar una evidencia ya verificada y borrar o mejorar la evaluación que le dejó una empresa | **Arreglado** (22 oct), prueba en verde |
+| A3 | Alta | «Llámeme» sin cuenta permite llenar la base y la cola del equipo | **Arreglado** (22 oct), prueba en verde |
 | M1 | Media | El límite de 5 códigos por hora se salta llamando directo a Supabase | Leyendo el código |
 | M2 | Media (alta al prender SMS) | Reclamar un perfil del gestor no exige que el celular esté confirmado | Leyendo el código; depende de la configuración |
 | M3 | Media | Etiquetas nuevas llegan a las empresas sin revisión del equipo (pueden llevar un celular) | Prueba que falla |
@@ -25,9 +25,10 @@ después alguien puede cambiar sin que la base lo frene.
 | M7 | Media | Verificar el NIT en el RUES no prueba que quien registra sea de esa empresa | Sospecha de proceso |
 | B1–B8 | Baja | Detalles de defensa en profundidad | Ver abajo |
 
-Las pruebas están en [`tests/db/seguridad.test.ts`](../tests/db/seguridad.test.ts). Hoy **fallan
-las 9 a propósito**: cada una describe lo que debería pasar. Cuando se arregle un hallazgo, su
-prueba pasa a verde. Las 82 pruebas que ya existían siguen pasando.
+Las pruebas están en [`tests/db/seguridad.test.ts`](../tests/db/seguridad.test.ts). Cada una
+describe lo que debería pasar. El 22 de octubre se arreglaron A1, A2 y A3 en `supabase/migrations/20261026000001_seguridad_altos.sql`, y sus 8 pruebas
+quedaron en verde. **Solo sigue fallando, a propósito, la de M3**, hasta que se arregle. La
+migración nueva todavía **no está aplicada en la base real**.
 
 ---
 
@@ -47,6 +48,8 @@ prueba pasa a verde. Las 82 pruebas que ya existían siguen pasando.
 - **Cómo se arregla:** en `proteger_verificacion`, si la empresa ya está verificada, rechazar
   cambios de `nombre` y `nit` que no vengan del equipo. Otra opción es quitar la verificación
   (poner `verificada_en` en null) para que el equipo vuelva a revisar.
+- **Estado: arreglado.** Se eligió rechazar el cambio. Si la empresa necesita corregir su nombre o
+  su NIT, lo hace el equipo después de volver a mirar el RUES.
 
 ### A2 · Alta · Lo verificado se puede cambiar después, y las evaluaciones malas se pueden borrar
 
@@ -68,6 +71,10 @@ prueba pasa a verde. Las 82 pruebas que ya existían siguen pasando.
   `autorizada_empresas`. Si quiere corregir algo, se crea una evidencia nueva que vuelve a revisión.
   Además, `evidencia_borrar` no debe permitir que la persona borre las de `tipo = 'evaluacion'`.
   Ocultarlas sí, con `autorizada_empresas`, si el equipo así lo decide.
+- **Estado: arreglado.** Una evidencia verificada ya no cambia de texto, archivo, referencia ni
+  perfil, y la persona no puede borrar una evaluación (sí se borra si borra todo su perfil).
+  **Queda una decisión para el equipo:** hoy la persona todavía puede ocultarle una evaluación a
+  las empresas con `autorizada_empresas`.
 
 ### A3 · Alta · «Llámeme» sin cuenta sirve para llenar la base
 
@@ -90,6 +97,12 @@ prueba pasa a verde. Las 82 pruebas que ya existían siguen pasando.
      muestra el WhatsApp del equipo.
   3. Al prender producción, poner un CAPTCHA amable (Cloudflare Turnstile, que casi nunca le pide
      nada a la persona) en «Llámeme» y en `/entrar`.
+- **Estado: arreglado (1 y 2).** El motivo de `help_requests` tiene un tope de 500 letras y el
+  teléfono, de 20. Sin cuenta se aceptan máximo 30 pedidos por hora en total. Si se pasa, la
+  pantalla le dice a la persona que escriba por WhatsApp o lo intente en una hora. El CAPTCHA (3)
+  sigue pendiente para producción. Las personas con cuenta todavía pueden crear muchas solicitudes
+  cortas: llenar la base así tomaría cerca de un millón de pedidos, pero conviene ponerles un tope
+  diario más adelante.
 
 ### M3 · Media · Etiquetas nuevas llegan a las empresas sin pasar por el equipo
 
