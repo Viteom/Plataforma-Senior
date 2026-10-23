@@ -57,8 +57,8 @@ export default async function EquipoAyuda() {
         </h2>
         <p className="flex items-start gap-3 rounded-md bg-surface p-4">
           <MessageSquareWarning aria-hidden className="mt-0.5 size-6 shrink-0" />
-          El envío automático de SMS está apagado (es de pago). Llame a estas personas para contarles que tienen una
-          oportunidad nueva, sin decir el nombre de la empresa, y anótelo.
+          El envío automático de SMS está apagado (es de pago). Llama a estas personas para contarles que tienen una
+          oportunidad nueva, sin decir el nombre de la empresa, y anótalo.
         </p>
         {avisos.length ? (
           <ul className="flex flex-col gap-3">

@@ -15,8 +15,8 @@ export function MiPerfilDemo() {
         <div className="flex items-start gap-3">
           <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />
           <p>
-            <span className="font-bold">Reservado.</span> Las empresas ven su experiencia, pero no
-            su nombre ni su foto.
+            <span className="font-bold">Reservado.</span> Las empresas ven tu experiencia, pero no
+            tu nombre ni tu foto.
           </p>
         </div>
         <Button variant="secundario" size="normal" className="self-start">
@@ -39,7 +39,7 @@ export function MiPerfilDemo() {
       </Seccion>
 
       <Seccion titulo="Cómo me pueden contratar">
-        <p className="text-text-muted">Aún no ha elegido formas de trabajar.</p>
+        <p className="text-text-muted">Aún no has elegido formas de trabajar.</p>
       </Seccion>
 
       <Seccion titulo="Empresas que me buscaron">

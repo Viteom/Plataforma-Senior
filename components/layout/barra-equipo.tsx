@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { MARCA } from "@/lib/marca";
+import { Logo } from "@/components/marca/logo";
 import { estaActivo, navEquipo } from "@/lib/navegacion";
 import { cn } from "@/lib/utils";
 
@@ -18,8 +18,8 @@ export function BarraEquipo() {
     <aside className="border-b-2 border-border-subtle bg-surface lg:sticky lg:top-0 lg:h-dvh lg:w-72 lg:shrink-0 lg:border-r-2 lg:border-b-0">
       <div className="flex h-full flex-col gap-4 p-4">
         <div className="flex items-center justify-between gap-3">
-          <Link href="/equipo" className="inline-flex min-h-tap flex-col justify-center">
-            <span className="text-lg font-bold">{MARCA.nombre}</span>
+          <Link href="/equipo" className="inline-flex min-h-tap flex-col justify-center gap-1">
+            <Logo alto={28} />
             <span className="text-sm text-text-muted">Equipo</span>
           </Link>
           <BotonAyuda className="lg:hidden" />

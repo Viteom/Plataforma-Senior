@@ -7,7 +7,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 
 import { FormularioPerfil } from "./formulario";
 
-export const metadata: Metadata = { title: "Cree su perfil" };
+export const metadata: Metadata = { title: "Crea tu perfil" };
 
 export default async function PerfilNuevo() {
   if (MODO_DEMO) return <FormularioPerfil guias={[]} />;

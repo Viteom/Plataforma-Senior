@@ -22,7 +22,7 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
   } = await supabase.auth.getUser();
   if (!user) redirect("/entrar");
 
-  const general = { errores: { general: "No pudimos guardar su perfil. Intente de nuevo o pida ayuda." }, paso: 3 as const };
+  const general = { errores: { general: "No pudimos guardar tu perfil. Intenta de nuevo o pide ayuda." }, paso: 3 as const };
 
   const campos = {
     nombre: p.nombre,

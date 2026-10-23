@@ -16,20 +16,20 @@ export default async function Inicio() {
     <Pantalla titulo="Hola">
       {nuevas > 0 ? (
         <section aria-labelledby="siguiente" className="flex flex-col gap-4 rounded-lg bg-surface p-5">
-          <p className="text-base font-bold text-text-muted">Su siguiente paso</p>
+          <p className="text-base font-bold text-text-muted">Tu siguiente paso</p>
           <h2 id="siguiente" className="text-xl">
-            {nuevas === 1 ? "Tiene una oportunidad nueva" : `Tiene ${nuevas} oportunidades nuevas`}
+            {nuevas === 1 ? "Tienes una oportunidad nueva" : `Tienes ${nuevas} oportunidades nuevas`}
           </h2>
-          <p>Una empresa necesita algo parecido a lo que usted ya resolvió. Usted decide si le interesa.</p>
+          <p>Una organización busca a alguien con una experiencia como la tuya. Tú decides si te interesa.</p>
           <Button asChild ancho="completo">
             <Link href="/oportunidades">Ver oportunidades</Link>
           </Button>
         </section>
       ) : (
         <section aria-labelledby="siguiente" className="flex flex-col gap-4 rounded-lg bg-surface p-5">
-          <p className="text-base font-bold text-text-muted">Su siguiente paso</p>
+          <p className="text-base font-bold text-text-muted">Tu siguiente paso</p>
           <h2 id="siguiente" className="text-xl">
-            Cuente un problema que resolvió
+            Cuenta un reto que resolviste
           </h2>
           <p>Es lo que las empresas miran primero. Toma unos 10 minutos.</p>
           <Button asChild ancho="completo">
@@ -45,8 +45,8 @@ export default async function Inicio() {
         <Tarjeta>
           <Handshake aria-hidden className="size-8" />
           <p>
-            Cuando una empresa necesite a alguien como usted, se lo contamos aquí y usted decide si
-            le interesa.
+            Cuando una empresa necesite a alguien como tú, te lo contamos aquí y tú decides si
+            te interesa.
           </p>
           <EnlaceFlecha href="/oportunidades">Ver oportunidades</EnlaceFlecha>
         </Tarjeta>
@@ -58,7 +58,7 @@ export default async function Inicio() {
         </h2>
         <Tarjeta>
           <BookOpen aria-hidden className="size-8" />
-          <p>Cursos gratuitos para ponerse al día y para empezar su propio negocio.</p>
+          <p>Cursos gratuitos para ponerte al día y para empezar tu propio negocio.</p>
           <EnlaceFlecha href="/aprende">Ver cursos</EnlaceFlecha>
         </Tarjeta>
       </section>

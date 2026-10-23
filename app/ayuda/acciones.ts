@@ -11,20 +11,20 @@ export async function pedirLlamada(_p: Estado, datos: FormData): Promise<Estado>
   const celular = normalizarCelular(String(datos.get("celular") ?? ""));
   const franja = datos.get("franja") === "tarde" ? "tarde" : "manana";
   const motivo = String(datos.get("motivo") ?? "").replace(/\s+/g, " ").trim().slice(0, 300);
-  if (!celular) return { error: "Escriba los 10 números del celular. Empieza por 3." };
+  if (!celular) return { error: "Escribe los 10 números del celular. Empieza por 3." };
   if (MODO_DEMO) return { aviso: "En la demostración no se guarda nada." };
 
   const supabase = await crearClienteServidor();
   const { error } = await supabase.rpc("pedir_llamada", { telefono: celular, franja, motivo });
   if (error) {
-    if (/ya pidió/.test(error.message)) return { error: "Ya tenemos su pedido de hoy. Le llamamos pronto." };
+    if (/ya pidió/.test(error.message)) return { error: "Ya tenemos tu pedido de hoy. Te llamamos pronto." };
     // Tope global de pedidos sin cuenta (migración de seguridad): la salida humana sigue abierta.
     if (/muchos pedidos/.test(error.message)) {
-      return { error: "Ahora mismo tenemos muchos pedidos. Escríbanos por WhatsApp o intente de nuevo en una hora." };
+      return { error: "Ahora mismo tenemos muchos pedidos. Escríbenos por WhatsApp o intenta de nuevo en una hora." };
     }
-    return { error: "No pudimos guardar su pedido. Intente de nuevo en un momento." };
+    return { error: "No pudimos guardar tu pedido. Intenta de nuevo en un momento." };
   }
-  return { aviso: `Listo. Le llamamos en la ${franja === "tarde" ? "tarde (2 a 6)" : "mañana (8 a 12)"} desde el número de la plataforma.` };
+  return { aviso: `Listo. Te llamamos en la ${franja === "tarde" ? "tarde (2 a 6)" : "mañana (8 a 12)"} desde el número de Kánna.` };
 }
 
 // El chat detectó un tema que atiende una persona. Con sesión, se crea la solicitud; sin sesión,

@@ -9,40 +9,40 @@ const pasos = [
   {
     titulo: "Entrar",
     puntos: [
-      "Toque «Crear mi perfil» o «Entrar».",
-      "Escriba su número de celular. Le llega un código de 6 números por mensaje de texto.",
-      "Escriba el código. No necesita contraseña.",
+      "Toca «Crear mi perfil» o «Entrar».",
+      "Escribe tu número de celular. Te llega un código de 6 números por mensaje de texto.",
+      "Escribe el código. No necesitas contraseña.",
     ],
   },
   {
-    titulo: "Crear su perfil",
+    titulo: "Crear tu perfil",
     puntos: [
-      "Son 3 pasos: sus datos, cómo quiere trabajar y quién ve su perfil.",
-      "Con «Reservado», las empresas no ven su nombre hasta que usted acepte conocerlas.",
+      "Son 3 pasos: tus datos, cómo quieres trabajar y quién ve tu perfil.",
+      "Con «Reservado», las empresas no ven tu nombre hasta que aceptes conocerlas.",
     ],
   },
   {
-    titulo: "Contar su historia",
+    titulo: "Contar tu historia",
     puntos: [
-      "Cuente un problema difícil que resolvió: qué pasó, qué hizo y cómo terminó.",
-      "Puede escribirla, contarla hablando o pedir que le llamemos.",
-      "Después revise las etiquetas y quite las que no son suyas.",
+      "Cuenta un reto difícil que resolviste: qué pasó, qué hiciste y cómo terminó.",
+      "Puedes escribirla, contarla hablando o pedir que te llamemos.",
+      "Después revisa las etiquetas y quita las que no son tuyas.",
     ],
   },
   {
     titulo: "Recibir oportunidades",
     puntos: [
-      "Cuando una empresa le busque, le avisamos.",
-      "Usted decide: «Me interesa» o «No me interesa».",
-      "Si le interesa, alguien del equipo les pone en contacto.",
+      "Cuando una empresa te busque, te avisamos.",
+      "Tú decides: «Me interesa» o «No me interesa».",
+      "Si te interesa, alguien del equipo los pone en contacto.",
     ],
   },
   {
-    titulo: "Cuidarse de estafas",
+    titulo: "Cuidarte de estafas",
     puntos: [
-      "Nadie de la plataforma ni de una empresa le va a pedir dinero, códigos ni contraseñas.",
-      "Nunca pague por exámenes, cursos ni «aportes» para conseguir un trabajo.",
-      "Si alguien lo hace, use «Reportar esta empresa» o pida que le llamemos.",
+      "Nadie de Kánna ni de una empresa te va a pedir dinero, códigos ni contraseñas.",
+      "Nunca pagues por exámenes, cursos ni «aportes» para conseguir un trabajo.",
+      "Si alguien lo hace, usa «Reportar esta empresa» o pide que te llamemos.",
     ],
   },
 ];
@@ -56,7 +56,7 @@ export default function Guia() {
         </div>
       </header>
       <main id="contenido" className="mx-auto w-full max-w-xl px-4 py-8">
-        <Pantalla titulo="Guía paso a paso" intro="Lo básico para usar la plataforma. Si algo no le funciona, pida que le llamemos.">
+        <Pantalla titulo="Guía paso a paso" intro="Lo básico para usar Kánna. Si algo no te funciona, pide que te llamemos.">
           <ol className="flex flex-col gap-6">
             {pasos.map((p, i) => (
               <li key={p.titulo} className="flex gap-4">

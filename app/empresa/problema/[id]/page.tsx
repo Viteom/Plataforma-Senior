@@ -51,14 +51,14 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
       {necesidad.estado === "en_curaduria" && (
         <p className="flex items-start gap-3 rounded-md bg-surface p-5 text-lg">
           <Clock aria-hidden className="mt-1 size-6 shrink-0" />
-          Nuestro equipo está eligiendo hasta 5 perfiles para su problema. Cuando una persona diga que le interesa, aparece
+          Nuestro equipo está eligiendo hasta 5 perfiles para tu reto. Cuando una persona diga que le interesa, aparece
           aquí.
         </p>
       )}
 
       {necesidad.estado !== "en_curaduria" && !conexiones.length && (
         <p className="rounded-md bg-surface p-5 text-lg">
-          Enviamos su problema a las personas elegidas. Aparecerán aquí cuando digan que les interesa.
+          Enviamos tu reto a las personas elegidas. Aparecerán aquí cuando digan que les interesa.
         </p>
       )}
 
@@ -73,7 +73,7 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
                 <EstadoConexion estado={c.estado} />
                 {c.puntaje !== null && (
                   <p className="text-lg">
-                    <span className="font-bold">Coincide {Math.round(c.puntaje)} %</span> con su problema
+                    <span className="font-bold">Coincide {Math.round(c.puntaje)} %</span> con tu reto
                   </p>
                 )}
                 {c.desglose && <Desglose desglose={c.desglose} />}

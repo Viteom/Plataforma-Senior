@@ -55,8 +55,8 @@ export function Dictado({ onTexto }: Props) {
     r.onerror = (e) => {
       setAviso(
         e.error === "not-allowed"
-          ? "El navegador no tiene permiso para usar el micrófono. Puede darlo en la configuración o escribir su historia."
-          : "No pudimos escucharle bien. Intente de nuevo o escriba su historia.",
+          ? "El navegador no tiene permiso para usar el micrófono. Puedes darlo en la configuración o escribir tu historia."
+          : "No pudimos escucharte bien. Intenta de nuevo o escribe tu historia.",
       );
     };
     r.onend = () => setEscuchando(false);
@@ -74,7 +74,7 @@ export function Dictado({ onTexto }: Props) {
   if (soportado === false) {
     return (
       <p className="rounded-md bg-surface p-4">
-        Este navegador no permite dictar. Puede escribir su historia o pedir que le llamemos.
+        Este navegador no permite dictar. Puedes escribir tu historia o pedir que te llamemos.
       </p>
     );
   }
@@ -93,7 +93,7 @@ export function Dictado({ onTexto }: Props) {
         </Button>
       )}
       <p aria-live="polite" className="text-base text-text-muted">
-        {escuchando ? "Le estamos escuchando. Hable con calma; lo que diga aparece abajo." : aviso}
+        {escuchando ? "Te estamos escuchando. Habla con calma; lo que digas aparece abajo." : aviso}
       </p>
     </div>
   );

@@ -15,8 +15,8 @@ export default async function MiEmpresa() {
     return (
       <div className="max-w-2xl">
         <Pantalla
-          titulo="Registre su empresa"
-          intro="Lo necesitamos para que las personas sepan quién las busca. Verificamos el NIT en el RUES antes de que pueda pedir conexiones."
+          titulo="Registra tu empresa"
+          intro="Lo necesitamos para que las personas sepan quién las busca. Verificamos el NIT en el RUES antes de que puedas pedir conexiones."
         >
           <FormularioEmpresa />
         </Pantalla>
@@ -25,10 +25,10 @@ export default async function MiEmpresa() {
   }
 
   const estado = empresa.estado === "pausada"
-    ? { icono: PauseCircle, texto: "En pausa mientras revisamos un reporte. Escríbanos desde Ayuda." }
+    ? { icono: PauseCircle, texto: "En pausa mientras revisamos un reporte. Escríbenos desde Ayuda." }
     : empresa.verificada
-      ? { icono: BadgeCheck, texto: "Verificada. Puede pedir conocer perfiles." }
-      : { icono: Clock, texto: "En verificación. Revisamos el NIT en el RUES; le escribimos cuando quede lista." };
+      ? { icono: BadgeCheck, texto: "Verificada. Puedes pedir conocer perfiles." }
+      : { icono: Clock, texto: "En verificación. Revisamos el NIT en el RUES; te escribimos cuando quede lista." };
   const Icono = estado.icono;
 
   return (

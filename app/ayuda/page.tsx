@@ -26,8 +26,8 @@ export default function Ayuda() {
       </header>
       <main id="contenido" className="mx-auto w-full max-w-xl px-4 py-8">
         <Pantalla
-          titulo="¿En qué le ayudamos?"
-          intro="Siempre puede hablar con una persona del equipo. Nunca le vamos a pedir códigos, contraseñas ni dinero."
+          titulo="¿En qué te ayudamos?"
+          intro="Siempre puedes hablar con una persona del equipo. Nunca te vamos a pedir códigos, contraseñas ni dinero."
         >
           <section id="llameme" aria-labelledby="titulo-llameme" className="flex scroll-mt-20 flex-col gap-5 rounded-lg bg-surface p-5">
             <div className="flex items-center gap-3">
@@ -36,13 +36,13 @@ export default function Ayuda() {
                 Llámeme
               </h2>
             </div>
-            <p>Déjenos su número y una persona del equipo le llama. No necesita cuenta.</p>
+            <p>Déjanos tu número y una persona del equipo te llama. No necesitas cuenta.</p>
             <BotonAccion accion={pedirLlamada} campos={{}} texto="Pedir que me llamen" ancho="completo">
               <Campo id="tel-ayuda" etiqueta="Número de celular">
                 {(p) => <Input {...p} name="celular" type="tel" inputMode="numeric" autoComplete="tel-national" />}
               </Campo>
               <fieldset className="flex flex-col gap-2">
-                <legend className="mb-2 text-lg font-bold">¿A qué hora le queda bien?</legend>
+                <legend className="mb-2 text-lg font-bold">¿A qué hora te queda bien?</legend>
                 {[
                   ["manana", "Mañana (8 a 12)"],
                   ["tarde", "Tarde (2 a 6)"],
@@ -90,7 +90,7 @@ export default function Ayuda() {
               <BookOpenText aria-hidden className="size-7 shrink-0" />
               <span className="flex flex-col gap-1">
                 <span className="text-lg font-bold">Guía paso a paso</span>
-                <span className="text-text-muted">Cómo entrar, crear su perfil, contar su historia y cuidarse de estafas.</span>
+                <span className="text-text-muted">Cómo entrar, crear tu perfil, contar tu historia y cuidarte de estafas.</span>
               </span>
             </Link>
           </section>

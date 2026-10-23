@@ -25,9 +25,10 @@ export function diaColombia(fecha: Date) {
   return new Date(fecha.getTime() - 5 * 3600_000).toISOString().slice(0, 10);
 }
 
-// Sin nombre de empresa (privacidad) y con el aviso antifraude (regla 9).
+// Sin nombre de empresa (privacidad) y con el aviso antifraude (regla 9). El nombre va sin
+// tildes («Kanna», «codigo»): con «á» u «ó» el SMS deja de ser GSM-7, cabe la mitad y cuesta el doble.
 export function textoOportunidad(enlace: string) {
-  return `${MARCA.nombre}: tiene una oportunidad nueva. Entre a ${enlace} con su código. Nadie le va a pedir dinero.`;
+  return `${MARCA.nombreSms}: tienes una oportunidad nueva. Entra a ${enlace} con tu codigo. Nadie te va a pedir dinero.`;
 }
 
 export function decidirEnvios(

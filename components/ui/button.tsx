@@ -7,11 +7,13 @@ import { cn } from "@/lib/utils";
 // Primario y secundario miden 56 px; todo lo demás, mínimo 44 px.
 // Una sola variante "primario" visible por pantalla.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md font-bold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60 [&_svg]:size-6 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60 [&_svg]:size-6 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
         primario: "bg-primary text-on-primary hover:bg-primary-hover",
+        // Sobre fondos cobalto o bosque, donde el primario no se distingue.
+        acento: "bg-accent text-on-accent hover:bg-accent-hover",
         secundario: "border-2 border-text bg-bg text-text hover:bg-surface",
         suave: "bg-surface text-text hover:bg-surface-strong",
         enlace: "text-text underline underline-offset-4 hover:decoration-2",

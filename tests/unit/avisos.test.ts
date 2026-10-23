@@ -17,9 +17,13 @@ describe("avisos por SMS", () => {
 
   it("el texto no lleva el nombre de la empresa y recuerda que nadie pide dinero", () => {
     const t = textoOportunidad("https://ejemplo.co/o");
-    expect(t).toContain("Nadie le va a pedir dinero");
+    expect(t).toContain("Nadie te va a pedir dinero");
     expect(t).not.toMatch(/SAS|Ltda|empresa \w+/);
     expect(t.length).toBeLessThanOrEqual(160);
+  });
+
+  it("el texto usa solo el alfabeto GSM-7 (sin «á» ni «ó», que duplican el costo)", () => {
+    expect(textoOportunidad("https://kanna.co/o")).toMatch(/^[\x20-\x7E¡¿ñÑéèùìòÇüÜäöÄÖà]*$/);
   });
 
   it("solo envía entre 8 a. m. y 7 p. m.", () => {

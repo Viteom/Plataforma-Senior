@@ -16,7 +16,7 @@ export function FormularioProblema({ taxonomia }: { taxonomia: EntradaTaxonomia[
     <form action={crear} onSubmit={alEnviar} className="flex flex-col gap-8">
       <Campo
         id="problema"
-        etiqueta="¿Qué problema necesita resolver?"
+        etiqueta="¿Qué reto necesitas resolver?"
         ayuda="Ej.: Vamos a abrir una segunda planta y necesitamos cumplir con INVIMA en 6 meses."
       >
         {(p) => <Textarea {...p} name="problema" rows={5} />}
@@ -25,7 +25,7 @@ export function FormularioProblema({ taxonomia }: { taxonomia: EntradaTaxonomia[
       <Requisitos taxonomia={taxonomia} />
 
       <fieldset>
-        <legend className="mb-3 text-lg font-bold">¿Cómo lo quiere contratar?</legend>
+        <legend className="mb-3 text-lg font-bold">¿Cómo lo quieres contratar?</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {formasContratar.map(({ valor, etiqueta }) => (
             <label key={valor} className="flex min-h-tap items-center gap-3 rounded-md border-2 border-border px-4 py-2 text-lg hover:bg-surface">
@@ -52,7 +52,7 @@ export function FormularioProblema({ taxonomia }: { taxonomia: EntradaTaxonomia[
         <Campo id="ubicacion" etiqueta="Ciudad o región (opcional)">
           {(p) => <Input {...p} name="ubicacion" />}
         </Campo>
-        <Campo id="presupuesto" etiqueta="Presupuesto en pesos (opcional)" ayuda="Solo números. Nos ayuda a proponerle personas en su rango.">
+        <Campo id="presupuesto" etiqueta="Presupuesto en pesos (opcional)" ayuda="Solo números. Nos ayuda a proponerte personas en tu rango.">
           {(p) => <Input {...p} name="presupuesto" inputMode="numeric" />}
         </Campo>
       </div>

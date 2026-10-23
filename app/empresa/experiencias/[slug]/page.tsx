@@ -65,7 +65,7 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
         {exp.beneficios.length > 0 && (
           <section aria-labelledby="beneficios" className="flex flex-col gap-2">
             <h2 id="beneficios" className="text-xl">
-              Lo que se lleva su equipo
+              Lo que se lleva tu equipo
             </h2>
             <ul className="list-disc pl-6">
               {exp.beneficios.map((b) => (
@@ -128,7 +128,7 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
             {(p) => <Textarea {...p} name="nota" rows={3} className={`${p.className} min-h-28`} />}
           </Campo>
         </BotonAccion>
-        <p className="text-base text-text-muted">Le respondemos con el valor. No se paga nada por la plataforma.</p>
+        <p className="text-base text-text-muted">Te respondemos con el valor. No se paga nada por Kánna.</p>
       </aside>
     </div>
   );

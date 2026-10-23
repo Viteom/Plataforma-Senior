@@ -22,6 +22,7 @@
   --color-on-primary: #ffffff;
   --color-accent: #c6f24e; /* lima */
   --color-on-accent: #14532d;
+  --color-accent-hover: #b4e23c;
   --color-deep: #14532d; /* bosque: confianza y Experiencias */
   --color-on-deep: #f4f2ec;
   --color-focus: #1e3bff;
@@ -48,6 +49,11 @@
   --text-2xl--line-height: 1.25;
   --text-3xl: 2.25rem;
   --text-3xl--line-height: 1.2;
+  /* Titulares de marca (Bricolage Grotesque 800): solo piezas de la web */
+  --text-display: 2.75rem;
+  --text-display--line-height: 1;
+  --text-display-lg: 4.5rem;
+  --text-display-lg--line-height: 0.95;
 
   --radius-sm: 0.5rem; /* campos */
   --radius-md: 1rem; /* avisos y tarjetas pequeñas */

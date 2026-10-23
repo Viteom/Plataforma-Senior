@@ -14,10 +14,10 @@ import { meInteresa, noMeInteresa, reportarEmpresa } from "./acciones";
 export const metadata: Metadata = { title: "Oportunidades" };
 
 const ESTADO: Record<string, string> = {
-  visible_empresa: "Usted dijo que le interesa. Esperamos a la empresa.",
-  abierta: "Conexión abierta: nuestro equipo les pone en contacto.",
+  visible_empresa: "Dijiste que te interesa. Esperamos a la empresa.",
+  abierta: "Conexión abierta: nuestro equipo los pone en contacto.",
   cerrada: "Terminada.",
-  descarta: "Usted dijo que no le interesa.",
+  descarta: "Dijiste que no te interesa.",
   pausada: "En pausa mientras revisamos un reporte.",
 };
 
@@ -27,13 +27,13 @@ export default async function Oportunidades() {
   const anteriores = oportunidades.filter((o) => o.estado !== "enviada_talento");
 
   return (
-    <Pantalla titulo="Oportunidades" intro="Empresas que necesitan algo parecido a lo que usted ya resolvió.">
+    <Pantalla titulo="Oportunidades" intro="Organizaciones que buscan una experiencia como la tuya.">
       {/* Aviso antifraude fijo (regla 9). */}
       <p className="flex items-start gap-3 rounded-md border-2 border-text p-4">
         <ShieldAlert aria-hidden className="mt-0.5 size-6 shrink-0" />
         <span>
-          <span className="font-bold">Nadie de la plataforma ni de una empresa le va a pedir dinero</span>, códigos,
-          contraseñas, ni pagos por «exámenes», «aportes a salud y pensión» o cursos. Si alguien lo hace, repórtelo.
+          <span className="font-bold">Nadie de Kánna ni de una empresa te va a pedir dinero</span>, códigos,
+          contraseñas, ni pagos por «exámenes», «aportes a salud y pensión» o cursos. Si alguien lo hace, repórtalo.
         </span>
       </p>
 
@@ -41,7 +41,7 @@ export default async function Oportunidades() {
         <div className="flex flex-col items-center gap-3 rounded-lg bg-surface px-5 py-10 text-center">
           <Handshake aria-hidden className="size-12" />
           <h2 className="text-xl">Todavía no hay oportunidades</h2>
-          <p className="max-w-prose text-text-muted">Cuando una empresa le busque, le avisamos por mensaje de texto.</p>
+          <p className="max-w-prose text-text-muted">Cuando una empresa te busque, te avisamos por mensaje de texto.</p>
         </div>
       )}
 
@@ -100,7 +100,7 @@ function TarjetaOportunidad({ o }: { o: Oportunidad }) {
       </div>
 
       <p className="text-lg">
-        {o.problema ? `«${o.problema}»` : "Vio su perfil y quiere conocerle."}
+        {o.problema ? `«${o.problema}»` : "Vio tu perfil y quiere conocerte."}
       </p>
       {o.formatos && o.formatos.length > 0 && (
         <p className="text-base">Busca: {o.formatos.map(etiquetaForma).join(", ")}</p>

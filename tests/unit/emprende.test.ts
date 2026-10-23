@@ -10,12 +10,12 @@ describe("ruta de Emprende", () => {
 
   it("agrega un paso por necesidad, sin repetir y en orden", () => {
     const r = rutaPara("vendiendo", ["digital", "precios", "precios"]);
-    expect(r.map((p) => p.titulo)).toEqual(["Anote lo que vende cada semana", "Calcule su precio", "Muestre lo que hace por WhatsApp"]);
+    expect(r.map((p) => p.titulo)).toEqual(["Anota lo que vendes cada semana", "Calcula tu precio", "Muestra lo que haces por WhatsApp"]);
   });
 
   it("el paso de crédito advierte sobre pedir plata por adelantado", () => {
     const [paso] = rutaPara("idea", ["dinero"]).slice(-1);
-    expect(paso.descripcion).toMatch(/Desconfíe/);
+    expect(paso.descripcion).toMatch(/Desconfía/);
   });
 
   it("todas las necesidades tienen un paso", () => {

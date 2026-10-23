@@ -15,10 +15,10 @@ export default async function EtiquetasNuevas() {
   return (
     <Pantalla
       titulo="Etiquetas nuevas"
-      intro="Lo que las personas escribieron con sus palabras. Las empresas no lo ven hasta que usted lo aprueba."
+      intro="Lo que las personas escribieron con sus palabras. Las empresas no lo ven hasta que lo apruebes."
     >
       <p className="text-text-muted">
-        Quite las que tengan teléfonos, correos, edad, fechas o algo que no sea experiencia. «Sumar a la lista» la deja como
+        Quita las que tengan teléfonos, correos, edad, fechas o algo que no sea experiencia. «Sumar a la lista» la deja como
         opción para todas las personas y cuenta en el puntaje.
       </p>
       {etiquetas.length ? (

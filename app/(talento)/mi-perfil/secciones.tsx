@@ -81,7 +81,7 @@ export function SeccionDatos({ datos }: { datos: Datos }) {
         <Campo id="oficio" etiqueta="Oficio">
           {(p) => <Input {...p} name="oficio" defaultValue={datos.oficio} />}
         </Campo>
-        <Campo id="resumen" etiqueta="Resumen (opcional)" ayuda="Dos o tres frases sobre lo que sabe hacer. No escriba su edad.">
+        <Campo id="resumen" etiqueta="Resumen (opcional)" ayuda="Dos o tres frases sobre lo que sabes hacer. No escribas tu edad.">
           {(p) => <Textarea {...p} name="resumen" defaultValue={datos.resumen ?? ""} rows={3} className={`${p.className} min-h-28`} />}
         </Campo>
         <Mensaje estado={estado} />
@@ -117,14 +117,14 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
     <Seccion titulo="Mi foto">
       <p className="text-text-muted">
         {reservado
-          ? "Las empresas la ven solo cuando usted acepta conocerlas."
-          : "Las empresas la ven junto con su nombre. Una foto de frente, con buena luz, ayuda a que le reconozcan."}
+          ? "Las empresas la ven solo cuando aceptas conocerlas."
+          : "Las empresas la ven junto con tu nombre. Una foto de frente, con buena luz, ayuda a que te reconozcan."}
       </p>
       <div className="flex flex-wrap items-center gap-5">
         {fotoUrl ? (
           // Enlace firmado de Storage que vence en minutos: no pasa por el optimizador de imágenes.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={fotoUrl} alt="Su foto de perfil" className="size-32 rounded-full border-2 border-border-subtle object-cover" />
+          <img src={fotoUrl} alt="Tu foto de perfil" className="size-32 rounded-full border-2 border-border-subtle object-cover" />
         ) : (
           <div className="flex size-32 items-center justify-center rounded-full border-2 border-dashed border-border bg-surface">
             <Camera aria-hidden className="size-10 text-text-muted" />
@@ -151,7 +151,7 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
       {!cambiando && <Mensaje estado={estado} />}
       {cambiando && (
         <form action={enviar} onSubmit={alEnviar} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
-          <Campo id="foto" etiqueta="Foto (JPG o PNG, hasta 5 MB)" ayuda="Puede tomarla con el celular en este momento.">
+          <Campo id="foto" etiqueta="Foto (JPG o PNG, hasta 5 MB)" ayuda="Puedes tomarla con el celular en este momento.">
             {(p) => (
               <input
                 {...p}
@@ -183,8 +183,8 @@ export function Visibilidad({ visibilidad }: { visibilidad: "reservado" | "visib
       <p>
         <span className="font-bold">{reservado ? "Reservado." : "Visible."}</span>{" "}
         {reservado
-          ? "Las empresas ven su experiencia, pero no su nombre ni su foto."
-          : "Las empresas ven su nombre, su foto y su historia."}
+          ? "Las empresas ven tu experiencia, pero no tu nombre ni tu foto."
+          : "Las empresas ven tu nombre, tu foto y tu historia."}
       </p>
     </div>
   );
@@ -221,7 +221,7 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
             ))}
           </ul>
         ) : (
-          <p className="text-text-muted">Aún no ha elegido formas de trabajar.</p>
+          <p className="text-text-muted">Aún no has elegido formas de trabajar.</p>
         )}
         {primera && (
           <p className="text-base text-text-muted">
@@ -242,7 +242,7 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
     <Seccion titulo="Cómo me pueden contratar">
       <form action={guardar} onSubmit={alEnviar} className="flex flex-col gap-6">
         <fieldset className="flex flex-col gap-3">
-          <legend className="mb-3 text-lg font-bold">¿Cómo le gustaría trabajar?</legend>
+          <legend className="mb-3 text-lg font-bold">¿Cómo te gustaría trabajar?</legend>
           {formasContratar.map(({ valor, etiqueta, descripcion }) => (
             <Opcion
               key={valor}
@@ -328,8 +328,8 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
   return (
     <Seccion titulo="Lo que respalda mi experiencia">
       <p className="text-text-muted">
-        Una persona que conozca su trabajo, o una foto o documento. El equipo lo revisa antes de que una empresa lo vea, y
-        usted decide si lo muestra.
+        Una persona que conozca tu trabajo, o una foto o documento. El equipo lo revisa antes de que una empresa lo vea, y
+        tú decides si lo muestras.
       </p>
 
       {evidencias.length > 0 && (
@@ -385,7 +385,7 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
 
       {agregando === "referencia" && (
         <form action={guardarRef} onSubmit={alEnviarRef} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
-          <h3 className="text-lg">Una persona que conozca su trabajo</h3>
+          <h3 className="text-lg">Una persona que conozca tu trabajo</h3>
           <p className="text-base text-text-muted">Solo el equipo ve su nombre y su teléfono. Nunca se los damos a una empresa.</p>
           <Campo id="ref-nombre" etiqueta="Nombre">
             {(p) => <Input {...p} name="nombre" />}
@@ -393,7 +393,7 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
           <Campo id="ref-telefono" etiqueta="Celular">
             {(p) => <Input {...p} name="telefono" type="tel" inputMode="numeric" />}
           </Campo>
-          <Campo id="ref-descripcion" etiqueta="¿De dónde le conoce?" ayuda="Por ejemplo: fue mi jefe en la planta.">
+          <Campo id="ref-descripcion" etiqueta="¿De dónde te conoce?" ayuda="Por ejemplo: fue mi jefe en la planta.">
             {(p) => <Input {...p} name="descripcion" />}
           </Campo>
           <Mensaje estado={estadoRef} />
@@ -408,7 +408,7 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
         <form action={guardarArch} onSubmit={alEnviarArch} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
           <h3 className="text-lg">Una foto o un documento</h3>
           <p className="text-base text-text-muted">
-            Por ejemplo, un certificado o una foto de su trabajo. Que no se vean fechas de nacimiento ni documentos de identidad.
+            Por ejemplo, un certificado o una foto de tu trabajo. Que no se vean fechas de nacimiento ni documentos de identidad.
           </p>
           <Campo id="archivo" etiqueta="Archivo (foto o PDF, hasta 10 MB)">
             {(p) => (
@@ -471,7 +471,7 @@ export function SeccionMisDatos() {
           </Button>
         ) : (
           <form action={borrar} className="flex flex-col gap-4 rounded-lg border-2 border-danger p-5">
-            <p className="font-bold">¿Seguro? Se borran su perfil, sus historias, su huella y sus evidencias. No se puede deshacer.</p>
+            <p className="font-bold">¿Seguro? Se borran tu perfil, tus historias, tu huella y tus evidencias. No se puede deshacer.</p>
             <Mensaje estado={estado} />
             <div className="flex flex-wrap gap-3">
               <Button type="submit" className="bg-danger hover:bg-danger" disabled={borrando}>

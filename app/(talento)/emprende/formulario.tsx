@@ -40,7 +40,7 @@ export function Diagnostico() {
         </ol>
         {estado.asesoria && (
           <p role="status" className="rounded-md bg-surface p-4 font-bold">
-            Listo: alguien del equipo le contacta para la asesoría.
+            Listo: alguien del equipo te contacta para la asesoría.
           </p>
         )}
       </section>
@@ -50,14 +50,14 @@ export function Diagnostico() {
   return (
     <form action={enviar} onSubmit={alEnviar} className="flex flex-col gap-8">
       <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-lg font-bold">¿En qué va su negocio?</legend>
+        <legend className="mb-3 text-lg font-bold">¿En qué va tu negocio?</legend>
         {ETAPAS.map((e) => (
           <Opcion key={e.valor} name="etapa" value={e.valor} checked={etapa === e.valor} onChange={() => setEtapa(e.valor)} titulo={e.etiqueta} />
         ))}
       </fieldset>
       <fieldset className="flex flex-col gap-3">
-        <legend className="mb-1 text-lg font-bold">¿Con qué necesita ayuda?</legend>
-        <p className="mb-2 text-text-muted">Puede elegir varias.</p>
+        <legend className="mb-1 text-lg font-bold">¿Con qué necesitas ayuda?</legend>
+        <p className="mb-2 text-text-muted">Puedes elegir varias.</p>
         {NECESIDADES.map((n) => (
           <Opcion
             key={n.valor}
@@ -70,7 +70,7 @@ export function Diagnostico() {
           />
         ))}
       </fieldset>
-      <Opcion tipo="checkbox" name="asesoria" value="si" checked={asesoria} onChange={() => setAsesoria(!asesoria)} titulo="Quiero que alguien me asesore" descripcion="Una persona del equipo le contacta." />
+      <Opcion tipo="checkbox" name="asesoria" value="si" checked={asesoria} onChange={() => setAsesoria(!asesoria)} titulo="Quiero que alguien me asesore" descripcion="Una persona del equipo te contacta." />
       {estado.error && (
         <p role="alert" className="font-bold text-danger">
           {estado.error}

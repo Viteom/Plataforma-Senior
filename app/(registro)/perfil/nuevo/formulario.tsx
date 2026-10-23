@@ -15,7 +15,7 @@ import { borradorVacio, erroresDelPaso, type BorradorPerfil, type Errores } from
 
 import { guardarPerfil, type EstadoPerfil } from "./acciones";
 
-const titulos = ["Sus datos", "Cómo quiere trabajar", "Quién ve su perfil"];
+const titulos = ["Tus datos", "Cómo quieres trabajar", "Quién ve tu perfil"];
 
 export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
   const tituloRef = useRef<HTMLHeadingElement>(null);
@@ -73,7 +73,7 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
 
   return (
     <Pantalla
-      titulo="Cree su perfil"
+      titulo="Crea tu perfil"
       antesDelTitulo={
         <div className="flex flex-col gap-2">
           <p className="text-base font-bold">
@@ -101,24 +101,24 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
 
         {paso === 1 && (
           <>
-            <Campo id="nombre" etiqueta="Su nombre" error={errores.nombre}>
+            <Campo id="nombre" etiqueta="Tu nombre" error={errores.nombre}>
               {(p) => <Input {...p} value={b.nombre} onChange={(e) => cambiar("nombre", e.target.value)} autoComplete="name" />}
             </Campo>
-            <Campo id="ubicacion" etiqueta="Ciudad o vereda donde vive" error={errores.ubicacion}>
+            <Campo id="ubicacion" etiqueta="Ciudad o vereda donde vives" error={errores.ubicacion}>
               {(p) => (
                 <Input {...p} value={b.ubicacion} onChange={(e) => cambiar("ubicacion", e.target.value)} autoComplete="address-level2" />
               )}
             </Campo>
             <Campo
               id="oficio"
-              etiqueta="¿A qué se ha dedicado?"
+              etiqueta="¿A qué te has dedicado?"
               ayuda="Por ejemplo: contabilidad, mantenimiento de máquinas, tejido."
               error={errores.oficio}
             >
               {(p) => <Input {...p} value={b.oficio} onChange={(e) => cambiar("oficio", e.target.value)} />}
             </Campo>
             <fieldset className="flex flex-col gap-3" aria-describedby={errores.requisito ? "requisito-error" : undefined}>
-              <legend className="mb-3 text-lg font-bold">¿Cuál de estas describe su caso?</legend>
+              <legend className="mb-3 text-lg font-bold">¿Cuál de estas describe tu caso?</legend>
               {(
                 [
                   ["edad", "Tengo 45 años o más"],
@@ -143,9 +143,9 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
             </fieldset>
             {noCumple && (
               <div role="status" className="flex flex-col gap-2 rounded-md bg-surface p-4">
-                <p className="font-bold">Por ahora esta plataforma es para talento con trayectoria.</p>
+                <p className="font-bold">Por ahora Kánna es para talento con trayectoria.</p>
                 <p className="text-text-muted">
-                  Le podemos avisar cuando abramos para más personas.{" "}
+                  Te podemos avisar cuando abramos para más personas.{" "}
                   <Link href="/ayuda" className="font-bold text-text underline underline-offset-4">
                     Hablar con alguien del equipo
                   </Link>
@@ -158,8 +158,8 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
         {paso === 2 && (
           <>
             <fieldset className="flex flex-col gap-3">
-              <legend className="mb-1 text-lg font-bold">¿Cómo le gustaría trabajar?</legend>
-              <p className="mb-2 text-text-muted">Puede elegir varias.</p>
+              <legend className="mb-1 text-lg font-bold">¿Cómo te gustaría trabajar?</legend>
+              <p className="mb-2 text-text-muted">Puedes elegir varias.</p>
               {formasContratar.map(({ valor, etiqueta, descripcion }) => (
                 <Opcion
                   key={valor}
@@ -222,8 +222,8 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
         {paso === 3 && (
           <>
             <fieldset className="flex flex-col gap-3">
-              <legend className="sr-only">Quién ve su perfil</legend>
-              <p className="mb-3 text-lg text-text-muted">Puede cambiarlo cuando quiera desde Mi perfil.</p>
+              <legend className="sr-only">Quién ve tu perfil</legend>
+              <p className="mb-3 text-lg text-text-muted">Puedes cambiarlo cuando quieras desde Mi perfil.</p>
               <Opcion
                 name="visibilidad"
                 value="reservado"
@@ -231,7 +231,7 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 onChange={() => cambiar("visibilidad", "reservado")}
                 icono={<EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />}
                 titulo="Reservado"
-                descripcion="Las empresas ven su experiencia y su oficio, pero no su nombre ni su foto. Los ven solo cuando usted acepta conocerlas."
+                descripcion="Las empresas ven tu experiencia y tu oficio, pero no tu nombre ni tu foto. Los ven solo cuando aceptas conocerlas."
               />
               <Opcion
                 name="visibilidad"
@@ -240,7 +240,7 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 onChange={() => cambiar("visibilidad", "visible")}
                 icono={<Eye aria-hidden className="mt-0.5 size-6 shrink-0" />}
                 titulo="Visible"
-                descripcion="Las empresas ven su nombre, su foto y su historia."
+                descripcion="Las empresas ven tu nombre, tu foto y tu historia."
               />
             </fieldset>
 
@@ -252,10 +252,10 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 checked={b.autorizo}
                 onChange={() => cambiar("autorizo", !b.autorizo)}
                 titulo={`Autorizo a ${MARCA.nombre} a usar mis datos para crear mi perfil y conectarme con empresas.`}
-                descripcion="Nunca le mostramos su edad a una empresa. Puede descargar o borrar sus datos cuando quiera."
+                descripcion="Nunca le mostramos tu edad a una empresa. Puedes descargar o borrar tus datos cuando quieras."
               />
               <Link href="/privacidad" className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4">
-                Cómo cuidamos sus datos
+                Cómo cuidamos tus datos
               </Link>
               {errores.autorizo && (
                 <p role="alert" className="font-bold text-danger">

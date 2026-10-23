@@ -10,7 +10,7 @@ export default function SinConexion() {
     <Pantalla
       titulo="No hay conexión a internet"
       antesDelTitulo={<WifiOff aria-hidden className="size-12" />}
-      intro="Revise los datos o el wifi y vuelva a intentar. Lo que ya había guardado no se pierde."
+      intro="Revisa los datos o el wifi y vuelve a intentar. Lo que ya habías guardado no se pierde."
     />
   );
 }

@@ -31,7 +31,7 @@ export async function enviarRegistro(datos: FormData): Promise<Resultado> {
   const medio = datos.get("autorizacionMedio") === "audio" ? "audio" : "firma";
   const autorizacion = archivo(datos.get("autorizacion"));
 
-  if (!UUID.test(id)) return { ok: false, error: "Registro dañado. Vuelva a crearlo." };
+  if (!UUID.test(id)) return { ok: false, error: "Registro dañado. Vuelve a crearlo." };
   if (nombre.length < 2 || ubicacion.length < 2) return { ok: false, error: "Falta el nombre o la vereda." };
   if (celularCrudo && !celular) return { ok: false, error: "El celular debe tener 10 números y empezar por 3." };
   if (!historiaTexto && !historiaAudio) return { ok: false, error: "Falta la historia (escrita o grabada)." };
@@ -49,7 +49,7 @@ export async function enviarRegistro(datos: FormData): Promise<Resultado> {
     .from("talent_profiles")
     .insert({ id, user_id: null, registrado_por: user.id, nombre, ubicacion, oficio, visibilidad });
   if (errorPerfil && !/duplicate|23505/.test(`${errorPerfil.code} ${errorPerfil.message}`)) {
-    return { ok: false, error: "No pudimos crear el perfil. Intente de nuevo." };
+    return { ok: false, error: "No pudimos crear el perfil. Intenta de nuevo." };
   }
 
   // 2. Archivos, en carpetas con el id del perfil (así lo exigen las reglas de Storage).
@@ -59,9 +59,9 @@ export async function enviarRegistro(datos: FormData): Promise<Resultado> {
     return error ? null : ruta;
   };
   const rutaAutorizacion = await subir("autorizaciones", medio, autorizacion);
-  if (!rutaAutorizacion) return { ok: false, error: "No pudimos subir la autorización. Intente de nuevo." };
+  if (!rutaAutorizacion) return { ok: false, error: "No pudimos subir la autorización. Intenta de nuevo." };
   const rutaAudio = historiaAudio ? await subir("historias", "historia", historiaAudio) : null;
-  if (historiaAudio && !rutaAudio) return { ok: false, error: "No pudimos subir el audio de la historia. Intente de nuevo." };
+  if (historiaAudio && !rutaAudio) return { ok: false, error: "No pudimos subir el audio de la historia. Intenta de nuevo." };
   const rutaFoto = foto ? await subir("fotos", "foto", foto) : null;
   if (rutaFoto) await supabase.from("talent_profiles").update({ foto_path: rutaFoto }).eq("id", id);
 
@@ -74,7 +74,7 @@ export async function enviarRegistro(datos: FormData): Promise<Resultado> {
       texto: historiaTexto || "[Historia grabada en audio: falta transcribirla]",
       audio_path: rutaAudio,
     });
-    if (error) return { ok: false, error: "No pudimos guardar la historia. Intente de nuevo." };
+    if (error) return { ok: false, error: "No pudimos guardar la historia. Intenta de nuevo." };
   }
 
   // 4. Celular y autorización: solo los ve el equipo.
@@ -84,7 +84,7 @@ export async function enviarRegistro(datos: FormData): Promise<Resultado> {
     autorizacion_medio: medio,
     autorizacion_archivo: rutaAutorizacion,
   });
-  if (errorPrivado) return { ok: false, error: "No pudimos guardar la autorización. Intente de nuevo." };
+  if (errorPrivado) return { ok: false, error: "No pudimos guardar la autorización. Intenta de nuevo." };
 
   revalidatePath("/gestor/registrar");
   return { ok: true };

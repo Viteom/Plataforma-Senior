@@ -11,7 +11,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type EstadoEntrar = { error?: string; aviso?: string };
 
-const ERROR_GENERAL = "No pudimos enviar el código. Intente de nuevo en un momento o pida ayuda.";
+const ERROR_GENERAL = "No pudimos enviar el código. Intenta de nuevo en un momento o pide ayuda.";
 
 async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
   const supabase = await crearClienteServidor();
@@ -29,7 +29,7 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
   if (!permitido) {
     return {
       error:
-        "Ya pidió 5 códigos en la última hora. Espere un rato o pida ayuda y le colaboramos.",
+        "Ya pediste 5 códigos en la última hora. Espera un rato o pide ayuda y te colaboramos.",
     };
   }
 
@@ -42,7 +42,7 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
 
   if (error) {
     if (error.status === 429) {
-      return { error: "Debe esperar 45 segundos antes de pedir otro código." };
+      return { error: "Debes esperar 45 segundos antes de pedir otro código." };
     }
     console.error("[entrar] envío del código:", error.status, error.code, error.message);
     return { error: ERROR_GENERAL };
@@ -60,8 +60,8 @@ export async function enviarCodigo(_previo: EstadoEntrar, datos: FormData): Prom
     return {
       error:
         medio === "celular"
-          ? "Escriba los 10 números del celular. Empieza por 3, por ejemplo 300 123 4567."
-          : "Revise el correo. Debe tener una @ y terminar en algo como .com o .co.",
+          ? "Escribe los 10 números del celular. Empieza por 3, por ejemplo 300 123 4567."
+          : "Revisa el correo. Debe tener una @ y terminar en algo como .com o .co.",
     };
   }
 
@@ -76,7 +76,7 @@ export async function enviarCodigo(_previo: EstadoEntrar, datos: FormData): Prom
 export async function reenviarCodigo(_previo: EstadoEntrar): Promise<EstadoEntrar> {
   const pendiente = await leerPendiente();
   if (!pendiente) redirect("/entrar");
-  return (await pedirCodigo(pendiente)) ?? { aviso: "Le enviamos un código nuevo." };
+  return (await pedirCodigo(pendiente)) ?? { aviso: "Te enviamos un código nuevo." };
 }
 
 export async function verificarCodigo(_previo: EstadoEntrar, datos: FormData): Promise<EstadoEntrar> {
@@ -85,7 +85,7 @@ export async function verificarCodigo(_previo: EstadoEntrar, datos: FormData): P
 
   const pendiente = await leerPendiente();
   if (!pendiente) {
-    return { error: "Pasaron más de 10 minutos. Vuelva a pedir el código." };
+    return { error: "Pasaron más de 10 minutos. Vuelve a pedir el código." };
   }
 
   const supabase = await crearClienteServidor();
@@ -95,7 +95,7 @@ export async function verificarCodigo(_previo: EstadoEntrar, datos: FormData): P
       : await supabase.auth.verifyOtp({ email: pendiente.valor, token: codigo, type: "email" });
 
   if (error || !data.user) {
-    return { error: "El código no es correcto o ya venció. Revíselo o pida otro." };
+    return { error: "El código no es correcto o ya venció. Revísalo o pide otro." };
   }
 
   await borrarPendiente();

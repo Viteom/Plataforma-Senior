@@ -23,7 +23,7 @@ export default async function Explorar({ searchParams }: { searchParams: Promise
   return (
     <Pantalla
       titulo="Explorar perfiles"
-      intro="Personas que ya resolvieron problemas como el suyo. Filtre por cómo quiere contratar."
+      intro="Personas con experiencia para aportar a tu reto. Filtra por cómo quieres contratar."
     >
       <AvisoEmpresa empresa={empresa} />
 
@@ -77,8 +77,8 @@ export default async function Explorar({ searchParams }: { searchParams: Promise
           </div>
         ) : (
           <p className="rounded-md bg-surface p-5">
-            No encontramos perfiles con esa búsqueda. Pruebe con otras palabras o cuéntenos el problema en «Buscar por un
-            problema»: nuestro equipo le ayuda a encontrar a la persona.
+            No encontramos perfiles con esa búsqueda. Prueba con otras palabras o cuéntanos el reto en «Buscar por un
+            problema»: nuestro equipo te ayuda a encontrar a la persona.
           </p>
         )}
       </section>

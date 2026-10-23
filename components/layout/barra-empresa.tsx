@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { MARCA } from "@/lib/marca";
+import { Logo } from "@/components/marca/logo";
 import { estaActivo, navEmpresa } from "@/lib/navegacion";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +18,9 @@ export function BarraEmpresa() {
   return (
     <header className="border-b-2 border-border-subtle bg-bg">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2 xl:flex-nowrap xl:px-8">
-        <Link href="/empresa/explorar" className="inline-flex min-h-tap items-center text-lg font-bold">
-          {MARCA.nombre}
-          <span className="ml-2 rounded-sm bg-surface-strong px-2 text-sm">Empresas</span>
+        <Link href="/empresa/explorar" className="inline-flex min-h-tap items-center gap-2">
+          <Logo alto={28} />
+          <span className="rounded-sm bg-surface-strong px-2 text-sm font-bold">Empresas</span>
         </Link>
         <nav aria-label="Principal" className="order-last w-full xl:order-none xl:w-auto xl:flex-1">
           <ul className="grid grid-cols-2 gap-2 xl:flex xl:gap-1">

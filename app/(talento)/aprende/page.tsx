@@ -18,7 +18,7 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
   const cursos = await listarCursos(tema);
 
   return (
-    <Pantalla titulo="Aprende" intro="Cursos gratuitos de otras entidades, elegidos para usted.">
+    <Pantalla titulo="Aprende" intro="Cursos gratuitos de otras entidades, elegidos para ti.">
       {/* Filtros como enlaces: funcionan sin JavaScript y el tema no es un dato personal. */}
       <nav aria-label="Temas">
         <ul className="flex flex-wrap gap-2">
@@ -64,13 +64,13 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
           ))}
         </ul>
       ) : (
-        <p className="rounded-md bg-surface p-5">Todavía no hay cursos de este tema. Estamos buscando los mejores para usted.</p>
+        <p className="rounded-md bg-surface p-5">Todavía no hay cursos de este tema. Estamos buscando los mejores para ti.</p>
       )}
 
       <Tarjeta className="bg-surface">
         <Lightbulb aria-hidden className="size-8" />
-        <h2 className="text-xl">¿Quiere emprender?</h2>
-        <p>Responda unas preguntas y le sugerimos una ruta según la etapa de su idea.</p>
+        <h2 className="text-xl">¿Quieres emprender?</h2>
+        <p>Responde unas preguntas y te sugerimos una ruta según la etapa de tu idea.</p>
         <Link href="/emprende" className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4">
           Ir a Emprende
         </Link>

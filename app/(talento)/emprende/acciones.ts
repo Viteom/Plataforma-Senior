@@ -10,7 +10,7 @@ export async function guardarDiagnostico(_p: EstadoDiagnostico, datos: FormData)
   const etapa = datos.get("etapa");
   const necesidades = datos.getAll("necesidades").filter(esNecesidad);
   const asesoria = datos.get("asesoria") === "si";
-  if (!esEtapa(etapa)) return { error: "Elija en qué va su negocio." };
+  if (!esEtapa(etapa)) return { error: "Elige en qué va tu negocio." };
   const ruta = rutaPara(etapa, necesidades);
   if (MODO_DEMO) return { ruta, asesoria };
 

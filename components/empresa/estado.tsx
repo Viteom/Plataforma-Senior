@@ -7,8 +7,8 @@ import type { EstadoEmpresa, MiEmpresa } from "@/lib/datos/tipos";
 export const TEXTO_ESTADO: Record<EstadoEmpresa, string> = {
   esperando: "Esperando respuesta de la persona",
   no_disponible: "La persona no está disponible por ahora",
-  le_interesa: "Le interesa: usted decide si quiere conocerla",
-  abierta: "Conexión abierta: les ponemos en contacto",
+  le_interesa: "Le interesa: tú decides si quieres conocerla",
+  abierta: "Conexión abierta: los ponemos en contacto",
   cerrada: "Cerrada",
   pausada: "En pausa",
 };
@@ -36,10 +36,10 @@ export function EstadoConexion({ estado }: { estado: EstadoEmpresa }) {
 export function AvisoEmpresa({ empresa }: { empresa: MiEmpresa | null }) {
   if (empresa && empresa.verificada && empresa.estado === "activa") return null;
   const texto = !empresa
-    ? "Para pedir conocer perfiles, primero registre los datos de su empresa."
+    ? "Para pedir conocer perfiles, primero registra los datos de tu empresa."
     : empresa.estado === "pausada"
-      ? "Su empresa está en pausa mientras revisamos un reporte. Puede explorar, pero no pedir conexiones."
-      : "Estamos verificando su empresa en el RUES. Mientras tanto puede explorar perfiles.";
+      ? "Tu empresa está en pausa mientras revisamos un reporte. Puedes explorar, pero no pedir conexiones."
+      : "Estamos verificando tu empresa en el RUES. Mientras tanto puedes explorar perfiles.";
   return (
     <div role="status" className="flex flex-wrap items-start gap-3 rounded-md border-2 border-border p-4">
       <Building2 aria-hidden className="mt-0.5 size-6 shrink-0" />
