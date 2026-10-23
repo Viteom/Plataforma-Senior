@@ -1,6 +1,8 @@
-# Plataforma Senior
+# Kánna
 
-PWA que conecta talento con trayectoria con empresas. Nombre de trabajo hasta el brandbook.
+PWA que conecta talento con trayectoria con organizaciones en Colombia. Antes «Plataforma Senior».
+
+- Brandbook: https://claude.ai/artifact/V7A3pmoq1R8xU4WdwoU1cv (Kánna tutea; marca en `app/globals.css`, `lib/marca.ts` y `public/marca/`)
 
 - Brief y fuente única: [docs/brief.md](docs/brief.md)
 - Reglas del repositorio: [CLAUDE.md](CLAUDE.md)
