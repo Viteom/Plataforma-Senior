@@ -22,7 +22,7 @@ export function Requisitos({ taxonomia }: { taxonomia: EntradaTaxonomia[] }) {
     <fieldset className="flex flex-col gap-6">
       <legend className="mb-1 text-lg font-bold">¿Qué debe saber la persona?</legend>
       <p className="text-text-muted">
-        Toque una vez para «Deseable», dos veces para «Obligatorio». Elija al menos uno.
+        Toca una vez para «Deseable», dos veces para «Obligatorio». Elige al menos uno.
       </p>
       {Object.entries(niveles).map(([id, n]) =>
         n === "no" ? null : <input key={id} type="hidden" name={n} value={id} />,

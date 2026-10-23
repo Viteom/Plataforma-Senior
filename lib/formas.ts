@@ -11,13 +11,13 @@ export type FormaContratar =
   | "experiencia";
 
 export const formasContratar: { valor: FormaContratar; etiqueta: string; descripcion: string }[] = [
-  { valor: "conversacion", etiqueta: "Conversación de una hora", descripcion: "Una empresa le consulta un problema concreto." },
+  { valor: "conversacion", etiqueta: "Conversación de una hora", descripcion: "Una empresa te consulta un reto concreto." },
   { valor: "horas", etiqueta: "Por horas", descripcion: "Unas horas a la semana, según se necesite." },
   { valor: "proyecto", etiqueta: "Por proyecto", descripcion: "Un trabajo con inicio y fin." },
-  { valor: "mentoria", etiqueta: "Mentoría", descripcion: "Acompaña a una persona o a un equipo." },
+  { valor: "mentoria", etiqueta: "Mentoría", descripcion: "Acompañas a una persona o a un equipo." },
   { valor: "fraccional", etiqueta: "Fraccional", descripcion: "Un cargo de dirección unos días al mes." },
   { valor: "medio_tiempo", etiqueta: "Medio tiempo", descripcion: "Media jornada estable." },
-  { valor: "experiencia", etiqueta: "Experiencia o taller", descripcion: "Guía un taller para un equipo." },
+  { valor: "experiencia", etiqueta: "Experiencia o taller", descripcion: "Guías un taller para un equipo." },
 ];
 
 export const esForma = (v: unknown): v is FormaContratar => formasContratar.some((f) => f.valor === v);

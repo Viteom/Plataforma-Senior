@@ -32,7 +32,7 @@ export function Grabadora({ audio, onAudio, texto }: Props) {
       setAviso("");
       setGrabando(true);
     } catch {
-      setAviso("No pudimos usar el micrófono. Revise el permiso del navegador o escriba la historia.");
+      setAviso("No pudimos usar el micrófono. Revisa el permiso del navegador o escribe la historia.");
     }
   }
 

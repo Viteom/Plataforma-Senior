@@ -90,10 +90,10 @@ export async function enviarElegidos(_p: Estado, datos: FormData): Promise<Estad
   const need = String(datos.get("need") ?? "");
   const elegidos = datos.getAll("elegido").map(String).filter((v) => UUID.test(v));
   if (!UUID.test(need)) return { error: "Búsqueda no válida." };
-  if (!elegidos.length) return { error: "Elija al menos una persona." };
+  if (!elegidos.length) return { error: "Elige al menos una persona." };
   if (elegidos.length > 5) return { error: "Máximo 5 personas por búsqueda." };
   const razones = Object.fromEntries(elegidos.map((id) => [id, texto(datos.get(`razon-${id}`), 200)]));
-  if (Object.values(razones).some((r) => r.length < 5)) return { error: "Escriba una línea de por qué para cada persona elegida." };
+  if (Object.values(razones).some((r) => r.length < 5)) return { error: "Escribe una línea de por qué para cada persona elegida." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
 
@@ -122,7 +122,7 @@ export async function verificarEmpresa(_p: Estado, datos: FormData): Promise<Est
   const id = String(datos.get("id") ?? "");
   const fuente = texto(datos.get("fuente"), 200);
   if (!UUID.test(id)) return { error: "Empresa no válida." };
-  if (fuente.length < 3) return { error: "Anote dónde lo verificó, por ejemplo «RUES, matrícula activa»." };
+  if (fuente.length < 3) return { error: "Anota dónde lo verificaste, por ejemplo «RUES, matrícula activa»." };
   if (MODO_DEMO) return DEMO;
   const { supabase, user } = await equipo();
   const { error } = await supabase
@@ -153,7 +153,7 @@ export async function revisarEvidencia(_p: Estado, datos: FormData): Promise<Est
   const decision = datos.get("decision") === "verificada" ? "verificada" : "rechazada";
   const nota = texto(datos.get("nota"), 200);
   if (!UUID.test(id)) return { error: "Evidencia no válida." };
-  if (decision === "verificada" && nota.length < 5) return { error: "Escriba una línea de lo que confirmó. La verá la empresa." };
+  if (decision === "verificada" && nota.length < 5) return { error: "Escribe una línea de lo que confirmaste. La verá la empresa." };
   // La nota la ven empresas: no puede revelar la edad (regla 1).
   if (/\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b/i.test(nota)) {
     return { error: "La nota no puede mencionar edad, años ni fechas: la ven las empresas." };
@@ -175,7 +175,7 @@ export async function guardarGuia(_p: Estado, datos: FormData): Promise<Estado> 
   if (!esForma(tipo)) return { error: "Forma de contratar no válida." };
   if (!["hora", "conversacion", "mes", "proyecto", "persona"].includes(unidad)) return { error: "Unidad no válida." };
   if (!(minimo > 0) || !(maximo >= minimo)) return { error: "El mínimo debe ser mayor que cero y no mayor que el máximo." };
-  if (fuente.length < 3) return { error: "Anote de dónde sale el rango." };
+  if (fuente.length < 3) return { error: "Anota de dónde sale el rango." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
   const { error } = await supabase
@@ -241,9 +241,9 @@ export async function guardarExperiencia(_p: Estado, datos: FormData): Promise<E
   const nombre = texto(datos.get("nombre"), 120);
   const proposito = texto(datos.get("proposito"), 2000);
   const formatos = datos.getAll("formatos").map(String).filter((f) => f === "territorio" || f === "sede");
-  if (nombre.length < 3) return { error: "Escriba el nombre de la experiencia." };
-  if (proposito.length < 20) return { error: "Cuente el propósito en al menos una frase." };
-  if (!formatos.length) return { error: "Elija al menos un formato." };
+  if (nombre.length < 3) return { error: "Escribe el nombre de la experiencia." };
+  if (proposito.length < 20) return { error: "Cuenta el propósito en al menos una frase." };
+  if (!formatos.length) return { error: "Elige al menos un formato." };
 
   // "Título: descripción" por línea.
   const momentos = lineas(datos.get("momentos")).map((l) => {
@@ -318,14 +318,14 @@ export async function avanzarSolicitud(_p: Estado, datos: FormData): Promise<Est
   const siguiente = SIGUIENTE_SOLICITUD[actual];
   if (!UUID.test(id) || !siguiente) return { error: "Datos no válidos." };
   const valor = numero(datos.get("valor"));
-  if (siguiente === "cotizada" && !(valor && valor > 0)) return { error: "Escriba el valor de la cotización." };
+  if (siguiente === "cotizada" && !(valor && valor > 0)) return { error: "Escribe el valor de la cotización." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
   const cambios = siguiente === "cotizada" ? { estado: siguiente, valor_cotizado: valor } : { estado: siguiente };
   const { error } = await supabase.from("experience_requests").update(cambios).eq("id", id).eq("estado", actual);
   if (error) return { error: "No pudimos actualizar la solicitud." };
   revalidatePath("/equipo/experiencias");
-  return { aviso: "Actualizada. Recuerde avisarle a la empresa por correo o teléfono." };
+  return { aviso: "Actualizada. Recuerda avisarle a la empresa por correo o teléfono." };
 }
 
 export async function registrarImpacto(_p: Estado, datos: FormData): Promise<Estado> {
@@ -334,7 +334,7 @@ export async function registrarImpacto(_p: Estado, datos: FormData): Promise<Est
   const horas = numero(datos.get("horas"));
   const pago = numero(datos.get("pago"));
   if (!UUID.test(id)) return { error: "Solicitud no válida." };
-  if (personas === null || horas === null || pago === null) return { error: "Complete personas, horas y pago a la sabedora." };
+  if (personas === null || horas === null || pago === null) return { error: "Completa personas, horas y pago a la sabedora." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
   const { error } = await supabase.from("impact_records").insert({
@@ -372,7 +372,7 @@ export async function revisarEtiqueta(_p: Estado, datos: FormData): Promise<Esta
   if (!etiqueta) return { error: "Esa etiqueta ya no existe." };
   // Lo que ven las empresas no puede revelar la edad (regla 1).
   if (/\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b|\d{5,}|@/i.test(etiqueta.etiqueta as string)) {
-    return { error: "Tiene edad, fechas o datos de contacto. Quítela." };
+    return { error: "Tiene edad, fechas o datos de contacto. Quítala." };
   }
 
   let taxonomyId: string | null = null;

@@ -8,7 +8,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 
 import { FormularioHuella } from "./formulario";
 
-export const metadata: Metadata = { title: "Su historia" };
+export const metadata: Metadata = { title: "Tu historia" };
 
 // La disponibilidad de la IA se revisa aquí, en el servidor (docs/ia-desde-moai.md, sección 5).
 export default async function Huella() {

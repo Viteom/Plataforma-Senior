@@ -1,7 +1,10 @@
-// Nombre de trabajo hasta que llegue el brandbook. Todo texto que diga la marca sale de aquí.
+// Todo texto que diga la marca sale de aquí (brandbook Kánna).
 export const MARCA = {
-  nombre: "Plataforma Senior",
-  nombreCorto: "Senior",
+  nombre: "Kánna",
+  nombreCorto: "Kánna",
+  // En SMS la «á» obliga a mensajes de 70 caracteres que cuestan el doble: sin tilde.
+  nombreSms: "Kanna",
+  lema: "Experiencia que abre posibilidades.",
   descripcion:
-    "Conectamos talento con trayectoria con empresas que necesitan resolver problemas reales.",
+    "Conectamos personas con trayectoria con organizaciones que buscan talento para nuevos retos.",
 } as const;

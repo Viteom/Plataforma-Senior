@@ -85,7 +85,7 @@ export function ElegirPropuestos({ need, propuestas }: { need: string; propuesta
         {enviando
           ? "Enviando…"
           : !elegidos.length
-            ? "Elija al menos una persona"
+            ? "Elige al menos una persona"
             : elegidos.length === 1
               ? "Enviar a la persona elegida"
               : `Enviar a las ${elegidos.length} personas elegidas`}

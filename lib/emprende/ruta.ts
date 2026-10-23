@@ -23,25 +23,25 @@ export type Paso = { titulo: string; descripcion: string; tema?: TemaCurso };
 
 const POR_ETAPA: Record<Etapa, Paso[]> = {
   idea: [
-    { titulo: "Escriba su idea en una frase", descripcion: "Qué vende, a quién y por qué se lo comprarían a usted." },
-    { titulo: "Pregúntele a 5 posibles clientes", descripcion: "Antes de invertir, compruebe que alguien lo necesita y pagaría por ello." },
+    { titulo: "Escribe tu idea en una frase", descripcion: "Qué vendes, a quién y por qué te lo comprarían a ti." },
+    { titulo: "Pregúntales a 5 posibles clientes", descripcion: "Antes de invertir, comprueba que alguien lo necesita y pagaría por ello." },
   ],
   vendiendo: [
-    { titulo: "Anote lo que vende cada semana", descripcion: "Con eso sabe qué funciona y qué no.", tema: "negocio" },
+    { titulo: "Anota lo que vendes cada semana", descripcion: "Con eso sabes qué funciona y qué no.", tema: "negocio" },
   ],
   creciendo: [
-    { titulo: "Revise qué le deja más ganancia", descripcion: "Crezca en lo que más le deja, no en lo que más vende.", tema: "negocio" },
-    { titulo: "Piense a quién le enseña", descripcion: "Si crece, alguien más tiene que saber hacerlo como usted.", tema: "mentoria" },
+    { titulo: "Revisa qué te deja más ganancia", descripcion: "Crece en lo que más te deja, no en lo que más vendes.", tema: "negocio" },
+    { titulo: "Piensa a quién le enseñas", descripcion: "Si creces, alguien más tiene que saber hacerlo como tú.", tema: "mentoria" },
   ],
 };
 
 const POR_NECESIDAD: Record<Necesidad, Paso> = {
-  clientes: { titulo: "Busque clientes donde ya están", descripcion: "Empiece por conocidos, grupos de la vereda o del barrio y ferias.", tema: "negocio" },
-  precios: { titulo: "Calcule su precio", descripcion: "Sume materiales y su tiempo; nunca cobre por debajo de eso.", tema: "cobrar" },
-  cuentas: { titulo: "Separe la plata del negocio", descripcion: "Un cuaderno o una hoja con lo que entra y lo que sale, cada día.", tema: "negocio" },
-  formalizar: { titulo: "Saque el RUT", descripcion: "Es gratis en la DIAN. Después, si lo necesita, registre el negocio en la Cámara de Comercio.", tema: "negocio" },
-  digital: { titulo: "Muestre lo que hace por WhatsApp", descripcion: "Fotos claras, precio y cómo pedirlo. Un catálogo sencillo basta.", tema: "digital" },
-  dinero: { titulo: "Conozca opciones de crédito pequeño", descripcion: "Pregunte por microcréditos y fondos de su caja de compensación. Desconfíe de quien le pida plata por adelantado.", tema: "negocio" },
+  clientes: { titulo: "Busca clientes donde ya están", descripcion: "Empieza por conocidos, grupos de la vereda o del barrio y ferias.", tema: "negocio" },
+  precios: { titulo: "Calcula tu precio", descripcion: "Suma materiales y tu tiempo; nunca cobres por debajo de eso.", tema: "cobrar" },
+  cuentas: { titulo: "Separa la plata del negocio", descripcion: "Un cuaderno o una hoja con lo que entra y lo que sale, cada día.", tema: "negocio" },
+  formalizar: { titulo: "Saca el RUT", descripcion: "Es gratis en la DIAN. Después, si lo necesitas, registra el negocio en la Cámara de Comercio.", tema: "negocio" },
+  digital: { titulo: "Muestra lo que haces por WhatsApp", descripcion: "Fotos claras, precio y cómo pedirlo. Un catálogo sencillo basta.", tema: "digital" },
+  dinero: { titulo: "Conoce opciones de crédito pequeño", descripcion: "Pregunta por microcréditos y fondos de tu caja de compensación. Desconfía de quien te pida plata por adelantado.", tema: "negocio" },
 };
 
 export function rutaPara(etapa: Etapa, necesidades: Necesidad[]): Paso[] {

@@ -102,11 +102,11 @@ export function RegistroAsistido() {
   const cambiar = <K extends keyof Borrador>(k: K, v: Borrador[K]) => setB((x) => (x ? { ...x, [k]: v } : x));
 
   function errorDelPaso(x: Borrador): string {
-    if (paso === 0 && (x.nombre.trim().length < 2 || x.ubicacion.trim().length < 2)) return "Escriba el nombre y la vereda o ciudad.";
+    if (paso === 0 && (x.nombre.trim().length < 2 || x.ubicacion.trim().length < 2)) return "Escribe el nombre y la vereda o ciudad.";
     if (paso === 0 && x.celular.trim() && !/^3\d{9}$/.test(x.celular.replace(/\D/g, "").replace(/^57/, ""))) {
       return "El celular debe tener 10 números y empezar por 3.";
     }
-    if (paso === 1 && !x.historiaTexto.trim() && !x.historiaAudio) return "Escriba la historia o grábela.";
+    if (paso === 1 && !x.historiaTexto.trim() && !x.historiaAudio) return "Escribe la historia o grábala.";
     if (paso === 3 && !x.autorizacion) return x.autorizacionMedio === "firma" ? "Falta la firma." : "Falta el audio de aceptación.";
     return "";
   }
@@ -138,7 +138,7 @@ export function RegistroAsistido() {
     return (
       <Pantalla
         titulo="Registro asistido"
-        intro="Usted crea el perfil en nombre de la persona. Funciona sin señal: lo que registre se guarda en este celular y se envía solo cuando vuelva la conexión."
+        intro="Creas el perfil en nombre de la persona. Funciona sin señal: lo que registres se guarda en este celular y se envía solo cuando vuelva la conexión."
       >
         <p className="flex items-center gap-3 rounded-md bg-surface p-4 font-bold" role="status">
           {enLinea ? <Wifi aria-hidden className="size-6" /> : <WifiOff aria-hidden className="size-6" />}
@@ -229,7 +229,7 @@ export function RegistroAsistido() {
             {(p) => <Input {...p} type="tel" inputMode="numeric" value={b.celular} onChange={(e) => cambiar("celular", e.target.value)} />}
           </Campo>
           <fieldset className="flex flex-col gap-3">
-            <legend className="mb-3 text-lg font-bold">¿Quiere que las empresas vean su nombre y su foto?</legend>
+            <legend className="mb-3 text-lg font-bold">¿La persona quiere que las empresas vean su nombre y su foto?</legend>
             <Opcion name="g-vis" value="reservado" checked={b.visibilidad === "reservado"} onChange={() => cambiar("visibilidad", "reservado")} titulo="No, reservado" descripcion="Solo ven su experiencia hasta que acepte conocerlas." />
             <Opcion name="g-vis" value="visible" checked={b.visibilidad === "visible"} onChange={() => cambiar("visibilidad", "visible")} titulo="Sí, visible" descripcion="Ven su nombre, su foto y su historia." />
           </fieldset>
@@ -261,7 +261,7 @@ export function RegistroAsistido() {
       {paso === 3 && (
         <div className="flex flex-col gap-6">
           <div className="rounded-md bg-surface p-4">
-            <p className="font-bold">Léale esto en voz alta:</p>
+            <p className="font-bold">Léele esto en voz alta:</p>
             <p>
               «Autorizo a {MARCA.nombre} a usar mis datos para crear mi perfil y conectarme con empresas. Mi edad nunca se le muestra a una
               empresa. Puedo pedir que borren mis datos cuando quiera.»

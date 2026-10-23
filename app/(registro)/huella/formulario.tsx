@@ -20,9 +20,9 @@ import { confirmarHuella, guardarHistoria, type EstadoHuella } from "./acciones"
 type Modo = "escribir" | "dictar" | "llamada";
 
 const modos = [
-  { valor: "escribir" as const, titulo: "Escribirla", descripcion: "A su ritmo, con sus palabras.", icono: PenLine },
-  { valor: "dictar" as const, titulo: "Contarla hablando", descripcion: "El celular escribe lo que usted dice.", icono: Mic },
-  { valor: "llamada" as const, titulo: "Que me llamen", descripcion: "Una persona del equipo le ayuda por teléfono.", icono: Phone },
+  { valor: "escribir" as const, titulo: "Escribirla", descripcion: "A tu ritmo, con tus palabras.", icono: PenLine },
+  { valor: "dictar" as const, titulo: "Contarla hablando", descripcion: "El celular escribe lo que dices.", icono: Mic },
+  { valor: "llamada" as const, titulo: "Que me llamen", descripcion: "Una persona del equipo te ayuda por teléfono.", icono: Phone },
 ];
 
 type Props = { taxonomia: EntradaTaxonomia[]; ia: boolean; nombre: string | null };
@@ -57,18 +57,18 @@ function Contar({
         revision.reemplazos.fechas + revision.reemplazos.tiempos > 0 && "las fechas y edades",
         revision.reemplazos.contacto > 0 && "los datos de contacto",
         revision.reemplazos.documentos > 0 && "los números de documento",
-        revision.reemplazos.nombre > 0 && "su nombre",
+        revision.reemplazos.nombre > 0 && "tu nombre",
       ].filter((x): x is string => Boolean(x))
     : [];
   const listaQuitados = new Intl.ListFormat("es", { type: "conjunction" }).format(quitados);
 
   return (
     <Pantalla
-      titulo="Cuéntenos un problema difícil que resolvió"
-      intro="¿Qué pasó, qué hizo usted y cómo terminó? Con eso armamos su huella de experiencia: lo que las empresas ven de usted."
+      titulo="Cuéntanos un reto difícil que resolviste"
+      intro="¿Qué pasó, qué hiciste y cómo terminó? Con eso armamos tu huella de experiencia: lo que las empresas ven de ti."
     >
       <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-lg font-bold">¿Cómo prefiere contarla?</legend>
+        <legend className="mb-3 text-lg font-bold">¿Cómo prefieres contarla?</legend>
         {modos.map(({ valor, titulo, descripcion, icono: Icono }) => (
           <Opcion
             key={valor}
@@ -86,7 +86,7 @@ function Contar({
       {modo === "llamada" ? (
         <div className="flex flex-col gap-6">
           <p className="text-lg">
-            Déjenos su número y la hora en que le queda bien. Nunca le vamos a pedir códigos, contraseñas ni dinero.
+            Déjanos tu número y la hora en que te queda bien. Nunca te vamos a pedir códigos, contraseñas ni dinero.
           </p>
           <Button asChild ancho="completo">
             <Link href="/ayuda#llameme">Pedir que me llamen</Link>
@@ -98,8 +98,8 @@ function Contar({
           {modo === "dictar" && <Dictado onTexto={(t) => setHistoria((h) => (h ? `${h} ${t}` : t))} />}
           <Campo
             id="historia"
-            etiqueta={modo === "dictar" ? "Lo que dijo (puede corregirlo)" : "Su historia"}
-            ayuda="No importa la ortografía. Cuente detalles: dónde era, cuántas personas, qué normas."
+            etiqueta={modo === "dictar" ? "Lo que dijiste (puedes corregirlo)" : "Tu historia"}
+            ayuda="No importa la ortografía. Cuenta detalles: dónde era, con quién, qué hiciste."
             error={estado.error}
           >
             {(p) => (
@@ -113,14 +113,14 @@ function Contar({
                 <p className="flex items-start gap-3">
                   <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0" />
                   <span>
-                    Antes de enviarla al asistente quitamos {listaQuitados}. Su texto aquí no cambia.
+                    Antes de enviarla al asistente quitamos {listaQuitados}. Tu texto aquí no cambia.
                   </span>
                 </p>
               )}
               {revision.nombresPosibles.length > 0 && (
                 <p>
                   ¿Estos son nombres de otras personas?{" "}
-                  <span className="font-bold">{revision.nombresPosibles.join(", ")}</span>. Si quiere, cámbielos por el
+                  <span className="font-bold">{revision.nombresPosibles.join(", ")}</span>. Si quieres, cámbialos por el
                   cargo, por ejemplo «el jefe de planta».
                 </p>
               )}
@@ -129,12 +129,12 @@ function Contar({
 
           {!ia && (
             <p className="text-base text-text-muted">
-              Después de guardarla, usted elige de una lista las palabras que describen su experiencia.
+              Después de guardarla, eliges de una lista las palabras que describen tu experiencia.
             </p>
           )}
 
           <Button type="submit" ancho="completo" disabled={guardando}>
-            {guardando ? (ia ? "Leyendo su historia…" : "Guardando…") : ia ? "Guardar y ver mis etiquetas" : "Guardar mi historia"}
+            {guardando ? (ia ? "Leyendo tu historia…" : "Guardando…") : ia ? "Guardar y ver mis etiquetas" : "Guardar mi historia"}
           </Button>
         </form>
       )}
@@ -147,9 +147,9 @@ function Contar({
 }
 
 const MENSAJE_MANUAL = {
-  apagada: "Elija solo lo que se parezca a lo suyo. Si no lo encuentra, escríbalo con sus palabras.",
-  cuota: "Hoy ya usó el asistente varias veces. Su historia quedó guardada: elija sus etiquetas o escríbalas.",
-  error: "El asistente no respondió. Su historia quedó guardada: elija sus etiquetas o escríbalas.",
+  apagada: "Elige solo lo que se parezca a lo tuyo. Si no lo encuentras, escríbelo con tus palabras.",
+  cuota: "Hoy ya usaste el asistente varias veces. Tu historia quedó guardada: elige tus etiquetas o escríbelas.",
+  error: "El asistente no respondió. Tu historia quedó guardada: elige tus etiquetas o escríbelas.",
 };
 
 type Libre = { capa: Capa; texto: string };
@@ -169,11 +169,11 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
 
   return (
     <Pantalla
-      titulo={manual ? "Elija sus etiquetas" : "Esto entendimos de su historia"}
+      titulo={manual ? "Elige tus etiquetas" : "Esto entendimos de tu historia"}
       intro={
         manual
           ? MENSAJE_MANUAL[estado.motivoManual ?? "apagada"]
-          : "Quite lo que no sea suyo tocando la etiqueta. Puede agregar otras o escribirlas con sus palabras."
+          : "Quita lo que no sea tuyo tocando la etiqueta. Puedes agregar otras o escribirlas con tus palabras."
       }
     >
       <form action={confirmar} className="flex flex-col gap-8">
@@ -254,13 +254,13 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
         })}
 
         <p className="text-base text-text-muted">
-          Lo que escriba con sus palabras lo revisa el equipo antes de que lo vea una empresa.
+          Lo que escribas con tus palabras lo revisa el equipo antes de que lo vea una empresa.
         </p>
 
         {estado.dudas && estado.dudas.length > 0 && (
           <div className="flex flex-col gap-2 rounded-md bg-surface p-4">
-            <h2 className="text-lg">Para que su historia quede más clara</h2>
-            <p className="text-text-muted">Si quiere, cuente esto en otra historia desde Mi perfil:</p>
+            <h2 className="text-lg">Para que tu historia quede más clara</h2>
+            <p className="text-text-muted">Si quieres, cuenta esto en otra historia desde Mi perfil:</p>
             <ul className="list-disc pl-6">
               {estado.dudas.map((d) => (
                 <li key={d}>{d}</li>
@@ -270,7 +270,7 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
         )}
 
         <p className="text-base text-text-muted">
-          Al confirmar, las empresas pueden encontrar su perfil según lo que eligió: reservado o visible.
+          Al confirmar, las empresas pueden encontrar tu perfil según lo que elegiste: reservado o visible.
         </p>
 
         {resultado.error && (
@@ -305,7 +305,7 @@ function EscribirOtra({ capa, onAgregar }: { capa: Capa; onAgregar: (texto: stri
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor={id} className="font-bold">
-        ¿No está? Escríbalo con sus palabras
+        ¿No está? Escríbelo con tus palabras
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input

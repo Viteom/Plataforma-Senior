@@ -16,7 +16,7 @@ type Turno = { de: "persona" | "asistente"; texto: string; enlace?: Enlace; aPer
 // automática: pasa a una persona. Siempre hay un botón para hablar con alguien.
 export function ChatAyuda() {
   const [turnos, setTurnos] = useState<Turno[]>([
-    { de: "asistente", texto: "Hola. ¿En qué le ayudamos? Escriba su pregunta con sus palabras." },
+    { de: "asistente", texto: "Hola. ¿En qué te ayudamos? Escribe tu pregunta con tus palabras." },
   ]);
   const [mensaje, setMensaje] = useState("");
   const [fallas, setFallas] = useState(0);
@@ -37,7 +37,7 @@ export function ChatAyuda() {
       const { creada } = await escalarChat(r.categoria, texto);
       respuesta = {
         de: "asistente",
-        texto: creada ? `${r.texto} Ya le avisamos al equipo.` : `${r.texto} Déjenos su celular en «Llámeme» y le llamamos.`,
+        texto: creada ? `${r.texto} Ya le avisamos al equipo.` : `${r.texto} Déjanos tu celular en «Llámeme» y te llamamos.`,
         aPersona: true,
       };
     } else if (r.tipo === "no_entendi") {
@@ -53,7 +53,7 @@ export function ChatAyuda() {
   return (
     <div className="flex flex-col gap-4">
       <p className="text-base text-text-muted">
-        Le responde un asistente automático con respuestas preparadas por el equipo. No escriba datos personales.
+        Te responde un asistente automático con respuestas preparadas por el equipo. No escribas datos personales.
       </p>
       <ol aria-live="polite" className="flex max-h-[28rem] flex-col gap-3 overflow-y-auto rounded-md border-2 border-border-subtle p-3">
         {turnos.map((t, i) => (
@@ -62,7 +62,7 @@ export function ChatAyuda() {
             ref={i === turnos.length - 1 ? final : undefined}
             className={cn("flex max-w-[90%] flex-col gap-2 rounded-md p-3", t.de === "persona" ? "self-end bg-surface-strong" : "self-start bg-surface")}
           >
-            <span className="sr-only">{t.de === "persona" ? "Usted:" : "Asistente:"}</span>
+            <span className="sr-only">{t.de === "persona" ? "Tú:" : "Asistente:"}</span>
             <p>{t.texto}</p>
             {t.enlace && (
               <Link href={t.enlace.href} className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4">
@@ -87,7 +87,7 @@ export function ChatAyuda() {
           value={mensaje}
           onChange={(e) => setMensaje(e.target.value)}
           maxLength={MAX_CARACTERES}
-          placeholder="Escriba su pregunta"
+          placeholder="Escribe tu pregunta"
           autoComplete="off"
           className="min-h-action flex-1 rounded-sm border-2 border-border bg-bg px-4 text-base placeholder:text-text-muted focus-visible:border-text"
         />

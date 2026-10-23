@@ -64,7 +64,7 @@ export default async function MiPerfil() {
         </form>
         {perfil.estado === "borrador" ? (
           <p className="rounded-md bg-surface p-4">
-            Las empresas todavía no ven su perfil: falta confirmar su huella de experiencia.{" "}
+            Las empresas todavía no ven tu perfil: falta confirmar tu huella de experiencia.{" "}
             <Link href="/huella" className="font-bold underline underline-offset-4">
               Contar mi historia
             </Link>
@@ -73,8 +73,8 @@ export default async function MiPerfil() {
           <form action={cambiarEstado} className="flex flex-col gap-2">
             <p>
               {perfil.estado === "pausado"
-                ? "Su perfil está en pausa: ninguna empresa lo ve."
-                : "Su perfil está disponible para las empresas."}
+                ? "Tu perfil está en pausa: ninguna empresa lo ve."
+                : "Tu perfil está disponible para las empresas."}
             </p>
             <input type="hidden" name="estado" value={perfil.estado === "pausado" ? "publicado" : "pausado"} />
             <Button type="submit" variant="suave" size="normal" className="self-start">
@@ -115,7 +115,7 @@ export default async function MiPerfil() {
             );
           })
         ) : (
-          <p className="text-text-muted">Todavía no tiene etiquetas confirmadas.</p>
+          <p className="text-text-muted">Todavía no tienes etiquetas confirmadas.</p>
         )}
         <Link href="/huella" className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline underline-offset-4">
           <Pencil aria-hidden className="size-5" />
@@ -137,7 +137,7 @@ export default async function MiPerfil() {
             ))}
           </ul>
         ) : (
-          <p className="text-text-muted">Todavía ninguna. Aquí verá las empresas que quisieron conocerle.</p>
+          <p className="text-text-muted">Todavía ninguna. Aquí verás las empresas que quisieron conocerte.</p>
         )}
       </Seccion>
 

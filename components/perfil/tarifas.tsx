@@ -18,7 +18,7 @@ export function Tarifas({ formas, guias, tarifas, onTarifa, orientacion, onOrien
     <fieldset className="flex flex-col gap-5 rounded-lg bg-surface p-5">
       <legend className="sr-only">Cuánto cobrar</legend>
       <div className="flex flex-col gap-1">
-        <h3 className="text-lg">¿Cuánto quiere cobrar? (opcional)</h3>
+        <h3 className="text-lg">¿Cuánto quieres cobrar? (opcional)</h3>
         <p className="text-base text-text-muted">Las empresas ven un rango, no el número exacto.</p>
       </div>
       {formas.map((forma) => {
@@ -69,7 +69,7 @@ export function Tarifas({ formas, guias, tarifas, onTarifa, orientacion, onOrien
         checked={orientacion}
         onChange={() => onOrientacion(!orientacion)}
         titulo="Prefiero que el equipo me oriente sobre cuánto cobrar"
-        descripcion="Alguien del equipo le llama o le escribe."
+        descripcion="Alguien del equipo te llama o te escribe."
         className="bg-bg"
       />
     </fieldset>

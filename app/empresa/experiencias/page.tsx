@@ -15,7 +15,7 @@ export default async function Experiencias() {
   return (
     <Pantalla
       titulo="Experiencias con saberes"
-      intro="Talleres y ceremonias para su equipo, guiados por sabedoras y sabedores desde su oficio."
+      intro="Talleres y ceremonias para tu equipo, guiados por sabedoras y sabedores desde su oficio."
     >
       {experiencias.length ? (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -51,7 +51,7 @@ export default async function Experiencias() {
         </div>
       ) : (
         <p className="rounded-md bg-surface p-5 text-lg">
-          Estamos preparando las primeras experiencias con sabedoras y sabedores del territorio. Muy pronto las verá aquí.
+          Estamos preparando las primeras experiencias con sabedoras y sabedores del territorio. Muy pronto las verás aquí.
         </p>
       )}
       {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo.</p>}

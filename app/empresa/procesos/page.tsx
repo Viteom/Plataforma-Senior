@@ -27,7 +27,7 @@ export default async function Procesos() {
   const directas = conexiones.filter((c) => c.origen === "exploracion");
 
   return (
-    <Pantalla titulo="Mis procesos" intro="Sus búsquedas, los perfiles que pidió conocer y sus experiencias.">
+    <Pantalla titulo="Mis procesos" intro="Tus búsquedas, los perfiles que pediste conocer y tus experiencias.">
       <section aria-labelledby="busquedas" className="flex flex-col gap-3">
         <h2 id="busquedas" className="text-xl">
           Búsquedas por problema
@@ -50,7 +50,7 @@ export default async function Procesos() {
           </ul>
         ) : (
           <p className="text-text-muted">
-            Todavía no ha buscado por un problema.{" "}
+            Todavía no has buscado por un problema.{" "}
             <Link href="/empresa/problema/nuevo" className="font-bold text-text underline underline-offset-4">
               Buscar por un problema
             </Link>
@@ -60,7 +60,7 @@ export default async function Procesos() {
 
       <section aria-labelledby="directas" className="flex flex-col gap-3">
         <h2 id="directas" className="text-xl">
-          Perfiles que pidió conocer
+          Perfiles que pediste conocer
         </h2>
         {directas.length ? (
           <ul className="flex flex-col gap-3">
@@ -83,7 +83,7 @@ export default async function Procesos() {
                       </summary>
                       <BotonAccion accion={cerrarConexion} campos={{ conexion: c.id }} texto="Cerrar conexión" variant="secundario" className="mt-3">
                         <fieldset>
-                          <legend className="mb-2 font-bold">¿Cómo le fue con esta persona?</legend>
+                          <legend className="mb-2 font-bold">¿Cómo te fue con esta persona?</legend>
                           <div className="flex flex-wrap gap-2">
                             {[1, 2, 3, 4, 5].map((n) => (
                               <label key={n} className="flex min-h-tap min-w-tap items-center justify-center gap-2 rounded-md border-2 border-border px-3 has-[:checked]:border-text has-[:checked]:bg-surface-strong has-[:checked]:font-bold">
@@ -103,7 +103,7 @@ export default async function Procesos() {
           </ul>
         ) : (
           <p className="text-text-muted">
-            Todavía no ha pedido conocer a nadie.{" "}
+            Todavía no has pedido conocer a nadie.{" "}
             <Link href="/empresa/explorar" className="font-bold text-text underline underline-offset-4">
               Explorar perfiles
             </Link>
@@ -141,7 +141,7 @@ export default async function Procesos() {
           </ul>
         ) : (
           <p className="text-text-muted">
-            Todavía no ha pedido una experiencia.{" "}
+            Todavía no has pedido una experiencia.{" "}
             <Link href="/empresa/experiencias" className="font-bold text-text underline underline-offset-4">
               Ver experiencias
             </Link>

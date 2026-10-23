@@ -19,9 +19,9 @@ export type Curso = {
 
 export const TEMAS: { valor: TemaCurso; etiqueta: string }[] = [
   { valor: "digital", etiqueta: "Herramientas digitales" },
-  { valor: "cobrar", etiqueta: "Cobrar por su trabajo" },
+  { valor: "cobrar", etiqueta: "Cobrar por tu trabajo" },
   { valor: "mentoria", etiqueta: "Mentoría" },
-  { valor: "negocio", etiqueta: "Su propio negocio" },
+  { valor: "negocio", etiqueta: "Tu propio negocio" },
   { valor: "oficio", etiqueta: "Oficios" },
 ];
 
@@ -35,7 +35,7 @@ const CURSOS_EJEMPLO: Curso[] = [
     tema: "digital",
     modalidad: "virtual",
     gratuito: true,
-    descripcion: "Busque cursos de herramientas digitales, emprendimiento y oficios. Se inscribe con su documento.",
+    descripcion: "Busca cursos de herramientas digitales, emprendimiento y oficios. Te inscribes con tu documento.",
   },
 ];
 

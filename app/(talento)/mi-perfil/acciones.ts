@@ -13,7 +13,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 export type Estado = { error?: string; aviso?: string };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const ERROR = "No pudimos guardar el cambio. Intente de nuevo o pida ayuda.";
+const ERROR = "No pudimos guardar el cambio. Intenta de nuevo o pide ayuda.";
 const TIPOS_ARCHIVO = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 const MAX_ARCHIVO = 10 * 1024 * 1024;
 
@@ -66,11 +66,11 @@ export async function cambiarEstado(datos: FormData) {
 
 export async function actualizarFormas(_p: Estado, datos: FormData): Promise<Estado> {
   const formas = datos.getAll("formas").map(String).filter(esForma) as FormaContratar[];
-  if (!formas.length) return { error: "Elija al menos una forma de trabajar." };
+  if (!formas.length) return { error: "Elige al menos una forma de trabajar." };
   const horasCrudas = String(datos.get("horas") ?? "").trim();
   const horas = horasCrudas ? Number(horasCrudas) : null;
   if (horas !== null && (!Number.isInteger(horas) || horas < 1 || horas > 48)) {
-    return { error: "Escriba un número de horas entre 1 y 48." };
+    return { error: "Escribe un número de horas entre 1 y 48." };
   }
   const modalidad = ["presencial", "remoto", "mixto"].includes(String(datos.get("modalidad"))) ? String(datos.get("modalidad")) : "presencial";
   const orientacion = datos.get("orientacion") === "si";
@@ -114,9 +114,9 @@ export async function agregarReferencia(_p: Estado, datos: FormData): Promise<Es
   const nombre = texto(datos.get("nombre"), 80);
   const descripcion = texto(datos.get("descripcion"), 120);
   const telefono = normalizarCelular(String(datos.get("telefono") ?? ""));
-  if (nombre.length < 2) return { error: "Escriba el nombre de la persona." };
-  if (!telefono) return { error: "Escriba un celular de 10 números, empezando por 3." };
-  if (descripcion.length < 2) return { error: "Cuéntenos de dónde le conoce, por ejemplo «fue mi jefe en la planta»." };
+  if (nombre.length < 2) return { error: "Escribe el nombre de la persona." };
+  if (!telefono) return { error: "Escribe un celular de 10 números, empezando por 3." };
+  if (descripcion.length < 2) return { error: "Cuéntanos de dónde te conoce, por ejemplo «fue mi jefe en la planta»." };
 
   const { supabase, perfil } = await sesion();
   const { error } = await supabase.from("evidence").insert({
@@ -134,10 +134,10 @@ export async function agregarReferencia(_p: Estado, datos: FormData): Promise<Es
 export async function subirArchivo(_p: Estado, datos: FormData): Promise<Estado> {
   const archivo = datos.get("archivo");
   const descripcion = texto(datos.get("descripcion"), 120);
-  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elija una foto o un documento." };
+  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elige una foto o un documento." };
   if (!TIPOS_ARCHIVO.includes(archivo.type)) return { error: "Solo fotos (JPG, PNG) o documentos PDF." };
-  if (archivo.size > MAX_ARCHIVO) return { error: "El archivo pesa más de 10 MB. Intente con una foto más liviana." };
-  if (descripcion.length < 2) return { error: "Cuéntenos qué muestra, por ejemplo «certificado del curso»." };
+  if (archivo.size > MAX_ARCHIVO) return { error: "El archivo pesa más de 10 MB. Intenta con una foto más liviana." };
+  if (descripcion.length < 2) return { error: "Cuéntanos qué muestra, por ejemplo «certificado del curso»." };
 
   const { supabase, perfil } = await sesion();
   const extension = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "application/pdf": "pdf" }[archivo.type];
@@ -162,9 +162,9 @@ const MAX_FOTO = 5 * 1024 * 1024;
 
 export async function subirFoto(_p: Estado, datos: FormData): Promise<Estado> {
   const archivo = datos.get("foto");
-  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elija una foto." };
+  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elige una foto." };
   if (!TIPOS_FOTO.includes(archivo.type)) return { error: "Solo fotos JPG, PNG o WebP." };
-  if (archivo.size > MAX_FOTO) return { error: "La foto pesa más de 5 MB. Intente con una más liviana." };
+  if (archivo.size > MAX_FOTO) return { error: "La foto pesa más de 5 MB. Intenta con una más liviana." };
 
   const { supabase, perfil } = await sesion();
   const { data: actual } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
@@ -231,7 +231,7 @@ export async function descargarDatos(): Promise<string> {
       huella: huella.data,
       evidencias: evidencias.data,
       solicitudes_de_ayuda: ayudas.data,
-      nota: "Su fecha de nacimiento y su autorización de datos las guarda el equipo aparte. Puede pedirlas desde Ayuda.",
+      nota: "Tu fecha de nacimiento y tu autorización de datos las guarda el equipo aparte. Puedes pedirlas desde Ayuda.",
     },
     null,
     2,

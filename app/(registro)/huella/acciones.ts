@@ -40,9 +40,9 @@ export async function guardarHistoria(_previo: EstadoHuella, datos: FormData): P
   const historia = String(datos.get("historia") ?? "").trim();
   const origen = datos.get("origen") === "dictado" ? "dictado" : "escrito";
   if (historia.length < MIN) {
-    return { error: "Cuéntenos un poco más: qué pasó, qué hizo usted y cómo terminó." };
+    return { error: "Cuéntanos un poco más: qué pasó, qué hiciste y cómo terminó." };
   }
-  if (historia.length > MAX) return { error: "La historia es muy larga. Intente resumirla un poco." };
+  if (historia.length > MAX) return { error: "La historia es muy larga. Intenta resumirla un poco." };
 
   if (MODO_DEMO) {
     // Ejemplo fijo para revisar la pantalla de confirmación sin IA ni base de datos.
@@ -76,7 +76,7 @@ export async function guardarHistoria(_previo: EstadoHuella, datos: FormData): P
     .insert({ talent_id: perfil.id, texto: historia, origen })
     .select("id")
     .single();
-  if (error || !guardada) return { error: "No pudimos guardar su historia. Intente de nuevo o pida ayuda." };
+  if (error || !guardada) return { error: "No pudimos guardar tu historia. Intenta de nuevo o pide ayuda." };
 
   const { data: tax } = await supabase.from("taxonomy").select("id, capa, etiqueta, sinonimos");
   const taxonomia = (tax ?? []) as EntradaTaxonomia[];
@@ -145,7 +145,7 @@ export async function confirmarHuella(_previo: { error?: string }, datos: FormDa
   }
 
   if (!seleccionadas.length && !agregadas.length && !libres.length) {
-    return { error: "Elija o escriba al menos una etiqueta que describa su experiencia." };
+    return { error: "Elige o escribe al menos una etiqueta que describa tu experiencia." };
   }
   if (MODO_DEMO) redirect("/mi-perfil");
 
@@ -157,7 +157,7 @@ export async function confirmarHuella(_previo: { error?: string }, datos: FormDa
   const { data: perfil } = await supabase.from("talent_profiles").select("id, estado").eq("user_id", user.id).maybeSingle();
   if (!perfil) redirect("/perfil/nuevo");
 
-  const fallo = { error: "No pudimos guardar sus etiquetas. Intente de nuevo o pida ayuda." };
+  const fallo = { error: "No pudimos guardar tus etiquetas. Intenta de nuevo o pide ayuda." };
 
   // Las que la persona quitó se borran; las que dejó quedan confirmadas.
   if (historiaId) {

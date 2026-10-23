@@ -31,7 +31,7 @@ export function FormularioEntrar({ para, demo }: Props) {
   return (
     <Pantalla
       titulo={para === "empresa" ? "Entrar como empresa" : "Entrar"}
-      intro="Le enviamos un código de 6 números. No necesita contraseña."
+      intro="Te enviamos un código de 6 números. No necesitas contraseña."
     >
       <form
         // Siempre una acción de servidor (POST): el número nunca viaja en la URL.
@@ -41,7 +41,7 @@ export function FormularioEntrar({ para, demo }: Props) {
       >
         <input type="hidden" name="para" value={para} />
         <fieldset className="flex flex-col gap-3">
-          <legend className="mb-3 text-lg font-bold">¿Dónde quiere recibir el código?</legend>
+          <legend className="mb-3 text-lg font-bold">¿Dónde quieres recibir el código?</legend>
           <div className="grid grid-cols-2 gap-3">
             {medios.map(({ valor, etiqueta, icono: Icono }) => (
               <label

@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-import { MARCA } from "@/lib/marca";
+import { Logo } from "@/components/marca/logo";
 import { cn } from "@/lib/utils";
 
 import { BotonAyuda } from "./boton-ayuda";
@@ -32,8 +32,8 @@ export function Encabezado({ inicioHref = "/", volver, ancho = "celular", sinAyu
             {volver.etiqueta ?? "Volver"}
           </Link>
         ) : (
-          <Link href={inicioHref} className="inline-flex min-h-tap items-center text-lg font-bold">
-            {MARCA.nombre}
+          <Link href={inicioHref} className="inline-flex min-h-tap items-center">
+            <Logo alto={30} />
           </Link>
         )}
         {!sinAyuda && <BotonAyuda />}

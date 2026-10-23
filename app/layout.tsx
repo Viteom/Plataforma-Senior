@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible } from "next/font/google";
+import { Atkinson_Hyperlegible, Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 
 import { MARCA } from "@/lib/marca";
 
@@ -9,6 +9,22 @@ const atkinson = Atkinson_Hyperlegible({
   subsets: ["latin"],
   weight: ["400", "700"],
   variable: "--font-atkinson",
+  display: "swap",
+});
+
+// Letras de marca: solo en titulares grandes de la web. La app se lee en Atkinson.
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["600", "800"],
+  variable: "--font-bricolage",
+  display: "swap",
+});
+
+const instrument = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["italic"],
+  variable: "--font-instrument",
   display: "swap",
 });
 
@@ -23,12 +39,12 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#f4f2ec",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-CO" className={atkinson.variable}>
+    <html lang="es-CO" className={`${atkinson.variable} ${bricolage.variable} ${instrument.variable}`}>
       <body className="min-h-dvh antialiased">
         <a
           href="#contenido"

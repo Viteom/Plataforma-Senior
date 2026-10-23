@@ -57,7 +57,7 @@ export default async function FichaPerfil({ params }: { params: Promise<{ id: st
           <div className="flex items-start gap-3 rounded-md bg-surface p-4">
             <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />
             <p>
-              <span className="font-bold">Perfil reservado.</span> Verá el nombre cuando esta persona acepte conocerle.
+              <span className="font-bold">Perfil reservado.</span> Verás el nombre cuando esta persona acepte conocerte.
             </p>
           </div>
         )}
@@ -155,14 +155,14 @@ export default async function FichaPerfil({ params }: { params: Promise<{ id: st
               textoEnviando="Enviando…"
               ancho="completo"
             />
-            <p className="text-base text-text-muted">Le contamos a la persona. Si le interesa, les ponemos en contacto.</p>
+            <p className="text-base text-text-muted">Le contamos a la persona. Si le interesa, los ponemos en contacto.</p>
           </>
         ) : (
           <p className="flex items-start gap-2 rounded-md bg-surface p-4 text-base">
             <BadgeCheck aria-hidden className="mt-0.5 size-5 shrink-0" />
             {empresa
-              ? "Podrá pedir conocer este perfil cuando su empresa esté verificada."
-              : "Para pedir conocer este perfil, registre primero su empresa."}
+              ? "Podrás pedir conocer este perfil cuando tu empresa esté verificada."
+              : "Para pedir conocer este perfil, registra primero tu empresa."}
           </p>
         )}
       </aside>

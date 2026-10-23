@@ -35,10 +35,10 @@ export function FormularioCodigo({ enviadoA, porCorreo, demo }: Props) {
 
   return (
     <Pantalla
-      titulo="Escriba el código"
+      titulo="Escribe el código"
       intro={
         <>
-          Se lo enviamos por {medio}
+          Te lo enviamos por {medio}
           {enviadoA && (
             <>
               {" "}
@@ -82,12 +82,12 @@ export function FormularioCodigo({ enviadoA, porCorreo, demo }: Props) {
       <form action={demo ? undefined : reenviar} className="flex flex-col gap-2">
         <p className="text-base text-text-muted">
           {segundos > 0
-            ? `Puede pedir otro código en ${segundos} segundos.`
-            : "¿No le llegó? Puede pedir otro código."}
+            ? `Puedes pedir otro código en ${segundos} segundos.`
+            : "¿No te llegó? Puedes pedir otro código."}
         </p>
         {/* Solo se anuncia cuando ya se puede reenviar o cuando cambia el resultado, no cada segundo */}
         <p aria-live="polite" className="text-base font-bold">
-          {segundos === 0 && !reenvio.error && !reenvio.aviso ? <span className="sr-only">Ya puede pedir otro código.</span> : null}
+          {segundos === 0 && !reenvio.error && !reenvio.aviso ? <span className="sr-only">Ya puedes pedir otro código.</span> : null}
           {reenvio.aviso}
           {reenvio.error && <span className="text-danger">{reenvio.error}</span>}
         </p>

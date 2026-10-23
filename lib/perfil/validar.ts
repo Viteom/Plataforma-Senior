@@ -58,29 +58,29 @@ const texto = (v: string, min: number, max: number) => {
 export function erroresDelPaso(b: BorradorPerfil, paso: 1 | 2 | 3): Errores {
   const e: Errores = {};
   if (paso === 1) {
-    if (!texto(b.nombre, 2, 80)) e.nombre = "Escriba su nombre.";
-    if (!texto(b.ubicacion, 2, 80)) e.ubicacion = "Escriba la ciudad o vereda donde vive.";
-    if (!texto(b.oficio, 2, 120)) e.oficio = "Cuéntenos en pocas palabras a qué se ha dedicado.";
+    if (!texto(b.nombre, 2, 80)) e.nombre = "Escribe tu nombre.";
+    if (!texto(b.ubicacion, 2, 80)) e.ubicacion = "Escribe la ciudad o vereda donde vives.";
+    if (!texto(b.oficio, 2, 120)) e.oficio = "Cuéntanos en pocas palabras a qué te has dedicado.";
     if (b.requisito !== "edad" && b.requisito !== "experiencia") {
-      e.requisito = b.requisito === "ninguno" ? "Por ahora no podemos seguir." : "Elija una opción.";
+      e.requisito = b.requisito === "ninguno" ? "Por ahora no podemos seguir." : "Elige una opción.";
     }
   }
   if (paso === 2) {
-    if (!b.formas.length || !b.formas.every(esForma)) e.formas = "Elija al menos una forma de trabajar.";
+    if (!b.formas.length || !b.formas.every(esForma)) e.formas = "Elige al menos una forma de trabajar.";
     if (b.horas.trim()) {
       const h = Number(b.horas);
-      if (!Number.isInteger(h) || h < 1 || h > 48) e.horas = "Escriba un número de horas entre 1 y 48.";
+      if (!Number.isInteger(h) || h < 1 || h > 48) e.horas = "Escribe un número de horas entre 1 y 48.";
     }
-    if (!["presencial", "remoto", "mixto"].includes(b.modalidad)) e.modalidad = "Elija una opción.";
+    if (!["presencial", "remoto", "mixto"].includes(b.modalidad)) e.modalidad = "Elige una opción.";
     for (const [forma, valor] of Object.entries(b.tarifas)) {
       if (!b.formas.includes(forma) || !valor.trim()) continue;
       const n = Number(valor.replace(/[^\d]/g, ""));
-      if (!Number.isFinite(n) || n <= 0) e.tarifas = "Escriba la tarifa solo con números, sin puntos.";
+      if (!Number.isFinite(n) || n <= 0) e.tarifas = "Escribe la tarifa solo con números, sin puntos.";
     }
   }
   if (paso === 3) {
-    if (b.visibilidad !== "reservado" && b.visibilidad !== "visible") e.visibilidad = "Elija una opción.";
-    if (!b.autorizo) e.autorizo = "Para crear su perfil necesitamos su autorización.";
+    if (b.visibilidad !== "reservado" && b.visibilidad !== "visible") e.visibilidad = "Elige una opción.";
+    if (!b.autorizo) e.autorizo = "Para crear tu perfil necesitamos tu autorización.";
   }
   return e;
 }

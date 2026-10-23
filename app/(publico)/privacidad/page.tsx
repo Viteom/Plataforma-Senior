@@ -4,28 +4,28 @@ import type { Metadata } from "next";
 import { Pantalla } from "@/components/layout/pantalla";
 import { MARCA } from "@/lib/marca";
 
-export const metadata: Metadata = { title: "Cómo cuidamos sus datos" };
+export const metadata: Metadata = { title: "Cómo cuidamos tus datos" };
 
 const puntos = [
   {
     icono: EyeOff,
-    titulo: "Su edad nunca la ve una empresa",
-    texto: "La fecha de nacimiento la guarda aparte y solo la puede ver el equipo, que deja registro cada vez que la consulta.",
+    titulo: "Tu edad nunca la ve una empresa",
+    texto: "Tu fecha de nacimiento se guarda aparte y solo la puede ver el equipo, que deja registro cada vez que la consulta.",
   },
   {
     icono: UserCheck,
-    titulo: "Usted decide quién ve su nombre",
-    texto: "Con perfil reservado, las empresas ven su experiencia pero no su nombre ni su foto hasta que usted acepte conocerlas.",
+    titulo: "Tú decides quién ve tu nombre",
+    texto: "Con perfil reservado, las empresas ven tu experiencia pero no tu nombre ni tu foto hasta que aceptes conocerlas.",
   },
   {
     icono: Lock,
-    titulo: "Su historia se usa para armar su huella",
-    texto: "Si usa el asistente, el texto se procesa con un proveedor de inteligencia artificial fuera de Colombia, sin su nombre, sus datos de contacto ni fechas. Antes de abrir el piloto verificamos y publicamos aquí que el proveedor no la usa para entrenar sus modelos.",
+    titulo: "Tu historia se usa para armar tu huella",
+    texto: "Si usas el asistente, el texto se procesa con un proveedor de inteligencia artificial fuera de Colombia, sin tu nombre, tus datos de contacto ni fechas. Antes de abrir el piloto verificamos y publicamos aquí que el proveedor no la usa para entrenar sus modelos.",
   },
   {
     icono: Trash2,
-    titulo: "Puede descargar o borrar sus datos",
-    texto: "Desde Mi perfil, cuando quiera.",
+    titulo: "Puedes descargar o borrar tus datos",
+    texto: "Desde Mi perfil, cuando quieras.",
   },
 ];
 
@@ -33,8 +33,8 @@ const puntos = [
 export default function Privacidad() {
   return (
     <Pantalla
-      titulo="Cómo cuidamos sus datos"
-      intro={`${MARCA.nombre} trata sus datos según la Ley 1581 de 2012 de Colombia.`}
+      titulo="Cómo cuidamos tus datos"
+      intro={`${MARCA.nombre} trata tus datos según la Ley 1581 de 2012 de Colombia.`}
     >
       <ul className="flex flex-col gap-5">
         {puntos.map(({ icono: Icono, titulo, texto }) => (

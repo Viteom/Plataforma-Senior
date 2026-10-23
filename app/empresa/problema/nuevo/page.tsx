@@ -24,7 +24,7 @@ export default async function ProblemaNuevo() {
     <div className="max-w-3xl">
       <Pantalla
         titulo="Buscar por un problema"
-        intro="Cuéntenos qué necesita resolver y qué debe saber la persona. Nuestro equipo revisa y le propone hasta 5 perfiles; solo verá los que digan que les interesa."
+        intro="Cuéntanos qué necesitas resolver y qué debe saber la persona. Nuestro equipo revisa y te propone hasta 5 perfiles; solo verás los que digan que les interesa."
       >
         <AvisoEmpresa empresa={empresa} />
         <FormularioProblema taxonomia={taxonomia} />

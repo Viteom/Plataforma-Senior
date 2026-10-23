@@ -22,7 +22,7 @@ export default async function Empresas() {
   return (
     <Pantalla
       titulo="Empresas y reportes"
-      intro="Ninguna empresa llega al talento sin verificar (regla 9). Revise el NIT en el RUES antes de marcarla."
+      intro="Ninguna empresa llega al talento sin verificar (regla 9). Revisa el NIT en el RUES antes de marcarla."
     >
       <section aria-labelledby="verificar" className="flex flex-col gap-4">
         <h2 id="verificar" className="text-xl">
@@ -65,7 +65,7 @@ export default async function Empresas() {
         <h2 id="reportes" className="text-xl">
           Reportes abiertos ({abiertos.length})
         </h2>
-        <p className="text-text-muted">Revise en máximo 2 días hábiles. Con dos reportes confirmados, la empresa queda en pausa para todo el talento.</p>
+        <p className="text-text-muted">Revisa en máximo 2 días hábiles. Con dos reportes confirmados, la empresa queda en pausa para todo el talento.</p>
         {abiertos.length ? (
           <ul className="flex flex-col gap-4">
             {abiertos.map((r) => (

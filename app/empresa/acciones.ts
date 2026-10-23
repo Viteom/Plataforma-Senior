@@ -28,11 +28,11 @@ async function sesion() {
 // Traduce los errores de la base a algo que la empresa entienda, sin detalles internos.
 function mensaje(error: { message?: string } | null): string {
   const m = error?.message ?? "";
-  if (/sin verificar|pausada/.test(m)) return "Su empresa todavía no está verificada o está en pausa. Le escribimos cuando quede lista.";
-  if (/registrada/.test(m)) return "Primero registre los datos de su empresa.";
-  if (/una_conexion_viva|duplicate/.test(m)) return "Ya pidió conocer este perfil. Lo verá en Mis procesos.";
+  if (/sin verificar|pausada/.test(m)) return "Tu empresa todavía no está verificada o está en pausa. Te escribimos cuando quede lista.";
+  if (/registrada/.test(m)) return "Primero registra los datos de tu empresa.";
+  if (/una_conexion_viva|duplicate/.test(m)) return "Ya pediste conocer este perfil. Lo verás en Mis procesos.";
   if (/no disponible/.test(m)) return "Este perfil ya no está disponible.";
-  return "No pudimos guardar. Intente de nuevo o pida ayuda.";
+  return "No pudimos guardar. Intenta de nuevo o pide ayuda.";
 }
 
 export async function registrarEmpresa(_p: Estado, datos: FormData): Promise<Estado> {
@@ -42,17 +42,17 @@ export async function registrarEmpresa(_p: Estado, datos: FormData): Promise<Est
   const tamano = texto(datos.get("tamano"), 40);
   const ciudad = texto(datos.get("ciudad"), 80);
   const contacto = texto(datos.get("contacto"), 120);
-  if (nombre.length < 2) return { error: "Escriba el nombre de la empresa." };
-  if (nit.length < 9 || nit.length > 10) return { error: "Escriba el NIT sin dígito de verificación: 9 o 10 números." };
-  if (ciudad.length < 2) return { error: "Escriba la ciudad." };
-  if (contacto.length < 2) return { error: "Escriba el nombre de la persona de contacto." };
+  if (nombre.length < 2) return { error: "Escribe el nombre de la empresa." };
+  if (nit.length < 9 || nit.length > 10) return { error: "Escribe el NIT sin dígito de verificación: 9 o 10 números." };
+  if (ciudad.length < 2) return { error: "Escribe la ciudad." };
+  if (contacto.length < 2) return { error: "Escribe el nombre de la persona de contacto." };
   if (MODO_DEMO) return DEMO;
 
   const { supabase, user } = await sesion();
   const { error } = await supabase.from("companies").insert({ owner_id: user.id, nombre, nit, sector, tamano, ciudad, contacto });
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa", "layout");
-  return { aviso: "Listo. Nuestro equipo verifica el NIT en el RUES; mientras tanto puede explorar perfiles." };
+  return { aviso: "Listo. Nuestro equipo verifica el NIT en el RUES; mientras tanto puedes explorar perfiles." };
 }
 
 export async function pedirConexion(_p: Estado, datos: FormData): Promise<Estado> {
@@ -74,20 +74,20 @@ export async function quieroConocer(_p: Estado, datos: FormData): Promise<Estado
   const { error } = await supabase.rpc("actuar_conexion", { conexion, accion: "quiero_conocer" });
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa", "layout");
-  return { aviso: "Listo. Nuestro equipo les pone en contacto en las próximas 24 horas hábiles." };
+  return { aviso: "Listo. Nuestro equipo los pone en contacto en las próximas 24 horas hábiles." };
 }
 
 export async function cerrarConexion(_p: Estado, datos: FormData): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   const evaluacion = Number(datos.get("evaluacion"));
   if (!UUID.test(conexion)) return { error: "Conexión no válida." };
-  if (!Number.isInteger(evaluacion) || evaluacion < 1 || evaluacion > 5) return { error: "Elija una calificación de 1 a 5." };
+  if (!Number.isInteger(evaluacion) || evaluacion < 1 || evaluacion > 5) return { error: "Elige una calificación de 1 a 5." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await sesion();
   const { error } = await supabase.rpc("actuar_conexion", { conexion, accion: "cerrar", evaluacion });
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa", "layout");
-  return { aviso: "Gracias. Su evaluación ayuda a otras empresas a confiar." };
+  return { aviso: "Gracias. Tu evaluación ayuda a otras empresas a confiar." };
 }
 
 // Buscar por un problema. Los requisitos se eligen de la taxonomía (sin IA: la IA está apagada).
@@ -101,14 +101,14 @@ export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estad
   const obligatorios = datos.getAll("obligatorio").map(String).filter((v) => UUID.test(v));
   const deseables = datos.getAll("deseable").map(String).filter((v) => UUID.test(v) && !obligatorios.includes(v));
 
-  if (problema.length < 20) return { error: "Cuéntenos el problema con un poco más de detalle." };
-  if (!formatos.length) return { error: "Elija al menos una forma de contratar." };
-  if (!obligatorios.length && !deseables.length) return { error: "Elija al menos un requisito de la lista." };
+  if (problema.length < 20) return { error: "Cuéntanos el reto con un poco más de detalle." };
+  if (!formatos.length) return { error: "Elige al menos una forma de contratar." };
+  if (!obligatorios.length && !deseables.length) return { error: "Elige al menos un requisito de la lista." };
   if (MODO_DEMO) redirect(`/empresa/problema/${necesidadEjemplo.id}`);
 
   const { supabase } = await sesion();
   const { data: empresa } = await supabase.rpc("mi_empresa");
-  if (!empresa) return { error: "Primero registre los datos de su empresa." };
+  if (!empresa) return { error: "Primero registra los datos de tu empresa." };
 
   const { data: necesidad, error } = await supabase
     .from("needs")
@@ -136,17 +136,17 @@ export async function pedirCotizacion(_p: Estado, datos: FormData): Promise<Esta
   const mes = texto(datos.get("mes"), 20);
   const nota = texto(datos.get("nota"), 1000) || null;
   if (!UUID.test(experiencia)) return { error: "Experiencia no válida." };
-  if (!Number.isInteger(personas) || personas < 1 || personas > 500) return { error: "Escriba cuántas personas, de 1 a 500." };
-  if (!mes) return { error: "Elija el mes." };
+  if (!Number.isInteger(personas) || personas < 1 || personas > 500) return { error: "Escribe cuántas personas, de 1 a 500." };
+  if (!mes) return { error: "Elige el mes." };
   if (MODO_DEMO) return DEMO;
 
   const { supabase } = await sesion();
   const { data: empresa } = await supabase.rpc("mi_empresa");
-  if (!empresa) return { error: "Primero registre los datos de su empresa en «Mi empresa»." };
+  if (!empresa) return { error: "Primero registra los datos de tu empresa en «Mi empresa»." };
   const { error } = await supabase
     .from("experience_requests")
     .insert({ experience_id: experiencia, company_id: empresa, formato, personas, mes, nota });
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa/procesos");
-  return { aviso: "Listo. Le enviamos la cotización en los próximos días hábiles. La verá en Mis procesos." };
+  return { aviso: "Listo. Te enviamos la cotización en los próximos días hábiles. La verás en Mis procesos." };
 }

@@ -35,7 +35,7 @@ describe("chat de ayuda sin IA", () => {
   });
 
   it("la edad nunca la ve una empresa", () => {
-    expect(responder("¿las empresas ven mi edad?").texto).toMatch(/nunca ven su edad/);
+    expect(responder("¿las empresas ven mi edad?").texto).toMatch(/nunca ven tu edad/);
   });
 
   it("si no entiende, lo dice y ofrece la llamada", () => {

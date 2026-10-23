@@ -49,7 +49,7 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
         <p role="status" className="flex items-start gap-3 rounded-md border-2 border-danger p-4">
           <AlertTriangle aria-hidden className="mt-0.5 size-6 shrink-0 text-danger" />
           <span>
-            <span className="font-bold">Empresa sin verificar.</span> Puede preparar la lista, pero no se envía a nadie hasta
+            <span className="font-bold">Empresa sin verificar.</span> Puedes preparar la lista, pero no se envía a nadie hasta
             verificarla en{" "}
             <Link href="/equipo/empresas" className="font-bold underline underline-offset-4">
               Empresas
@@ -96,7 +96,7 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
           {enCola.length > 0 ? (
             <ElegirPropuestos need={necesidad.id} propuestas={enCola} />
           ) : (
-            <p className="text-text-muted">Calcule el puntaje para ver los 10 mejores perfiles publicados.</p>
+            <p className="text-text-muted">Calcula el puntaje para ver los 10 mejores perfiles publicados.</p>
           )}
         </section>
       )}
