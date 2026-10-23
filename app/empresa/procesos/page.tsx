@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EstadoConexion } from "@/components/empresa/estado";
-import { TEXTO_FORMATO, TEXTO_SOLICITUD } from "@/components/experiencias/textos";
+import { TEXTO_SOLICITUD, TEXTO_TIPO } from "@/components/experiencias/textos";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { listarConexiones } from "@/lib/datos/consultas";
@@ -27,7 +27,7 @@ export default async function Procesos() {
   const directas = conexiones.filter((c) => c.origen === "exploracion");
 
   return (
-    <Pantalla titulo="Mis procesos" intro="Tus búsquedas, los perfiles que pediste conocer y tus experiencias.">
+    <Pantalla titulo="Mis procesos" intro="Tus búsquedas, los perfiles que pediste conocer y tus pedidos del campo.">
       <section aria-labelledby="busquedas" className="flex flex-col gap-3">
         <h2 id="busquedas" className="text-xl">
           Búsquedas por problema
@@ -112,7 +112,7 @@ export default async function Procesos() {
       </section>
       <section aria-labelledby="experiencias" className="flex flex-col gap-3">
         <h2 id="experiencias" className="text-xl">
-          Experiencias con saberes
+          Talento del campo
         </h2>
         {solicitudes.length ? (
           <ul className="flex flex-col gap-3">
@@ -123,7 +123,7 @@ export default async function Procesos() {
                   <span className="text-base text-text-muted">{fecha(s.creado_en)}</span>
                 </div>
                 <p className="text-base">
-                  {TEXTO_FORMATO[s.formato]} · {s.personas} personas · {s.mes}
+                  {TEXTO_TIPO[s.tipo].formato[s.formato]} · {s.personas} {TEXTO_TIPO[s.tipo].unidad} · {s.mes}
                 </p>
                 <p className="font-bold">{TEXTO_SOLICITUD[s.estado]}</p>
                 {s.valor_cotizado !== null && <p>Valor cotizado: {pesos(s.valor_cotizado)}</p>}
@@ -131,8 +131,9 @@ export default async function Procesos() {
                   <div className="rounded-md bg-surface p-4">
                     <p className="font-bold">Reporte de impacto</p>
                     <p>
-                      {s.impacto.personas_impactadas} personas de su equipo participaron durante {s.impacto.horas} horas. La sabedora o
-                      el sabedor recibió {pesos(s.impacto.pago_persona)}.
+                      {s.tipo === "oficio"
+                        ? `${s.impacto.personas_impactadas} personas del territorio trabajaron ${s.impacto.horas} horas en tu pedido y recibieron ${pesos(s.impacto.pago_persona)}.`
+                        : `${s.impacto.personas_impactadas} personas de tu equipo participaron durante ${s.impacto.horas} horas. La sabedora o el sabedor recibió ${pesos(s.impacto.pago_persona)}.`}
                     </p>
                   </div>
                 )}
@@ -141,9 +142,9 @@ export default async function Procesos() {
           </ul>
         ) : (
           <p className="text-text-muted">
-            Todavía no has pedido una experiencia.{" "}
-            <Link href="/empresa/experiencias" className="font-bold text-text underline underline-offset-4">
-              Ver experiencias
+            Todavía no has pedido un taller ni un oficio por encargo.{" "}
+            <Link href="/empresa/campo" className="font-bold text-text underline underline-offset-4">
+              Ver Talento del campo
             </Link>
           </p>
         )}

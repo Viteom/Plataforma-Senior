@@ -2,7 +2,7 @@ import { CircleCheck, CircleDashed, PauseCircle, Pencil, Plus } from "lucide-rea
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { TEXTO_FORMATO, TEXTO_SOLICITUD } from "@/components/experiencias/textos";
+import { TEXTO_SOLICITUD, TEXTO_TIPO } from "@/components/experiencias/textos";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { pesos } from "@/lib/formas";
 
 import { avanzarSolicitud, cambiarEstadoExperiencia, registrarImpacto } from "../acciones";
 
-export const metadata: Metadata = { title: "Experiencias" };
+export const metadata: Metadata = { title: "Talento del campo" };
 
 const ESTADO = {
   borrador: { icono: CircleDashed, texto: "Borrador" },
@@ -26,11 +26,14 @@ export default async function EquipoExperiencias() {
   const [experiencias, solicitudes] = await Promise.all([listarExperiencias(), listarSolicitudes()]);
 
   return (
-    <Pantalla titulo="Experiencias" intro="Se publican solo cuando la sabedora o el sabedor aprobó cómo aparece.">
+    <Pantalla
+      titulo="Talento del campo"
+      intro="Talleres, experiencias y oficios por encargo que Vasees arma con personas del territorio. Se publican solo cuando quien lo hace aprobó cómo aparece."
+    >
       <Button asChild className="self-start">
         <Link href="/equipo/experiencias/nueva">
           <Plus aria-hidden />
-          Crear experiencia
+          Crear oferta
         </Link>
       </Button>
 
@@ -42,18 +45,20 @@ export default async function EquipoExperiencias() {
           {experiencias.map((e) => {
             const { icono: Icono, texto } = ESTADO[e.estado];
             const faltan = [
-              !e.sabedora_nombre && "sabedora",
-              !e.duracion && "duración",
-              !e.grupo_max && "grupo",
+              !e.sabedora_nombre && TEXTO_TIPO[e.tipo].quien.toLowerCase(),
+              !e.duracion && TEXTO_TIPO[e.tipo].duracion.toLowerCase(),
+              !e.grupo_max && TEXTO_TIPO[e.tipo].grupo.toLowerCase(),
               !e.precio_desde && "precio",
-              !e.momentos.length && "momentos",
+              !e.momentos.length && "pasos",
               !e.testimonio && "testimonio",
-              !e.aprobada_por_sabedora_en && "aprobación de la sabedora",
+              !e.aprobada_por_sabedora_en && "aprobación de quien lo hace",
             ].filter(Boolean);
             return (
               <li key={e.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="text-lg">{e.nombre}</h3>
+                  <h3 className="text-lg">
+                    {e.nombre} <span className="text-base font-normal text-text-muted">· {TEXTO_TIPO[e.tipo].nombre}</span>
+                  </h3>
                   <span className="inline-flex items-center gap-2 font-bold">
                     <Icono aria-hidden className="size-5" />
                     {texto}
@@ -84,7 +89,7 @@ export default async function EquipoExperiencias() {
           Solicitudes de cotización
         </h2>
         <p className="text-text-muted">
-          El correo automático está apagado: avise a la empresa por correo o teléfono cuando cotice o confirme.
+          El correo automático está apagado: avisa a la empresa por correo o teléfono cuando cotices o confirmes.
         </p>
         {solicitudes.length ? (
           <ul className="flex flex-col gap-4">
@@ -111,7 +116,7 @@ function Solicitud({ s }: { s: SolicitudExperiencia }) {
           {s.empresa} · {s.experiencia}
         </p>
         <p>
-          {TEXTO_FORMATO[s.formato]} · {s.personas} personas · {s.mes}
+          {TEXTO_TIPO[s.tipo].formato[s.formato]} · {s.personas} {TEXTO_TIPO[s.tipo].unidad} · {s.mes}
         </p>
         {s.nota && <p className="text-text-muted">«{s.nota}»</p>}
       </div>
@@ -142,7 +147,7 @@ function Solicitud({ s }: { s: SolicitudExperiencia }) {
             <Campo id={`horas-${s.id}`} etiqueta="Horas">
               {(p) => <Input {...p} name="horas" inputMode="decimal" />}
             </Campo>
-            <Campo id={`pago-${s.id}`} etiqueta="Pago a la sabedora">
+            <Campo id={`pago-${s.id}`} etiqueta="Pago a quien lo hizo">
               {(p) => <Input {...p} name="pago" inputMode="numeric" />}
             </Campo>
           </div>
@@ -153,7 +158,7 @@ function Solicitud({ s }: { s: SolicitudExperiencia }) {
       )}
       {s.impacto && (
         <p className="rounded-md bg-surface p-4">
-          {s.impacto.personas_impactadas} personas · {s.impacto.horas} horas · {pesos(s.impacto.pago_persona)} para la sabedora
+          {s.impacto.personas_impactadas} personas · {s.impacto.horas} horas · {pesos(s.impacto.pago_persona)} para quien lo hizo
         </p>
       )}
     </article>

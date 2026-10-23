@@ -98,3 +98,20 @@ select * from (values
   ('d0000000-0000-4000-8000-000000000004'::uuid, 'medio_tiempo'::tipo_oferta, 20, 'presencial', 2000000::numeric)
 ) as o(talent_id, tipo, horas_semana, modalidad, tarifa_esperada)
 where not exists (select 1 from talent_offers t where t.talent_id = o.talent_id);
+
+-- 6. Talento del campo: un oficio por encargo y un taller, publicados, para que las empresas los vean.
+insert into experiences (slug, tipo, nombre, proposito, sabedora_nombre, sabedora_pueblo, temas, para_quien, beneficios, momentos, formatos, lugar, duracion, grupo_min, grupo_max, precio_desde, porcentaje_sabedora, estado, aprobada_por_sabedora_en)
+values
+  ('tejidos-en-guanga-prueba', 'oficio', 'Tejidos en guanga por encargo (prueba)',
+   'Ruanas, mochilas y tapices tejidos a mano en telar de guanga, para regalos corporativos o para vestir un espacio. Cada pieza lleva el nombre de quien la tejió.',
+   'Asociación de tejedoras de la vereda (prueba)', 'Nariño', '{Tejido,"Regalos corporativos"}', 'Empresas que buscan regalos con historia',
+   '{"Piezas únicas, hechas a mano","Una tarjeta con la historia de quien la tejió"}',
+   '[{"titulo":"Diseño","descripcion":"Eliges colores y tamaño con nuestro equipo."},{"titulo":"Tejido","descripcion":"Las tejedoras trabajan en sus casas, a su ritmo."},{"titulo":"Entrega","descripcion":"Vasees revisa cada pieza y la lleva a tu sede."}]'::jsonb,
+   '{sede}', null, '4 a 6 semanas', 10, 200, 120000, 70, 'publicada', now()),
+  ('taller-de-cesteria-prueba', 'experiencia', 'Taller de cestería con fibras naturales (prueba)',
+   'Tu equipo aprende a tejer una canasta pequeña con fibras naturales mientras conversa sobre el trabajo paciente y en equipo.',
+   'Maestro artesano de la región (prueba)', 'Boyacá', '{Cestería,"Trabajo en equipo"}', 'Equipos de hasta 25 personas',
+   '{"Una canasta tejida por cada persona","Una pausa para conversar sobre el trabajo en equipo"}',
+   '[{"titulo":"Apertura","descripcion":"El maestro cuenta de dónde viene la fibra."},{"titulo":"Tejido","descripcion":"Cada persona teje su canasta con acompañamiento."},{"titulo":"Cierre","descripcion":"Conversamos sobre lo que el oficio enseña del trabajo en equipo."}]'::jsonb,
+   '{territorio,sede}', 'Tibasosa, Boyacá', '3 horas', 8, 25, 85000, 60, 'publicada', now())
+on conflict (slug) do nothing;

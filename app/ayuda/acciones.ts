@@ -6,7 +6,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type Estado = { error?: string; aviso?: string };
 
-// "Llámeme": funciona también sin cuenta. Quien no logra entrar es quien más lo necesita.
+// "Llámame": funciona también sin cuenta. Quien no logra entrar es quien más lo necesita.
 export async function pedirLlamada(_p: Estado, datos: FormData): Promise<Estado> {
   const celular = normalizarCelular(String(datos.get("celular") ?? ""));
   const franja = datos.get("franja") === "tarde" ? "tarde" : "manana";
@@ -28,7 +28,7 @@ export async function pedirLlamada(_p: Estado, datos: FormData): Promise<Estado>
 }
 
 // El chat detectó un tema que atiende una persona. Con sesión, se crea la solicitud; sin sesión,
-// la pantalla pide el celular (Llámeme).
+// la pantalla pide el celular (Llámame).
 export async function escalarChat(categoria: string, mensaje: string): Promise<{ creada: boolean }> {
   if (MODO_DEMO) return { creada: false };
   const supabase = await crearClienteServidor();

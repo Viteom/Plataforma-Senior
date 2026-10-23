@@ -33,7 +33,7 @@ export default function Ayuda() {
             <div className="flex items-center gap-3">
               <Phone aria-hidden className="size-7" />
               <h2 id="titulo-llameme" className="text-xl">
-                Llámeme
+                Llámame
               </h2>
             </div>
             <p>Déjanos tu número y una persona del equipo te llama. No necesitas cuenta.</p>

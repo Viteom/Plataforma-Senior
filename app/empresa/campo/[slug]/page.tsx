@@ -1,8 +1,8 @@
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Package, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { MESES, TEXTO_FORMATO } from "@/components/experiencias/textos";
+import { MESES, TEXTO_TIPO } from "@/components/experiencias/textos";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { Campo, Input, Textarea } from "@/components/ui/campo";
@@ -12,17 +12,28 @@ import { pesos } from "@/lib/formas";
 
 import { pedirCotizacion } from "../../acciones";
 
-export default async function FichaExperiencia({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const exp = await obtenerExperiencia((await params).slug);
+  return { title: exp?.nombre ?? "Talento del campo" };
+}
+
+export default async function FichaCampo({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const exp = await obtenerExperiencia(slug);
   if (!exp) notFound();
 
+  const t = TEXTO_TIPO[exp.tipo];
+  const Icono = exp.tipo === "oficio" ? Package : Sparkles;
   const grupo =
-    exp.grupo_min && exp.grupo_max ? `De ${exp.grupo_min} a ${exp.grupo_max} personas` : exp.grupo_max ? `Hasta ${exp.grupo_max} personas` : null;
+    exp.grupo_min && exp.grupo_max
+      ? `De ${exp.grupo_min} a ${exp.grupo_max} ${t.unidad}`
+      : exp.grupo_max
+        ? `Hasta ${exp.grupo_max} ${t.unidad}`
+        : null;
   const datos = [
-    ["Sabedora o sabedor", exp.sabedora_nombre ? [exp.sabedora_nombre, exp.sabedora_pueblo].filter(Boolean).join(", ") : null],
-    ["Duración", exp.duracion],
-    ["Grupo", grupo],
+    [t.quien, exp.sabedora_nombre ? [exp.sabedora_nombre, exp.sabedora_pueblo].filter(Boolean).join(", ") : null],
+    [t.duracion, exp.duracion],
+    [t.grupo, grupo],
     ["Precio desde", exp.precio_desde ? pesos(exp.precio_desde) : null],
   ] as const;
   const mesActual = new Date().getMonth();
@@ -33,17 +44,18 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
         titulo={exp.nombre}
         antesDelTitulo={
           <Link
-            href="/empresa/experiencias"
+            href="/empresa/campo"
             className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline-offset-4 hover:underline"
           >
             <ArrowLeft aria-hidden className="size-5" />
-            Volver a experiencias
+            Volver a Talento del campo
           </Link>
         }
         intro={exp.proposito}
       >
-        <div className="flex aspect-[16/9] items-center justify-center rounded-lg bg-surface-strong">
-          <Sparkles aria-hidden className="size-16 text-text-muted" />
+        <p className="self-start rounded-full bg-surface px-3 text-base font-bold">{t.nombre}</p>
+        <div className="flex aspect-[16/9] items-center justify-center rounded-lg bg-deep">
+          <Icono aria-hidden className="size-16 text-accent" />
           <span className="sr-only">Fotos por cargar</span>
         </div>
 
@@ -65,7 +77,7 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
         {exp.beneficios.length > 0 && (
           <section aria-labelledby="beneficios" className="flex flex-col gap-2">
             <h2 id="beneficios" className="text-xl">
-              Lo que se lleva tu equipo
+              {t.recibe}
             </h2>
             <ul className="list-disc pl-6">
               {exp.beneficios.map((b) => (
@@ -78,12 +90,12 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
         {exp.momentos.length > 0 && (
           <section aria-labelledby="momentos" className="flex flex-col gap-3">
             <h2 id="momentos" className="text-xl">
-              Cómo transcurre
+              {t.proceso}
             </h2>
             <ol className="flex flex-col gap-3">
               {exp.momentos.map((m, i) => (
                 <li key={m.titulo} className="flex gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-strong font-bold">{i + 1}</span>
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary font-bold text-on-primary">{i + 1}</span>
                   <div>
                     <p className="font-bold">{m.titulo}</p>
                     <p className="text-text-muted">{m.descripcion}</p>
@@ -94,7 +106,11 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
           </section>
         )}
 
-        {exp.testimonio && <blockquote className="border-l-4 border-text pl-4 text-lg italic">{exp.testimonio}</blockquote>}
+        {exp.testimonio && <blockquote className="border-l-4 border-deep pl-4 text-lg italic">{exp.testimonio}</blockquote>}
+        <p className="rounded-md bg-surface p-4">
+          Vasees arma esta oferta con quienes la hacen, en su territorio. Ellas y ellos no tienen que usar la app: nosotros
+          cotizamos, coordinamos y te acompañamos.
+        </p>
         {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo.</p>}
       </Pantalla>
 
@@ -108,14 +124,14 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
             {exp.formatos.map((f, i) => (
               <label key={f} className="flex min-h-tap items-center gap-3 text-lg">
                 <input type="radio" name="formato" value={f} defaultChecked={i === 0} className="size-6 accent-[var(--color-primary)]" />
-                {TEXTO_FORMATO[f]}
+                {t.formato[f]}
               </label>
             ))}
           </fieldset>
-          <Campo id="personas" etiqueta="¿Cuántas personas?">
+          <Campo id="personas" etiqueta={t.cantidad}>
             {(p) => <Input {...p} name="personas" type="number" inputMode="numeric" min={1} max={500} className={`${p.className} max-w-40`} />}
           </Campo>
-          <Campo id="mes" etiqueta="Mes">
+          <Campo id="mes" etiqueta={exp.tipo === "oficio" ? "¿Para qué mes lo necesitas?" : "Mes"}>
             {(p) => (
               <select {...p} name="mes" defaultValue={MESES[(mesActual + 1) % 12]} className={`${p.className} min-h-action`}>
                 {MESES.map((m) => (
@@ -124,7 +140,7 @@ export default async function FichaExperiencia({ params }: { params: Promise<{ s
               </select>
             )}
           </Campo>
-          <Campo id="nota" etiqueta="Nota (opcional)">
+          <Campo id="nota" etiqueta="Nota (opcional)" ayuda={exp.tipo === "oficio" ? "Colores, tamaños o para qué es." : undefined}>
             {(p) => <Textarea {...p} name="nota" rows={3} className={`${p.className} min-h-28`} />}
           </Campo>
         </BotonAccion>

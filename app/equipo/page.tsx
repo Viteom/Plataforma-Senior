@@ -20,7 +20,7 @@ export default async function PanelCuraduria() {
     { cuantos: conteos.etiquetas, que: conteos.etiquetas === 1 ? "etiqueta nueva por revisar" : "etiquetas nuevas por revisar", href: "/equipo/etiquetas" },
     { cuantos: conteos.ayuda, que: conteos.ayuda === 1 ? "solicitud de ayuda" : "solicitudes de ayuda", href: "/equipo/ayuda" },
     { cuantos: conteos.avisos, que: conteos.avisos === 1 ? "aviso por dar" : "avisos por dar", href: "/equipo/ayuda#avisos" },
-    { cuantos: conteos.cotizaciones, que: conteos.cotizaciones === 1 ? "experiencia por cotizar" : "experiencias por cotizar", href: "/equipo/experiencias" },
+    { cuantos: conteos.cotizaciones, que: conteos.cotizaciones === 1 ? "pedido del campo por cotizar" : "pedidos del campo por cotizar", href: "/equipo/experiencias" },
   ];
 
   return (

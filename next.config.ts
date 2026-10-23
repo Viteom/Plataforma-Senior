@@ -9,6 +9,13 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+  // La sección de experiencias pasó a llamarse Talento del campo.
+  async redirects() {
+    return [
+      { source: "/empresa/experiencias", destination: "/empresa/campo", permanent: true },
+      { source: "/empresa/experiencias/:slug", destination: "/empresa/campo/:slug", permanent: true },
+    ];
+  },
   experimental: {
     // El registro asistido envía foto, audio de la historia y firma juntos.
     serverActions: { bodySizeLimit: "25mb" },

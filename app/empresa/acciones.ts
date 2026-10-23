@@ -136,7 +136,7 @@ export async function pedirCotizacion(_p: Estado, datos: FormData): Promise<Esta
   const mes = texto(datos.get("mes"), 20);
   const nota = texto(datos.get("nota"), 1000) || null;
   if (!UUID.test(experiencia)) return { error: "Experiencia no válida." };
-  if (!Number.isInteger(personas) || personas < 1 || personas > 500) return { error: "Escribe cuántas personas, de 1 a 500." };
+  if (!Number.isInteger(personas) || personas < 1 || personas > 500) return { error: "Escribe la cantidad, de 1 a 500." };
   if (!mes) return { error: "Elige el mes." };
   if (MODO_DEMO) return DEMO;
 

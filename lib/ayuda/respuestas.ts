@@ -99,8 +99,8 @@ const PREGUNTAS: { claves: string[]; texto: string; enlace?: Enlace }[] = [
     enlace: { href: "/emprende", texto: "Ir a Emprende" },
   },
   {
-    claves: ["taller", "experiencia", "sabedora", "sabedor", "tejido"],
-    texto: "Las experiencias con saberes son talleres que guían sabedoras y sabedores para equipos de empresas. Si enseñas un oficio tradicional, cuéntanos y te ayudamos a armar la tuya.",
+    claves: ["taller", "experiencia", "sabedora", "sabedor", "tejido", "campo", "encargo", "artesania", "artesanía"],
+    texto: "Talento del campo son talleres y oficios por encargo con personas del territorio, que Vasees arma con ellas. Si tienes un oficio o un saber tradicional, cuéntanos y te ayudamos a armar tu oferta.",
   },
   {
     claves: ["celular", "cambiar numero", "otro numero"],
