@@ -1,29 +1,38 @@
 @import "tailwindcss";
 
 /*
-  Tokens de marca. Provisionales (escala de grises) hasta que llegue el brandbook:
-  cambiar solo estos valores, nunca colores literales en componentes.
-  Contrastes en design-system/plataforma-senior/MASTER.md.
+  Tokens de marca Kánna (brandbook: https://claude.ai/artifact/V7A3pmoq1R8xU4WdwoU1cv).
+  Cambiar solo estos valores, nunca colores literales en componentes.
+  Contrastes verificados (WCAG 2.2 AA): cobalto/crema 6:1, blanco/cobalto 6,7:1,
+  bosque/lima 7:1, tinta suave/crema 6,9:1. La lima es la «cana»: escasa, nunca
+  como texto sobre crema ni blanco.
 */
 @theme {
   --color-*: initial;
-  --color-bg: #ffffff;
-  --color-surface: #f4f4f4;
-  --color-surface-strong: #e6e6e6;
-  --color-text: #141414;
-  --color-text-muted: #4d4d4d;
-  --color-border: #767676;
-  --color-border-subtle: #d4d4d4;
-  --color-primary: #141414;
-  --color-primary-hover: #3a3a3a;
+  --color-bg: #f4f2ec; /* crema */
+  --color-surface: #e7e3d8; /* crema-200, superficie hundida */
+  --color-surface-strong: #d6d1c4;
+  --color-raised: #ffffff; /* tarjetas elevadas */
+  --color-text: #141414; /* casi negro */
+  --color-text-muted: #55534d;
+  --color-border: #7a776f; /* borde de controles, 4:1 sobre crema */
+  --color-border-subtle: #d6d1c4;
+  --color-primary: #1e3bff; /* cobalto */
+  --color-primary-hover: #1730d6;
   --color-on-primary: #ffffff;
-  --color-focus: #0b57d0;
-  --color-danger: #b3261e;
-  --color-success: #1e6b34;
+  --color-accent: #c6f24e; /* lima */
+  --color-on-accent: #14532d;
+  --color-deep: #14532d; /* bosque: confianza y Experiencias */
+  --color-on-deep: #f4f2ec;
+  --color-focus: #1e3bff;
+  --color-danger: #b42318;
+  --color-success: #14532d;
   --color-white: #ffffff;
   --color-transparent: transparent;
 
-  --font-sans: var(--font-atkinson), system-ui, sans-serif;
+  --font-sans: var(--font-atkinson), system-ui, sans-serif; /* toda la app */
+  --font-display: var(--font-bricolage), "Arial Black", system-ui, sans-serif; /* titulares de marca */
+  --font-editorial: var(--font-instrument), Georgia, serif; /* remates en cursiva */
 
   /* Escala tipográfica: base de 18 px, nada de lectura por debajo de 16 px */
   --text-*: initial;
@@ -40,9 +49,9 @@
   --text-3xl: 2.25rem;
   --text-3xl--line-height: 1.2;
 
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
+  --radius-sm: 0.5rem; /* campos */
+  --radius-md: 1rem; /* avisos y tarjetas pequeñas */
+  --radius-lg: 1.75rem; /* tarjetas y puertas */
 
   --shadow-float: 0 8px 24px rgb(0 0 0 / 0.16);
 
