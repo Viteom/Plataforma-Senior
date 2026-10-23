@@ -36,6 +36,20 @@ describe("experiencias", () => {
     expect(await como(db, u.curador, (tx) => filas(tx, "select * from experiences"))).toHaveLength(1);
   });
 
+  it("Talento del campo: lo existente es experiencia y se pueden crear oficios por encargo", async () => {
+    const [c] = await filas(db, "select tipo from experiences where slug = 'ceremonia-del-cuidado'");
+    expect(c.tipo).toBe("experiencia");
+    await filas(
+      db,
+      "insert into experiences (slug, tipo, nombre, proposito, formatos) values ('tejidos', 'oficio', 'Tejidos por encargo', 'Ruanas tejidas a mano en telar.', '{sede}')",
+    );
+    await expect(
+      filas(db, "insert into experiences (slug, tipo, nombre, proposito, formatos) values ('x', 'vacante', 'X', 'Algo que no es del campo.', '{sede}')"),
+    ).rejects.toThrow(/check/);
+    // El oficio sigue la misma regla: sin aprobación de quien lo hace, no se publica.
+    await expect(filas(db, "update experiences set estado = 'publicada' where slug = 'tejidos'")).rejects.toThrow(/check/);
+  });
+
   it("no se publica sin la aprobación de la sabedora", async () => {
     await expect(filas(db, "update experiences set estado = 'publicada' where slug = 'ceremonia-del-cuidado'")).rejects.toThrow(/check/);
     await filas(db, "update experiences set estado = 'publicada', aprobada_por_sabedora_en = now() where slug = 'ceremonia-del-cuidado'");

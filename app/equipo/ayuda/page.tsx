@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Solicitudes de ayuda" };
 
 const CANAL: Record<string, string> = {
   chat: "Chat",
-  llamada: "Llámeme",
+  llamada: "Llámame",
   boton: "Botón de ayuda",
   seguimiento_aviso: "Sin respuesta a un aviso",
   orientacion_tarifa: "Orientación de tarifa",

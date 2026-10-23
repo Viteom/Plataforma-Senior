@@ -75,9 +75,12 @@ export type Oportunidad = {
 };
 
 // Fila de experiences (lo público; el equipo ve además el estado y la aprobación).
+export type TipoCampo = "experiencia" | "oficio";
+
 export type ExperienciaVista = {
   id: string;
   slug: string;
+  tipo: TipoCampo;
   nombre: string;
   proposito: string;
   sabedora_nombre: string | null;
@@ -103,6 +106,7 @@ export type EstadoSolicitud = "recibida" | "cotizada" | "confirmada" | "realizad
 export type SolicitudExperiencia = {
   id: string;
   experiencia: string;
+  tipo: TipoCampo;
   empresa: string;
   formato: "territorio" | "sede";
   personas: number;

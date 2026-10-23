@@ -104,7 +104,7 @@ export async function enviarElegidos(_p: Estado, datos: FormData): Promise<Estad
     if (e2) {
       return {
         error: /sin verificar|pausada/.test(e2.message)
-          ? "La empresa no está verificada o está en pausa: verifíquela en Empresas antes de enviar."
+          ? "La empresa no está verificada o está en pausa: verifícala en Empresas antes de enviar."
           : "No pudimos enviar a las personas elegidas.",
       };
     }
@@ -238,10 +238,11 @@ const aSlug = (s: string) =>
 
 export async function guardarExperiencia(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
+  const tipo = datos.get("tipo") === "oficio" ? "oficio" : "experiencia";
   const nombre = texto(datos.get("nombre"), 120);
   const proposito = texto(datos.get("proposito"), 2000);
   const formatos = datos.getAll("formatos").map(String).filter((f) => f === "territorio" || f === "sede");
-  if (nombre.length < 3) return { error: "Escribe el nombre de la experiencia." };
+  if (nombre.length < 3) return { error: "Escribe el nombre de la oferta." };
   if (proposito.length < 20) return { error: "Cuenta el propósito en al menos una frase." };
   if (!formatos.length) return { error: "Elige al menos un formato." };
 
@@ -252,11 +253,12 @@ export async function guardarExperiencia(_p: Estado, datos: FormData): Promise<E
   });
   const grupoMin = numero(datos.get("grupo_min"));
   const grupoMax = numero(datos.get("grupo_max"));
-  if (grupoMin && grupoMax && grupoMax < grupoMin) return { error: "El grupo máximo no puede ser menor que el mínimo." };
+  if (grupoMin && grupoMax && grupoMax < grupoMin) return { error: "El máximo no puede ser menor que el mínimo." };
   const porcentaje = numero(datos.get("porcentaje_sabedora"));
-  if (porcentaje !== null && (porcentaje < 0 || porcentaje > 100)) return { error: "El porcentaje para la sabedora va de 0 a 100." };
+  if (porcentaje !== null && (porcentaje < 0 || porcentaje > 100)) return { error: "El porcentaje para quien lo hace va de 0 a 100." };
 
   const campos = {
+    tipo,
     nombre,
     proposito,
     sabedora_nombre: texto(datos.get("sabedora_nombre"), 120) || null,
@@ -285,13 +287,13 @@ export async function guardarExperiencia(_p: Estado, datos: FormData): Promise<E
     const aprobada = campos.aprobada_por_sabedora_en ? (actual?.aprobada_por_sabedora_en ?? campos.aprobada_por_sabedora_en) : null;
     const estado = !aprobada && actual?.estado === "publicada" ? "borrador" : actual?.estado;
     const { error } = await supabase.from("experiences").update({ ...campos, aprobada_por_sabedora_en: aprobada, estado }).eq("id", id);
-    if (error) return { error: "No pudimos guardar la experiencia." };
+    if (error) return { error: "No pudimos guardar la oferta." };
   } else {
     const { error } = await supabase.from("experiences").insert({ ...campos, slug: `${aSlug(nombre)}-${crypto.randomUUID().slice(0, 4)}` });
-    if (error) return { error: "No pudimos crear la experiencia." };
+    if (error) return { error: "No pudimos crear la oferta." };
   }
   revalidatePath("/equipo/experiencias");
-  revalidatePath("/empresa/experiencias");
+  revalidatePath("/empresa/campo");
   return { aviso: "Guardada." };
 }
 
@@ -303,10 +305,10 @@ export async function cambiarEstadoExperiencia(_p: Estado, datos: FormData): Pro
   const { supabase } = await equipo();
   const { error } = await supabase.from("experiences").update({ estado }).eq("id", id);
   if (error) {
-    return { error: /check/.test(error.message) ? "Falta la aprobación de la sabedora: márquela al editar la experiencia." : "No pudimos cambiar el estado." };
+    return { error: /check/.test(error.message) ? "Falta la aprobación de quien lo hace: márcala al editar la oferta." : "No pudimos cambiar el estado." };
   }
   revalidatePath("/equipo/experiencias");
-  revalidatePath("/empresa/experiencias");
+  revalidatePath("/empresa/campo");
   return { aviso: estado === "publicada" ? "Publicada: ya la ven las empresas." : "Listo." };
 }
 
@@ -334,7 +336,7 @@ export async function registrarImpacto(_p: Estado, datos: FormData): Promise<Est
   const horas = numero(datos.get("horas"));
   const pago = numero(datos.get("pago"));
   if (!UUID.test(id)) return { error: "Solicitud no válida." };
-  if (personas === null || horas === null || pago === null) return { error: "Completa personas, horas y pago a la sabedora." };
+  if (personas === null || horas === null || pago === null) return { error: "Completa personas, horas y pago a quien lo hizo." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
   const { error } = await supabase.from("impact_records").insert({

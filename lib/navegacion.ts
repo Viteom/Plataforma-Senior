@@ -11,7 +11,7 @@ import {
   LayoutList,
   LifeBuoy,
   Search,
-  Sparkles,
+  Sprout,
   UserRound,
   UserRoundPlus,
   type LucideIcon,
@@ -30,7 +30,7 @@ export const navTalento: ItemNav[] = [
 export const navEmpresa: ItemNav[] = [
   { href: "/empresa/explorar", etiqueta: "Explorar perfiles", icono: Compass },
   { href: "/empresa/problema/nuevo", etiqueta: "Buscar por un problema", icono: Search },
-  { href: "/empresa/experiencias", etiqueta: "Experiencias", icono: Sparkles },
+  { href: "/empresa/campo", etiqueta: "Talento del campo", icono: Sprout },
   { href: "/empresa/procesos", etiqueta: "Mis procesos", icono: LayoutList },
 ];
 
@@ -39,7 +39,7 @@ export const navEquipo: ItemNav[] = [
   { href: "/equipo/empresas", etiqueta: "Empresas y reportes", icono: Building2 },
   { href: "/equipo/evidencias", etiqueta: "Evidencias y tarifas", icono: BadgeCheck },
   { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
-  { href: "/equipo/experiencias", etiqueta: "Experiencias", icono: Sparkles },
+  { href: "/equipo/experiencias", etiqueta: "Talento del campo", icono: Sprout },
   { href: "/equipo/ayuda", etiqueta: "Solicitudes de ayuda", icono: Inbox },
   { href: "/gestor/registrar", etiqueta: "Registro asistido", icono: UserRoundPlus },
 ];

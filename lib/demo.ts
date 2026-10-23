@@ -175,6 +175,7 @@ export const oportunidadesEjemplo: Oportunidad[] = [
 export const experienciaEjemplo: ExperienciaVista = {
   id: "00000000-0000-4000-9400-000000000001",
   slug: "ceremonia-del-cuidado",
+  tipo: "experiencia",
   nombre: "Ceremonia del cuidado",
   proposito:
     "A través del tejido, encarna el cuidado y abre la conversación sobre cómo esa labor ha recaído históricamente en las mujeres y sobre la importancia de que quienes cuidan también sean cuidadas.",
@@ -196,10 +197,41 @@ export const experienciaEjemplo: ExperienciaVista = {
   aprobada_por_sabedora_en: null,
 };
 
+// Oficio por encargo de muestra: Vasees lo arma con la artesana, que no usa la app.
+export const oficioEjemplo: ExperienciaVista = {
+  id: "00000000-0000-4000-9400-000000000002",
+  slug: "tejidos-en-guanga-por-encargo",
+  tipo: "oficio",
+  nombre: "Tejidos en guanga por encargo",
+  proposito:
+    "Ruanas, mochilas y tapices tejidos a mano en telar de guanga, para regalos corporativos o para vestir un espacio. Cada pieza lleva el nombre de quien la tejió.",
+  sabedora_nombre: "Asociación de tejedoras de la vereda (ejemplo)",
+  sabedora_pueblo: "Nariño",
+  temas: ["Tejido", "Regalos corporativos"],
+  para_quien: "Empresas que buscan regalos con historia",
+  beneficios: ["Piezas únicas, hechas a mano", "Una tarjeta con la historia de quien la tejió"],
+  momentos: [
+    { titulo: "Diseño", descripcion: "Eliges colores y tamaño con nuestro equipo." },
+    { titulo: "Tejido", descripcion: "Las tejedoras trabajan en sus casas, a su ritmo." },
+    { titulo: "Entrega", descripcion: "Vasees revisa cada pieza y la lleva a tu sede." },
+  ],
+  formatos: ["sede"],
+  lugar: null,
+  duracion: "4 a 6 semanas",
+  grupo_min: 10,
+  grupo_max: 200,
+  precio_desde: 120000,
+  porcentaje_sabedora: 70,
+  testimonio: null,
+  estado: "publicada",
+  aprobada_por_sabedora_en: "2026-10-20T15:00:00Z",
+};
+
 export const solicitudesEjemplo: SolicitudExperiencia[] = [
   {
     id: "00000000-0000-4000-9500-000000000001",
     experiencia: "Ceremonia del cuidado",
+    tipo: "experiencia",
     empresa: "Clínica del Oriente",
     formato: "sede",
     personas: 20,

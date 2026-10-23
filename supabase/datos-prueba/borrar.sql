@@ -3,4 +3,5 @@
 delete from help_requests where user_id in (select id from auth.users where email like '%@prueba.invalid');
 delete from companies where owner_id in (select id from auth.users where email like '%@prueba.invalid');
 delete from talent_profiles where user_id is null and nombre like '%(prueba)%';
+delete from experiences where slug like '%-prueba';
 delete from auth.users where email like '%@prueba.invalid';
