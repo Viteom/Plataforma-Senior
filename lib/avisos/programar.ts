@@ -4,7 +4,15 @@ import { MARCA } from "@/lib/marca";
 // cuándo. El envío real (Twilio) es de pago y está apagado; mientras tanto la cola queda visible
 // para el equipo en /equipo/ayuda, que puede llamar a la persona.
 
-export type AvisoPendiente = { id: string; userId: string | null; creadoEn: Date };
+export type AvisoPendiente = { id: string; userId: string | null; creadoEn: Date; plantilla?: string };
+
+// Qué dice cada aviso en la cola del equipo (y por qué se envía).
+export const TEXTO_PLANTILLA: Record<string, string> = {
+  oportunidad_nueva: "Oportunidad nueva",
+  conversacion_agendada: "La organización agendó una conversación",
+  acuerdo_propuesto: "La organización propuso un acuerdo",
+  proceso_cerrado: "La organización decidió no seguir",
+};
 
 export type Decision = {
   enviar: { userId: string; ids: string[]; texto: string }[];
@@ -29,6 +37,11 @@ export function diaColombia(fecha: Date) {
 // tildes («Kanna», «codigo»): con «á» u «ó» el SMS deja de ser GSM-7, cabe la mitad y cuesta el doble.
 export function textoOportunidad(enlace: string) {
   return `${MARCA.nombreSms}: tienes una oportunidad nueva. Entra a ${enlace} con tu codigo. Nadie te va a pedir dinero.`;
+}
+
+// Para los pasos del proceso: tampoco dice la empresa ni el detalle, solo que hay algo que ver.
+export function textoNovedad(enlace: string) {
+  return `${MARCA.nombreSms}: hay novedades en tu proceso. Entra a ${enlace} con tu codigo. Nadie te va a pedir dinero.`;
 }
 
 export function decidirEnvios(
@@ -56,8 +69,9 @@ export function decidirEnvios(
       decision.esperar.push(...ids);
       continue;
     }
-    // Varias oportunidades: un solo SMS que las agrupa.
-    decision.enviar.push({ userId, ids, texto: textoOportunidad(enlace) });
+    // Varios avisos: un solo SMS que los agrupa. Si alguno es una oportunidad nueva, se dice eso.
+    const nueva = avisos.some((a) => (a.plantilla ?? "oportunidad_nueva") === "oportunidad_nueva");
+    decision.enviar.push({ userId, ids, texto: nueva ? textoOportunidad(enlace) : textoNovedad(enlace) });
   }
   return decision;
 }

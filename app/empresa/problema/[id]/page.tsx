@@ -3,15 +3,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Desglose, EstadoConexion } from "@/components/empresa/estado";
+import { Desglose } from "@/components/empresa/estado";
 import { TarjetaPerfil } from "@/components/empresa/tarjeta-perfil";
 import { Pantalla } from "@/components/layout/pantalla";
-import { BotonAccion } from "@/components/ui/boton-accion";
+import { PasosEmpresa } from "@/components/procesos/pasos-empresa";
 import { obtenerNecesidad } from "@/lib/datos/consultas";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma } from "@/lib/formas";
-
-import { quieroConocer } from "../../acciones";
 
 export const metadata: Metadata = { title: "Talento sugerido" };
 
@@ -70,7 +68,6 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
             <li key={c.id} className="grid gap-4 lg:grid-cols-[1fr_22rem]">
               <TarjetaPerfil perfil={perfil} />
               <div className="flex flex-col gap-4 rounded-md bg-surface p-5">
-                <EstadoConexion estado={c.estado} />
                 {c.puntaje !== null && (
                   <p className="text-lg">
                     <span className="font-bold">Coincide {Math.round(c.puntaje)} %</span> con tu reto
@@ -82,9 +79,7 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
                     <span className="font-bold">Nota del equipo:</span> {c.razon_curador}
                   </p>
                 )}
-                {c.estado === "le_interesa" && (
-                  <BotonAccion accion={quieroConocer} campos={{ conexion: c.id }} texto="Quiero conocer a esta persona" ancho="completo" />
-                )}
+                <PasosEmpresa c={c} />
               </div>
             </li>
           );

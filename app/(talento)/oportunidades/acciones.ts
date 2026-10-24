@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { MODO_DEMO } from "@/lib/demo";
+import { leerEvaluacion, leerMotivo, mensajeProceso } from "@/lib/procesos-formularios";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type Estado = { error?: string; aviso?: string };
@@ -56,4 +57,55 @@ export async function reportarEmpresa(_p: Estado, datos: FormData): Promise<Esta
   if (error) return { error: "No pudimos enviar el reporte. Llámanos desde Ayuda." };
   revalidatePath("/oportunidades");
   return { aviso: "Gracias. Pausamos todo con esa empresa y nuestro equipo lo revisa en máximo 2 días hábiles." };
+}
+
+// ── Pasos del proceso después de abrir la conexión ──────────────────────────
+
+async function paso(datos: FormData, accion: string, extra: object, aviso: string): Promise<Estado> {
+  const conexion = String(datos.get("conexion") ?? "");
+  if (!UUID.test(conexion)) return { error: "Oportunidad no válida." };
+  if (MODO_DEMO) return DEMO;
+  const supabase = await crearClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/entrar");
+  const { error } = await supabase.rpc("avanzar_proceso", { conexion, accion, datos: extra });
+  if (error) return { error: mensajeProceso(error) };
+  revalidatePath("/oportunidades");
+  return { aviso };
+}
+
+export async function confirmarFecha(_p: Estado, datos: FormData) {
+  return paso(datos, "confirmar_fecha", {}, "Listo. Le contamos a la organización que la fecha te sirve.");
+}
+
+export async function otraFecha(_p: Estado, datos: FormData) {
+  return paso(datos, "otra_fecha", {}, "Listo. Nuestro equipo te llama para acordar otra fecha.");
+}
+
+export async function aceptarAcuerdo(_p: Estado, datos: FormData) {
+  return paso(datos, "aceptar_acuerdo", {}, "¡Listo! Quedó el acuerdo. Cuando terminen, cuéntanos cómo te fue.");
+}
+
+export async function ajustarAcuerdo(_p: Estado, datos: FormData) {
+  return paso(datos, "ajustar_acuerdo", {}, "Listo. Nuestro equipo te llama para ajustar el acuerdo contigo.");
+}
+
+export async function noSeguir(_p: Estado, datos: FormData): Promise<Estado> {
+  const motivo = leerMotivo(datos, "talento");
+  if ("error" in motivo) return motivo;
+  return paso(datos, "no_seguir", { motivo: motivo.datos }, "Listo. Cerramos este proceso. Gracias por avisar.");
+}
+
+export async function terminar(_p: Estado, datos: FormData): Promise<Estado> {
+  const evaluacion = leerEvaluacion(datos);
+  if ("error" in evaluacion) return evaluacion;
+  return paso(datos, "terminar", { evaluacion: evaluacion.datos }, "Gracias. Marcamos el trabajo como terminado.");
+}
+
+export async function calificar(_p: Estado, datos: FormData): Promise<Estado> {
+  const evaluacion = leerEvaluacion(datos);
+  if ("error" in evaluacion) return evaluacion;
+  return paso(datos, "calificar", { evaluacion: evaluacion.datos }, "Gracias por contarnos cómo te fue.");
 }

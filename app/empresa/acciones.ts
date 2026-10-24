@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { MODO_DEMO, necesidadEjemplo } from "@/lib/demo";
 import { esForma } from "@/lib/formas";
+import { leerAcuerdo, leerAgenda, leerEvaluacion, leerMotivo, mensajeProceso } from "@/lib/procesos-formularios";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 // Acciones de la empresa. Los pasos de una conexión pasan por funciones de la base que revisan
@@ -77,17 +78,47 @@ export async function quieroConocer(_p: Estado, datos: FormData): Promise<Estado
   return { aviso: "Listo. Nuestro equipo los pone en contacto en las próximas 24 horas hábiles." };
 }
 
-export async function cerrarConexion(_p: Estado, datos: FormData): Promise<Estado> {
+// ── Pasos del proceso después de abrir la conexión ──────────────────────────
+
+async function paso(datos: FormData, accion: string, extra: object, aviso: string): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
-  const evaluacion = Number(datos.get("evaluacion"));
   if (!UUID.test(conexion)) return { error: "Conexión no válida." };
-  if (!Number.isInteger(evaluacion) || evaluacion < 1 || evaluacion > 5) return { error: "Elige una calificación de 1 a 5." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await sesion();
-  const { error } = await supabase.rpc("actuar_conexion", { conexion, accion: "cerrar", evaluacion });
-  if (error) return { error: mensaje(error) };
+  const { error } = await supabase.rpc("avanzar_proceso", { conexion, accion, datos: extra });
+  if (error) return { error: mensajeProceso(error) };
   revalidatePath("/empresa", "layout");
-  return { aviso: "Gracias. Tu evaluación ayuda a otras empresas a confiar." };
+  return { aviso };
+}
+
+export async function agendarConversacion(_p: Estado, datos: FormData): Promise<Estado> {
+  const agenda = leerAgenda(datos);
+  if ("error" in agenda) return agenda;
+  return paso(datos, "agendar", agenda.datos, "Listo. Le avisamos a la persona para que confirme la fecha.");
+}
+
+export async function proponerAcuerdo(_p: Estado, datos: FormData): Promise<Estado> {
+  const acuerdo = leerAcuerdo(datos);
+  if ("error" in acuerdo) return acuerdo;
+  return paso(datos, "proponer_acuerdo", acuerdo.datos, "Listo. Le enviamos el acuerdo a la persona para que lo revise.");
+}
+
+export async function noSeguirEmpresa(_p: Estado, datos: FormData): Promise<Estado> {
+  const motivo = leerMotivo(datos, "empresa");
+  if ("error" in motivo) return motivo;
+  return paso(datos, "no_seguir", { motivo: motivo.datos }, "Listo. Le avisamos a la persona con cuidado.");
+}
+
+export async function terminarProceso(_p: Estado, datos: FormData): Promise<Estado> {
+  const evaluacion = leerEvaluacion(datos);
+  if ("error" in evaluacion) return evaluacion;
+  return paso(datos, "terminar", { evaluacion: evaluacion.datos }, "Gracias. Tu calificación ayuda a otras organizaciones a confiar.");
+}
+
+export async function calificarProceso(_p: Estado, datos: FormData): Promise<Estado> {
+  const evaluacion = leerEvaluacion(datos);
+  if ("error" in evaluacion) return evaluacion;
+  return paso(datos, "calificar", { evaluacion: evaluacion.datos }, "Gracias. Tu calificación ayuda a otras organizaciones a confiar.");
 }
 
 // Buscar por un problema. Los requisitos se eligen de la taxonomía (sin IA: la IA está apagada).

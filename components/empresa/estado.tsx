@@ -1,36 +1,9 @@
-import { Building2, Check, Clock, PauseCircle, X } from "lucide-react";
+import { Building2 } from "lucide-react";
 import Link from "next/link";
 
-import type { EstadoEmpresa, MiEmpresa } from "@/lib/datos/tipos";
+import type { MiEmpresa } from "@/lib/datos/tipos";
 
-// Estados escritos en palabras, con ícono: nunca solo un color.
-export const TEXTO_ESTADO: Record<EstadoEmpresa, string> = {
-  esperando: "Esperando respuesta de la persona",
-  no_disponible: "La persona no está disponible por ahora",
-  le_interesa: "Le interesa: tú decides si quieres conocerla",
-  abierta: "Conexión abierta: los ponemos en contacto",
-  cerrada: "Cerrada",
-  pausada: "En pausa",
-};
-
-const ICONO: Record<EstadoEmpresa, typeof Check> = {
-  esperando: Clock,
-  no_disponible: X,
-  le_interesa: Check,
-  abierta: Check,
-  cerrada: Check,
-  pausada: PauseCircle,
-};
-
-export function EstadoConexion({ estado }: { estado: EstadoEmpresa }) {
-  const Icono = ICONO[estado];
-  return (
-    <span className="inline-flex items-center gap-2 font-bold">
-      <Icono aria-hidden className="size-5 shrink-0" />
-      {TEXTO_ESTADO[estado]}
-    </span>
-  );
-}
+// El estado de cada conexión, en palabras, lo dan las etapas del proceso (lib/procesos.ts).
 
 // Aviso según la situación de la empresa: sin registrar, en verificación o en pausa (regla 9).
 export function AvisoEmpresa({ empresa }: { empresa: MiEmpresa | null }) {

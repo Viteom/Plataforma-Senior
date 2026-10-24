@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
+import { TEXTO_PLANTILLA } from "@/lib/avisos/programar";
 import { ayudaYAvisos } from "@/lib/datos/equipo";
 import { MODO_DEMO } from "@/lib/demo";
 
@@ -18,6 +19,7 @@ const CANAL: Record<string, string> = {
   orientacion_tarifa: "Orientación de tarifa",
   borrar_cuenta: "Borrar cuenta",
   conexion_abierta: "Conexión abierta",
+  proceso: "Proceso con una organización",
 };
 
 const fecha = (iso: string) =>
@@ -67,7 +69,8 @@ export default async function EquipoAyuda() {
                 <div>
                   <p className="text-lg font-bold">{a.persona}</p>
                   <p className="text-base text-text-muted">
-                    {a.motivo_omitido ?? "Oportunidad nueva"} · {fecha(a.creado_en)}
+                    {TEXTO_PLANTILLA[a.plantilla] ?? "Aviso"}
+                    {a.motivo_omitido && ` · ${a.motivo_omitido}`} · {fecha(a.creado_en)}
                   </p>
                 </div>
                 <BotonAccion accion={avisadoPorLlamada} campos={{ id: a.id }} texto="Ya le avisé por llamada" variant="secundario" size="normal" />
