@@ -17,7 +17,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type ItemNav = { href: string; etiqueta: string; icono: LucideIcon };
+// «corta»: la etiqueta de la barra inferior en celular. Con cinco destinos cabe una palabra.
+export type ItemNav = { href: string; etiqueta: string; icono: LucideIcon; corta?: string };
 
 // Talento: barra inferior, máximo 4 destinos.
 export const navTalento: ItemNav[] = [
@@ -28,10 +29,16 @@ export const navTalento: ItemNav[] = [
 ];
 
 export const navEmpresa: ItemNav[] = [
-  { href: "/empresa/explorar", etiqueta: "Explorar perfiles", icono: Compass },
-  { href: "/empresa/problema/nuevo", etiqueta: "Buscar por un problema", icono: Search },
-  { href: "/empresa/campo", etiqueta: "Talento del campo", icono: Sprout },
-  { href: "/empresa/procesos", etiqueta: "Mis procesos", icono: LayoutList },
+  { href: "/empresa/explorar", etiqueta: "Explorar perfiles", icono: Compass, corta: "Explorar" },
+  { href: "/empresa/problema/nuevo", etiqueta: "Contar un reto", icono: Search, corta: "Un reto" },
+  { href: "/empresa/campo", etiqueta: "Talento del campo", icono: Sprout, corta: "Campo" },
+  { href: "/empresa/procesos", etiqueta: "Mis procesos", icono: LayoutList, corta: "Procesos" },
+];
+
+// En celular, la organización usa la misma barra inferior que el talento, con «Mi empresa» al final.
+export const navEmpresaCelular: ItemNav[] = [
+  ...navEmpresa,
+  { href: "/empresa/datos", etiqueta: "Mi empresa", icono: Building2, corta: "Empresa" },
 ];
 
 export const navEquipo: ItemNav[] = [

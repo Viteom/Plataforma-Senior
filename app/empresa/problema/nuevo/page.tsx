@@ -9,7 +9,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 
 import { FormularioProblema } from "./formulario";
 
-export const metadata: Metadata = { title: "Buscar por un problema" };
+export const metadata: Metadata = { title: "Contar un reto" };
 
 export default async function ProblemaNuevo() {
   const empresa = await obtenerMiEmpresa();
@@ -23,7 +23,7 @@ export default async function ProblemaNuevo() {
   return (
     <div className="max-w-3xl">
       <Pantalla
-        titulo="Buscar por un problema"
+        titulo="Contar un reto"
         intro="Cuéntanos qué necesitas resolver y qué debe saber la persona. Nuestro equipo revisa y te propone hasta 5 perfiles; solo verás los que digan que les interesa."
       >
         <AvisoEmpresa empresa={empresa} />

@@ -10,7 +10,7 @@ import { BotonAccion } from "@/components/ui/boton-accion";
 import type { ConexionEmpresa } from "@/lib/datos/tipos";
 import { situacion } from "@/lib/procesos";
 
-import { Calificacion, CamposAcuerdo, CamposAgenda, Motivos } from "./campos";
+import { Calificacion, CamposAcuerdo, CamposAgenda, Desplegable, Motivos } from "./campos";
 import { CuadroSituacion, LineaProceso } from "./linea";
 
 const enlace = "inline-flex min-h-tap items-center font-bold underline underline-offset-4";
@@ -38,17 +38,21 @@ export function PasosEmpresa({ c }: { c: ConexionEmpresa }) {
       )}
 
       {c.estado === "abierta" && (
-        <BotonAccion accion={agendarConversacion} campos={campos} texto="Registrar la conversación">
-          <CamposAgenda id={c.id} />
-        </BotonAccion>
+        <Desplegable texto="Registrar la conversación">
+          <BotonAccion accion={agendarConversacion} campos={campos} texto="Guardar la conversación">
+            <CamposAgenda id={c.id} />
+          </BotonAccion>
+        </Desplegable>
       )}
 
       {c.estado === "conversacion" && (
         <>
           {c.conversacion_confirmada ? (
-            <BotonAccion accion={proponerAcuerdo} campos={campos} texto="Enviar el acuerdo a la persona">
-              <CamposAcuerdo id={c.id} />
-            </BotonAccion>
+            <Desplegable texto="Proponer el acuerdo">
+              <BotonAccion accion={proponerAcuerdo} campos={campos} texto="Enviar el acuerdo a la persona">
+                <CamposAcuerdo id={c.id} />
+              </BotonAccion>
+            </Desplegable>
           ) : (
             // Si conversaron sin que la persona confirmara en la app, igual se puede seguir.
             <details>

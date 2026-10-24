@@ -48,7 +48,13 @@ export function ChatAyuda() {
 
   const decir = (...nuevos: Turno[]) => setTurnos((t) => [...t, ...nuevos].slice(-MAX_TURNOS));
 
+  // Sigue la conversación cuando llega un mensaje nuevo, pero no al cargar: Ayuda debe abrir
+  // arriba, con su título y la opción de llamada a la vista.
+  const ultimoVisto = useRef(turnos[turnos.length - 1]);
   useEffect(() => {
+    const ultimo = turnos[turnos.length - 1];
+    if (ultimo === ultimoVisto.current) return;
+    ultimoVisto.current = ultimo;
     final.current?.scrollIntoView({ block: "nearest" });
   }, [turnos]);
 

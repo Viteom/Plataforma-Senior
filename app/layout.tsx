@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 
+import { ToqueActivo } from "@/components/layout/toque-activo";
 import { MARCA } from "@/lib/marca";
 
 import "./globals.css";
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Saltar al contenido
         </a>
         {children}
+        <ToqueActivo />
       </body>
     </html>
   );
