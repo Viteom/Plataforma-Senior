@@ -40,6 +40,11 @@ describe("decidirRuta", () => {
     expect(decidirRuta("/", null)).toBeNull();
     expect(decidirRuta("/ayuda", null)).toBeNull();
     expect(decidirRuta("/entrar/codigo", null)).toBeNull();
+    for (const web of ["/talento", "/organizaciones", "/campo", "/confianza"]) {
+      expect(decidirRuta(web, null)).toBeNull();
+    }
+    // Talento del campo de la empresa sigue protegido, aunque la web tenga /campo.
+    expect(decidirRuta("/empresa/campo", null)).toBe("/entrar");
     expect(decidirRuta("/inicio", null)).toBe("/entrar");
     expect(decidirRuta("/empresa/explorar", null)).toBe("/entrar");
     expect(decidirRuta("/equipo", null)).toBe("/entrar");
