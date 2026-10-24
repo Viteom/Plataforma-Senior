@@ -9,7 +9,7 @@ export function BotonAyuda({ className }: { className?: string }) {
     <Link
       href="/ayuda"
       className={cn(
-        "inline-flex min-h-tap items-center gap-2 rounded-md border-2 border-text bg-bg px-3 text-base font-bold text-text transition-colors duration-150 hover:bg-surface",
+        "inline-flex min-h-tap items-center gap-2 rounded-md border-2 border-text bg-bg px-3 text-base font-bold text-text transition-[background-color,transform] duration-100 ease-out hover:bg-surface active:scale-[0.97] active:bg-surface-strong",
         className,
       )}
     >

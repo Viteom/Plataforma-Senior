@@ -5,17 +5,18 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 // Primario y secundario miden 56 px; todo lo demás, mínimo 44 px.
-// Una sola variante "primario" visible por pantalla.
+// Una sola variante "primario" visible por pantalla. Responden al presionar (active), no solo al
+// pasar el mouse: en celular no hay mouse.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60 [&_svg]:size-6 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 rounded-full font-bold transition-[color,background-color,transform] duration-100 ease-out enabled:active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60 [&_svg]:size-6 [&_svg]:shrink-0 [a&]:active:scale-[0.97]",
   {
     variants: {
       variant: {
-        primario: "bg-primary text-on-primary hover:bg-primary-hover",
+        primario: "bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-hover",
         // Sobre fondos cobalto o bosque, donde el primario no se distingue.
-        acento: "bg-accent text-on-accent hover:bg-accent-hover",
-        secundario: "border-2 border-text bg-bg text-text hover:bg-surface",
-        suave: "bg-surface text-text hover:bg-surface-strong",
+        acento: "bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-hover",
+        secundario: "border-2 border-text bg-bg text-text hover:bg-surface active:bg-surface-strong",
+        suave: "bg-surface text-text hover:bg-surface-strong active:bg-surface-strong",
         enlace: "text-text underline underline-offset-4 hover:decoration-2",
       },
       size: {

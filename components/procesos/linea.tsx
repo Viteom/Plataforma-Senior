@@ -3,13 +3,42 @@ import { Check, ChevronRight, Circle, CircleDot, Clock, Hand, UsersRound } from 
 import { cn } from "@/lib/utils";
 import { ETAPAS, textoTurno, type Etapa, type Lado, type Situacion } from "@/lib/procesos";
 
-// Las seis etapas en una línea. Hecha, la de ahora y las que faltan se distinguen con ícono,
-// peso de letra y texto para lector de pantalla, no solo con color.
+// Las seis etapas. En celular, una frase y una barra de seis tramos, como «Paso 1 de 3» al crear
+// el perfil: la lista completa ocupaba tres renglones. Desde tableta, la lista con íconos.
+// Hecha, la de ahora y las que faltan se distinguen con texto e ícono, no solo con color.
 export function LineaProceso({ etapa }: { etapa: Etapa }) {
   const actual = ETAPAS.findIndex((e) => e.id === etapa);
   const terminado = etapa === "terminado";
+  const siguiente = ETAPAS[actual + 1];
   return (
-    <ol aria-label="Etapas" className="flex flex-wrap items-center gap-x-1 gap-y-2">
+    <>
+      <div className="flex flex-col gap-2 sm:hidden">
+        <p className="text-base">
+          <span className="font-bold">
+            {terminado ? "Terminado" : `Etapa ${actual + 1} de ${ETAPAS.length}: ${ETAPAS[actual].nombre}`}
+          </span>
+          {!terminado && siguiente && <span className="text-text-muted"> · Sigue: {siguiente.nombre}</span>}
+        </p>
+        <div aria-hidden className="grid grid-cols-6 gap-1">
+          {ETAPAS.map((e, i) => (
+            <span
+              key={e.id}
+              className={cn(
+                "h-2 rounded-full",
+                i < actual || terminado ? "bg-deep" : i === actual ? "bg-primary" : "bg-surface-strong",
+              )}
+            />
+          ))}
+        </div>
+      </div>
+      <LineaCompleta actual={actual} terminado={terminado} />
+    </>
+  );
+}
+
+function LineaCompleta({ actual, terminado }: { actual: number; terminado: boolean }) {
+  return (
+    <ol aria-label="Etapas" className="hidden flex-wrap items-center gap-x-1 gap-y-2 sm:flex">
       {ETAPAS.map((e, i) => {
         const hecha = i < actual || terminado;
         const ahora = i === actual && !terminado;

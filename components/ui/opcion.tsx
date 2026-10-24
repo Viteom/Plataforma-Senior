@@ -30,8 +30,8 @@ export function Opcion({
   return (
     <label
       className={cn(
-        "flex min-h-action items-start gap-3 rounded-md border-2 p-4 transition-colors duration-150 has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-focus",
-        checked ? "border-text bg-surface-strong" : "border-border hover:bg-surface",
+        "flex min-h-action items-start gap-3 rounded-md border-2 p-4 transition-[background-color,border-color,transform] duration-100 ease-out active:scale-[0.99] has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-focus",
+        checked ? "border-text bg-surface-strong" : "border-border hover:bg-surface active:bg-surface-strong",
         className,
       )}
     >
