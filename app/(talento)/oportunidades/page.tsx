@@ -1,6 +1,7 @@
 import { BadgeCheck, Flag, Handshake, MapPin, ShieldAlert } from "lucide-react";
 import type { Metadata } from "next";
 
+import { AvisoDemo } from "@/components/demo/aviso-demo";
 import { Pantalla } from "@/components/layout/pantalla";
 import { Calificacion, Motivos } from "@/components/procesos/campos";
 import { CuadroSituacion, LineaProceso } from "@/components/procesos/linea";
@@ -41,6 +42,7 @@ export default async function Oportunidades() {
 
   return (
     <Pantalla titulo="Oportunidades" intro="Aquí ves cómo va cada una y qué sigue.">
+      <AvisoDemo lado="talento" />
       {/* Aviso antifraude fijo (regla 9). */}
       <p className="flex items-start gap-3 rounded-md border-2 border-text p-4">
         <ShieldAlert aria-hidden className="mt-0.5 size-6 shrink-0" />

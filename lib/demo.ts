@@ -1,4 +1,5 @@
 import { supabaseConfigurado } from "@/lib/supabase/config";
+import { taxonomiaDemo } from "@/lib/taxonomia-demo";
 
 // Datos de ejemplo para revisar el diseño mientras las pantallas no leen de Supabase
 // (hitos 3 y 4). Ningún dato de ejemplo incluye edad.
@@ -360,17 +361,5 @@ export const solicitudesEjemplo: SolicitudExperiencia[] = [
 ];
 
 // Taxonomía mínima para el modo demostración (la real vive en la migración de taxonomía semilla).
-export const taxonomiaEjemplo: { id: string; capa: "situaciones" | "contexto" | "escala" | "oficio" | "normas" | "transferir"; etiqueta: string; sinonimos: string[] }[] = [
-  { id: "00000000-0000-4000-9000-000000000001", capa: "situaciones", etiqueta: "Apertura de una planta nueva", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000002", capa: "situaciones", etiqueta: "Certificación sanitaria", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000003", capa: "situaciones", etiqueta: "Formación de personal nuevo", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000004", capa: "contexto", etiqueta: "Empresa familiar", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000005", capa: "contexto", etiqueta: "Alimentos", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000006", capa: "escala", etiqueta: "Equipo de 10 a 50 personas", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000007", capa: "oficio", etiqueta: "Producción de alimentos", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000008", capa: "oficio", etiqueta: "Calidad", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000009", capa: "normas", etiqueta: "INVIMA", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000010", capa: "normas", etiqueta: "SG-SST", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000011", capa: "transferir", etiqueta: "Formó a supervisores", sinonimos: [] },
-  { id: "00000000-0000-4000-9000-000000000012", capa: "transferir", etiqueta: "Escribió manuales de trabajo", sinonimos: [] },
-];
+// La misma taxonomía que siembran las migraciones (scripts/generar-taxonomia-demo.mjs).
+export const taxonomiaEjemplo = taxonomiaDemo;

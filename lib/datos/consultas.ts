@@ -10,6 +10,8 @@ import {
   oportunidadesEjemplo,
   perfilesEjemplo,
 } from "@/lib/demo";
+import { vistaEmpresaDemo, vistaTalentoDemo } from "@/lib/demo-proceso";
+import { leerProcesoDemo } from "@/lib/demo-proceso-cookie";
 import type { FormaContratar } from "@/lib/formas";
 import { ordenarPorBusqueda } from "@/lib/matching/busqueda";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
@@ -19,6 +21,12 @@ import type { ConexionEmpresa, EvidenciaVista, MiEmpresa, NecesidadVista, Oportu
 
 // Lecturas para las pantallas. En modo demostración devuelven los ejemplos de lib/demo.ts con la
 // misma forma; con Supabase leen solo de las vistas pensadas para cada rol.
+
+// Demostración: el primer proceso de cada lado es el que avanza (lib/demo-proceso.ts).
+async function conexionesDemo(): Promise<ConexionEmpresa[]> {
+  const viva = vistaEmpresaDemo(await leerProcesoDemo());
+  return [...(viva ? [viva] : []), ...conexionesEjemplo.slice(1)];
+}
 
 async function cliente() {
   const supabase = await crearClienteServidor();
@@ -59,7 +67,7 @@ export async function obtenerPerfil(id: string): Promise<{ perfil: PerfilVista; 
     const evidencias: EvidenciaVista[] = perfil.evidencias
       ? [{ id: "ev1", tipo: "referencia", descripcion: "Fue su jefe en la planta", nota_equipo: "Confirmó que lideró la certificación de la planta." }]
       : [];
-    return { perfil, evidencias, conexion: conexionesEjemplo.find((c) => c.talent_id === id) ?? null };
+    return { perfil, evidencias, conexion: (await conexionesDemo()).find((c) => c.talent_id === id) ?? null };
   }
   const { supabase } = await cliente();
   const [{ data: perfil }, { data: evidencias }, { data: conexiones }] = await Promise.all([
@@ -82,7 +90,7 @@ export async function obtenerPerfil(id: string): Promise<{ perfil: PerfilVista; 
 
 export async function listarConexiones(): Promise<{ conexiones: ConexionEmpresa[]; perfiles: Map<string, PerfilVista>; necesidades: NecesidadVista[] }> {
   if (MODO_DEMO) {
-    return { conexiones: conexionesEjemplo, perfiles: new Map(perfilesEjemplo.map((p) => [p.id, p])), necesidades: [necesidadEjemplo] };
+    return { conexiones: await conexionesDemo(), perfiles: new Map(perfilesEjemplo.map((p) => [p.id, p])), necesidades: [necesidadEjemplo] };
   }
   const { supabase } = await cliente();
   const [{ data: conexiones }, { data: necesidades }] = await Promise.all([
@@ -105,7 +113,7 @@ export async function obtenerNecesidad(id: string): Promise<{ necesidad: Necesid
     if (id !== necesidadEjemplo.id) return null;
     return {
       necesidad: necesidadEjemplo,
-      conexiones: conexionesEjemplo.filter((c) => c.need_id === id),
+      conexiones: (await conexionesDemo()).filter((c) => c.need_id === id),
       perfiles: new Map(perfilesEjemplo.map((p) => [p.id, p])),
     };
   }
@@ -130,7 +138,7 @@ export async function obtenerNecesidad(id: string): Promise<{ necesidad: Necesid
 // ── Talento ─────────────────────────────────────────────────────────────────
 
 export async function listarOportunidades(): Promise<Oportunidad[]> {
-  if (MODO_DEMO) return oportunidadesEjemplo;
+  if (MODO_DEMO) return [vistaTalentoDemo(await leerProcesoDemo()), ...oportunidadesEjemplo.slice(1)];
   const { supabase } = await cliente();
   const { data } = await supabase.from("talent_opportunities_view").select("*").order("creado_en", { ascending: false });
   return (data ?? []) as Oportunidad[];

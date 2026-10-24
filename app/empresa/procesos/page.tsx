@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { TEXTO_SOLICITUD, TEXTO_TIPO } from "@/components/experiencias/textos";
+import { AvisoDemo } from "@/components/demo/aviso-demo";
 import { Pantalla } from "@/components/layout/pantalla";
 import { PasosEmpresa, situacionEmpresa } from "@/components/procesos/pasos-empresa";
 import { listarConexiones } from "@/lib/datos/consultas";
@@ -34,6 +35,7 @@ export default async function Procesos() {
 
   return (
     <Pantalla titulo="Mis procesos" intro="Cómo va cada persona que quieres conocer, tus retos y tus pedidos del campo.">
+      <AvisoDemo lado="empresa" />
       {conexiones.length === 0 && (
         <p className="rounded-md bg-surface p-5 text-lg">
           Todavía no tienes procesos.{" "}
