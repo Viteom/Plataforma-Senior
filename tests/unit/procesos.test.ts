@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { decidirEnvios, textoNovedad } from "@/lib/avisos/programar";
 import { situacion, textoAcuerdo, type DatosProceso, type Lado } from "@/lib/procesos";
-import { leerAcuerdo, leerAgenda, leerMotivo } from "@/lib/procesos-formularios";
+import { leerAcuerdo, leerAgenda, leerMotivo, mensajeProceso } from "@/lib/procesos-formularios";
 
 // Procesos: cada lado ve en qué etapa va, a quién le toca y qué sigue, en palabras de Kánna.
 
@@ -79,6 +79,11 @@ describe("formularios del proceso", () => {
     expect(leerAcuerdo(form({ ...base, nota: "Llámame al 300 123 4567" }), ahora)).toMatchObject({ error: expect.stringMatching(/teléfonos/) });
     expect(leerAcuerdo(form({ ...base, inicio: "2026-10-01" }), ahora)).toMatchObject({ error: expect.stringMatching(/pasada/) });
     expect(leerAcuerdo(form({ ...base, horas: "80" }), ahora)).toMatchObject({ error: expect.stringMatching(/1 a 60/) });
+  });
+
+  it("si la organización cambió el acuerdo o la fecha mientras la persona miraba, se le pide revisar", () => {
+    expect(mensajeProceso({ message: "el acuerdo cambió: revísalo de nuevo" })).toMatch(/cambió el acuerdo.*Recarga/);
+    expect(mensajeProceso({ message: "la fecha cambió: revísala de nuevo" })).toMatch(/cambió la fecha.*Recarga/);
   });
 
   it("el motivo sale de la lista de cada lado", () => {

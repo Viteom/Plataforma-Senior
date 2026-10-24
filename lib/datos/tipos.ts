@@ -60,6 +60,10 @@ export type DatosEtapas = {
   cierre_tipo: "terminado" | "no_sigue" | null;
   cerrada_por: "empresa" | "talento" | "equipo" | null;
   motivo_cierre: string | null; // solo si cerró la organización
+  // Suben cada vez que la organización cambia el acuerdo o la fecha. La persona responde a la
+  // versión que vio: si cambió mientras miraba, la base le pide revisarla de nuevo.
+  acuerdo_version: number;
+  conversacion_version: number;
 };
 
 export type ConexionEmpresa = {

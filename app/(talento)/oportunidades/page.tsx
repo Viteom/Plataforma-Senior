@@ -111,6 +111,9 @@ export default async function Oportunidades() {
 
 function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
   const campos = { conexion: o.id };
+  // La persona responde a la fecha y al acuerdo que está viendo (ver la migración de revisión).
+  const conFecha = { ...campos, version: String(o.conversacion_version ?? 0) };
+  const conAcuerdo = { ...campos, version: String(o.acuerdo_version ?? 0) };
   const nueva = o.estado === "enviada_talento";
   const abierta = ["abierta", "conversacion", "acuerdo", "en_curso"].includes(o.estado);
 
@@ -153,14 +156,14 @@ function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
       )}
       {o.estado === "conversacion" && !o.conversacion_confirmada && (
         <>
-          <BotonAccion accion={confirmarFecha} campos={campos} texto="Sí, me sirve" ancho="completo" />
-          <BotonAccion accion={otraFecha} campos={campos} texto="Necesito otra fecha" variant="secundario" ancho="completo" />
+          <BotonAccion accion={confirmarFecha} campos={conFecha} texto="Sí, me sirve" ancho="completo" />
+          <BotonAccion accion={otraFecha} campos={conFecha} texto="Necesito otra fecha" variant="secundario" ancho="completo" />
         </>
       )}
       {o.estado === "acuerdo" && (
         <>
-          <BotonAccion accion={aceptarAcuerdo} campos={campos} texto="Acepto el acuerdo" ancho="completo" />
-          <BotonAccion accion={ajustarAcuerdo} campos={campos} texto="Quiero ajustarlo" variant="secundario" ancho="completo" />
+          <BotonAccion accion={aceptarAcuerdo} campos={conAcuerdo} texto="Acepto el acuerdo" ancho="completo" />
+          <BotonAccion accion={ajustarAcuerdo} campos={conAcuerdo} texto="Quiero ajustarlo" variant="secundario" ancho="completo" />
         </>
       )}
       {o.estado === "en_curso" && (
