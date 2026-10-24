@@ -87,6 +87,8 @@ export function leerEvaluacion(datos: FormData): Resultado<number> {
 // Errores de la base, en palabras para quien usa la app.
 export function mensajeProceso(error: { message?: string } | null): string {
   const m = error?.message ?? "";
+  if (/acuerdo cambió/.test(m)) return "La organización cambió el acuerdo mientras lo mirabas. Recarga la página y revisa el nuevo antes de aceptar.";
+  if (/fecha cambió/.test(m)) return "La organización cambió la fecha mientras la mirabas. Recarga la página y revisa la nueva.";
   if (/futura/.test(m)) return "Elige un día y una hora que todavía no hayan pasado.";
   if (/valor/.test(m)) return "El acuerdo necesita un valor: en Kánna el trabajo siempre se paga.";
   if (/sin respuesta/.test(m)) return "Pasaron 14 días: la persona ya no espera esta respuesta.";

@@ -76,20 +76,23 @@ async function paso(datos: FormData, accion: string, extra: object, aviso: strin
   return { aviso };
 }
 
+// La versión de la fecha o del acuerdo que la persona tenía en pantalla.
+const version = (datos: FormData) => ({ version: Number(datos.get("version")) });
+
 export async function confirmarFecha(_p: Estado, datos: FormData) {
-  return paso(datos, "confirmar_fecha", {}, "Listo. Le contamos a la organización que la fecha te sirve.");
+  return paso(datos, "confirmar_fecha", version(datos), "Listo. Le contamos a la organización que la fecha te sirve.");
 }
 
 export async function otraFecha(_p: Estado, datos: FormData) {
-  return paso(datos, "otra_fecha", {}, "Listo. Nuestro equipo te llama para acordar otra fecha.");
+  return paso(datos, "otra_fecha", version(datos), "Listo. Nuestro equipo te llama para acordar otra fecha.");
 }
 
 export async function aceptarAcuerdo(_p: Estado, datos: FormData) {
-  return paso(datos, "aceptar_acuerdo", {}, "¡Listo! Quedó el acuerdo. Cuando terminen, cuéntanos cómo te fue.");
+  return paso(datos, "aceptar_acuerdo", version(datos), "¡Listo! Quedó el acuerdo. Cuando terminen, cuéntanos cómo te fue.");
 }
 
 export async function ajustarAcuerdo(_p: Estado, datos: FormData) {
-  return paso(datos, "ajustar_acuerdo", {}, "Listo. Nuestro equipo te llama para ajustar el acuerdo contigo.");
+  return paso(datos, "ajustar_acuerdo", version(datos), "Listo. Nuestro equipo te llama para ajustar el acuerdo contigo.");
 }
 
 export async function noSeguir(_p: Estado, datos: FormData): Promise<Estado> {

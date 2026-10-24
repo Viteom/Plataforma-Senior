@@ -48,10 +48,18 @@ async function comoReal<T>(usuario: string, fn: () => Promise<T>) {
   }
 }
 
-const avanzar = (usuario: string, conexion: string, accion: string, datos: object = {}) =>
-  comoReal(usuario, () => filas(db, "select avanzar_proceso($1, $2, $3) as estado", [conexion, accion, JSON.stringify(datos)])).then(
-    ([f]) => f.estado as string,
-  );
+// Las respuestas de la persona llevan la versión que vio. Si la prueba no la da, se usa la vigente
+// (como si la pantalla estuviera al día).
+const DE_FECHA = ["confirmar_fecha", "otra_fecha"];
+const DE_ACUERDO = ["aceptar_acuerdo", "ajustar_acuerdo"];
+async function avanzar(usuario: string, conexion: string, accion: string, datos: Record<string, unknown> = {}) {
+  if ((DE_FECHA.includes(accion) || DE_ACUERDO.includes(accion)) && !("version" in datos)) {
+    const [v] = await filas(db, "select conversacion_version, acuerdo_version from connections where id = $1", [conexion]);
+    datos = { ...datos, version: DE_FECHA.includes(accion) ? v.conversacion_version : v.acuerdo_version };
+  }
+  const [f] = await comoReal(usuario, () => filas(db, "select avanzar_proceso($1, $2, $3) as estado", [conexion, accion, JSON.stringify(datos)]));
+  return f.estado as string;
+}
 
 // Conexión desde Explorar con la doble aceptación hecha: queda «abierta».
 async function abierta() {
@@ -99,6 +107,9 @@ describe("el proceso completo", () => {
     await avanzar(u.talento, id, "calificar", { evaluacion: 4 });
     const [c] = await filas(db, "select cierre_tipo, cerrada_por, evaluacion_empresa, evaluacion_talento from connections where id = $1", [id]);
     expect(c).toEqual({ cierre_tipo: "terminado", cerrada_por: "empresa", evaluacion_empresa: 5, evaluacion_talento: 4 });
+    // La calificación de la organización queda como evidencia verificada (A3).
+    const [ev] = await filas(db, "select tipo, estado from evidence where talent_id = $1", [perfil]);
+    expect(ev).toEqual({ tipo: "evaluacion", estado: "verificada" });
 
     // La persona recibe aviso en cada paso que la necesita.
     expect(await avisos(id)).toEqual(["oportunidad_nueva", "conversacion_agendada", "acuerdo_propuesto"]);
@@ -163,6 +174,53 @@ describe("cada quien da su paso", () => {
     await avanzar(u.talento, id, "aceptar_acuerdo");
     await avanzar(u.talento, id, "terminar", { evaluacion: 5 });
     await expect(avanzar(u.talento, id, "calificar", { evaluacion: 1 })).rejects.toThrow(/no permitida/);
+  });
+});
+
+describe("revisión de código (30 oct)", () => {
+  it("la RPC anterior ya no termina ni califica: sin acuerdo aceptado no hay cierre ni evidencia", async () => {
+    const id = await abierta();
+    await expect(comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'cerrar', 5)", [id]))).rejects.toThrow(/no permitida/);
+    await avanzar(u.empresa, id, "agendar", { fecha: manana(), modo: "llamada" });
+    await expect(comoReal(u.talento, () => filas(db, "select actuar_conexion($1, 'cerrar', 5)", [id]))).rejects.toThrow(/no permitida/);
+    expect(await filas(db, "select * from evidence where talent_id = $1", [perfil])).toHaveLength(0);
+  });
+
+  it("la persona acepta el acuerdo que vio: si la organización lo cambió, debe revisarlo de nuevo", async () => {
+    const id = await abierta();
+    await avanzar(u.empresa, id, "agendar", { fecha: manana(), modo: "llamada" });
+    await avanzar(u.empresa, id, "proponer_acuerdo", ACUERDO);
+    const vista = (await vistaTalento()).acuerdo_version as number;
+    expect(Number((await vistaTalento()).acuerdo_valor)).toBe(3000000);
+    // Con la pantalla abierta, la organización baja el valor a $1.
+    await avanzar(u.empresa, id, "proponer_acuerdo", { ...ACUERDO, valor: 1 });
+    await expect(avanzar(u.talento, id, "aceptar_acuerdo", { version: vista })).rejects.toThrow(/acuerdo cambió/);
+    await expect(avanzar(u.talento, id, "aceptar_acuerdo", { version: "x" })).rejects.toThrow(/acuerdo cambió/);
+    await expect(avanzar(u.talento, id, "ajustar_acuerdo", { version: vista })).rejects.toThrow(/acuerdo cambió/);
+    expect((await vistaTalento()).estado).toBe("acuerdo");
+    // Con la versión nueva, sí.
+    expect(await avanzar(u.talento, id, "aceptar_acuerdo", { version: vista + 1 })).toBe("en_curso");
+  });
+
+  it("la persona confirma la fecha que vio: si la organización la cambió, debe revisarla", async () => {
+    const id = await abierta();
+    await avanzar(u.empresa, id, "agendar", { fecha: manana(), modo: "llamada" });
+    const vista = (await vistaTalento()).conversacion_version as number;
+    await avanzar(u.empresa, id, "agendar", { fecha: new Date(Date.now() + 3 * 24 * 3600_000).toISOString(), modo: "presencial" });
+    await expect(avanzar(u.talento, id, "confirmar_fecha", { version: vista })).rejects.toThrow(/fecha cambió/);
+    await expect(avanzar(u.talento, id, "otra_fecha", { version: vista })).rejects.toThrow(/fecha cambió/);
+    expect((await vistaTalento()).conversacion_confirmada).toBe(false);
+  });
+
+  it("el valor del acuerdo es un número finito y positivo, también en llamadas directas", async () => {
+    const id = await abierta();
+    await avanzar(u.empresa, id, "agendar", { fecha: manana(), modo: "llamada" });
+    for (const valor of ["NaN", "Infinity", "-5", "1e9", "3.000.000", "1000000000000"]) {
+      await expect(avanzar(u.empresa, id, "proponer_acuerdo", { ...ACUERDO, valor })).rejects.toThrow(/valor/);
+    }
+    // Ni siquiera el equipo, escribiendo directo en la tabla.
+    await expect(filas(db, "update connections set acuerdo_valor = 'NaN' where id = $1", [id])).rejects.toThrow(/acuerdo_valor_finito/);
+    expect(await avanzar(u.empresa, id, "proponer_acuerdo", { ...ACUERDO, valor: "3000000.50" })).toBe("acuerdo");
   });
 });
 

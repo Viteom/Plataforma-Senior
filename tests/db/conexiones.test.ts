@@ -171,13 +171,11 @@ describe("flujo por problema (curaduría)", () => {
     expect(estado).toBe("abierta");
   });
 
-  it("al cerrar, la evaluación de la empresa queda como evidencia verificada", async () => {
+  it("cerrar ya no pasa por actuar_conexion: terminar exige el acuerdo aceptado (ver procesos.test.ts)", async () => {
     const { conexion } = await prepararNecesidad();
     await filas(db, "update connections set estado = 'abierta' where id = $1", [conexion]);
-    await expect(comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'cerrar')", [conexion]))).rejects.toThrow(/evaluación/);
-    await comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'cerrar', 5)", [conexion]));
-    const [ev] = await filas(db, "select tipo, estado, descripcion from evidence where talent_id = $1", [perfil]);
-    expect(ev).toMatchObject({ tipo: "evaluacion", estado: "verificada" });
+    await expect(comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'cerrar', 5)", [conexion]))).rejects.toThrow(/no permitida/);
+    expect(await filas(db, "select * from evidence where talent_id = $1", [perfil])).toHaveLength(0);
   });
 
   it("nadie se salta pasos: la persona no abre sola ni la empresa acepta por la persona", async () => {
