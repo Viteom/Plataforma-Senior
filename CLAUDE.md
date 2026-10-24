@@ -27,7 +27,7 @@ el anterior se haya probado en un celular real.
 8. **Marca en tokens.** La marca es **Kánna** (brandbook: https://claude.ai/artifact/V7A3pmoq1R8xU4WdwoU1cv).
    Colores, letras y radios viven en `app/globals.css`; el nombre, en `lib/marca.ts`; los logos,
    en `public/marca/` (nunca se redibujan). Toda la app se lee en Atkinson Hyperlegible; Bricolage
-   Grotesque e Instrument Serif solo en titulares de marca. La lima es escasa y nunca va como texto
+   Grotesque e Instrument Serif solo en titulares de marca. El maíz (acento, antes lima) es escaso y nunca va como texto
    sobre crema ni blanco. En SMS, sin tildes ("Kanna", "codigo") para no duplicar el costo.
 9. **Solo empresas verificadas llegan al talento.** Una empresa sin NIT verificado puede explorar,
    pero no pedir conexiones ni aparecer en las oportunidades. Cada oportunidad y cada SMS

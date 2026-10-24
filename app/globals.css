@@ -3,31 +3,33 @@
 /*
   Tokens de marca Kánna (brandbook: https://claude.ai/artifact/V7A3pmoq1R8xU4WdwoU1cv).
   Cambiar solo estos valores, nunca colores literales en componentes.
-  Contrastes verificados (WCAG 2.2 AA): cobalto/crema 6:1, blanco/cobalto 6,7:1,
-  bosque/lima 7:1, tinta suave/crema 6,9:1. La lima es la «cana»: escasa, nunca
-  como texto sobre crema ni blanco.
+  Paleta «Tierra y maíz» (24 oct 2026; reemplaza cobalto, lima y bosque).
+  Contrastes verificados (WCAG 2.2 AA): terracota/crema 6,2:1, blanco/terracota 7,1:1,
+  azul noche/maíz 10,2:1, crema/azul noche 12,4:1, tinta suave/crema 6,7:1, maíz/terracota 5,1:1.
+  Prohibido: terracota sobre azul noche (2:1) y maíz sobre crema o blanco (no se lee).
+  El maíz es la «cana»: escaso, nunca como texto sobre crema ni blanco.
 */
 @theme {
   --color-*: initial;
-  --color-bg: #f4f2ec; /* crema */
-  --color-surface: #e7e3d8; /* crema-200, superficie hundida */
-  --color-surface-strong: #d6d1c4;
+  --color-bg: #f6efe4; /* crema cálido */
+  --color-surface: #ebe2d3; /* crema-200, superficie hundida */
+  --color-surface-strong: #dcd0bd;
   --color-raised: #ffffff; /* tarjetas elevadas */
   --color-text: #141414; /* casi negro */
-  --color-text-muted: #55534d;
-  --color-border: #7a776f; /* borde de controles, 4:1 sobre crema */
-  --color-border-subtle: #d6d1c4;
-  --color-primary: #1e3bff; /* cobalto */
-  --color-primary-hover: #1730d6;
+  --color-text-muted: #5a5249;
+  --color-border: #7d746a; /* borde de controles, 4:1 sobre crema */
+  --color-border-subtle: #dcd0bd;
+  --color-primary: #a0330f; /* terracota */
+  --color-primary-hover: #86290a;
   --color-on-primary: #ffffff;
-  --color-accent: #c6f24e; /* lima */
-  --color-on-accent: #14532d;
-  --color-accent-hover: #b4e23c;
-  --color-deep: #14532d; /* bosque: confianza y Experiencias */
-  --color-on-deep: #f4f2ec;
-  --color-focus: #1e3bff;
-  --color-danger: #b42318;
-  --color-success: #14532d;
+  --color-accent: #fad86a; /* maíz */
+  --color-on-accent: #1e2a47;
+  --color-accent-hover: #f2c94c;
+  --color-deep: #1e2a47; /* azul noche: confianza y Talento del campo */
+  --color-on-deep: #f6efe4;
+  --color-focus: #a0330f;
+  --color-danger: #b42318; /* siempre con ícono y palabra: se parece a la terracota */
+  --color-success: #1e2a47;
   --color-white: #ffffff;
   --color-transparent: transparent;
 

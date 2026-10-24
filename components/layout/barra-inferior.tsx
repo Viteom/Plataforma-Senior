@@ -16,7 +16,7 @@ export function BarraInferior({ items = navTalento, className }: { items?: ItemN
       aria-label="Principal"
       className={cn("fixed inset-x-0 bottom-0 z-20 border-t-2 border-border-subtle bg-bg pb-[env(safe-area-inset-bottom)]", className)}
     >
-      <ul className="mx-auto grid max-w-xl" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
+      <ul className="mx-auto grid max-w-xl px-2" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
         {items.map(({ href, etiqueta, corta, icono: Icono }) => {
           const activo = estaActivo(pathname, href);
           return (

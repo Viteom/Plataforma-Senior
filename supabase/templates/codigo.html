@@ -3,8 +3,8 @@
   ya entraron antes) y «Confirm signup» (primera vez). Asunto: «Tu código para entrar a Kánna».
 
   MARCA Kánna (brandbook): colores de app/globals.css.
-      #1E3BFF cobalto · #14532D bosque · #141414 texto · #55534D texto secundario
-      #F4F2EC crema (fondos) · #D6D1C4 bordes suaves · #FFFFFF tarjeta
+      #A0330F terracota · #1E2A47 azul noche · #141414 texto · #5A5249 texto secundario
+      #F6EFE4 crema (fondos) · #DCD0BD bordes suaves · #FFFFFF tarjeta
   El nombre del remitente en Supabase (Authentication → Emails → SMTP Settings) también es «Kánna».
 
   No cambie la etiqueta .Token entre llaves dobles: ahí Supabase pone el código de 6 números.
@@ -19,13 +19,13 @@
     <meta name="supported-color-schemes" content="light" />
     <title>Tu código para entrar</title>
   </head>
-  <body style="margin: 0; padding: 0; background-color: #F4F2EC">
+  <body style="margin: 0; padding: 0; background-color: #F6EFE4">
     <!-- Lo que muestra la notificación del celular antes de abrir el correo. -->
     <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all">
       Tu código es {{ .Token }}. Vence en 10 minutos.
     </div>
 
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F4F2EC">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F6EFE4">
       <tr>
         <td align="center" style="padding: 24px 12px">
           <table
@@ -34,7 +34,7 @@
             cellpadding="0"
             cellspacing="0"
             border="0"
-            style="max-width: 560px; background-color: #ffffff; border: 2px solid #D6D1C4; border-radius: 12px"
+            style="max-width: 560px; background-color: #ffffff; border: 2px solid #DCD0BD; border-radius: 12px"
           >
             <!-- LOGO: para usar el logo, reemplace el texto de esta celda por
                  <img src="https://…/logo.png" alt="Kánna" width="200" style="display: block; border: 0; height: auto" />
@@ -42,7 +42,7 @@
                  por eso el código y el aviso nunca dependen de ella. -->
             <tr>
               <td
-                style="padding: 28px 28px 20px; border-bottom: 2px solid #D6D1C4; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 26px; line-height: 1.2; font-weight: bold; color: #1E3BFF"
+                style="padding: 28px 28px 20px; border-bottom: 2px solid #DCD0BD; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 26px; line-height: 1.2; font-weight: bold; color: #A0330F"
               >
                 Kánna
               </td>
@@ -61,7 +61,7 @@
                   <tr>
                     <td
                       align="center"
-                      style="padding: 20px 12px; background-color: #F4F2EC; border: 2px solid #1E3BFF; border-radius: 12px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 44px; line-height: 1.2; font-weight: bold; letter-spacing: 10px; color: #1E3BFF"
+                      style="padding: 20px 12px; background-color: #F6EFE4; border: 2px solid #A0330F; border-radius: 12px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 44px; line-height: 1.2; font-weight: bold; letter-spacing: 10px; color: #A0330F"
                     >
                       {{ .Token }}
                     </td>
@@ -83,7 +83,7 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td
-                      style="padding: 16px 20px; background-color: #F4F2EC; border-left: 6px solid #14532D; border-radius: 4px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; color: #141414"
+                      style="padding: 16px 20px; background-color: #F6EFE4; border-left: 6px solid #1E2A47; border-radius: 4px; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; color: #141414"
                     >
                       <p style="margin: 0 0 6px; font-size: 18px; line-height: 1.5; font-weight: bold">No compartas este código con nadie.</p>
                       <p style="margin: 0; font-size: 18px; line-height: 1.6">
@@ -98,7 +98,7 @@
 
             <tr>
               <td
-                style="padding: 20px 28px 28px; border-top: 2px solid #D6D1C4; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #55534D"
+                style="padding: 20px 28px 28px; border-top: 2px solid #DCD0BD; font-family: 'Atkinson Hyperlegible', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.6; color: #5A5249"
               >
                 <p style="margin: 0 0 12px">¿No pediste este código? Ignora este correo: nadie puede entrar a tu cuenta sin él.</p>
                 <p style="margin: 0">¿Necesitas ayuda? En Kánna toca «Ayuda» y pide que te llamemos.</p>

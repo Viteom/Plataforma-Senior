@@ -11,7 +11,7 @@ const simbolo = readFileSync("public/marca/kanna-simbolo-negativo.svg", "utf8")
   .replace(/^<svg[^>]*>/, "")
   .replace(/<\/svg>\s*$/, "");
 const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#1E3BFF"/>
+  <rect width="512" height="512" fill="#A0330F"/>
   <g transform="translate(102 102) scale(2.85)"><g transform="translate(4 4)">${simbolo}</g></g>
 </svg>`;
 

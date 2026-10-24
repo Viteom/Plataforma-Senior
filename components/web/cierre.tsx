@@ -6,7 +6,7 @@ import type { Retrato as DatosRetrato } from "@/lib/web/contenido";
 import { MARCO, retraso } from "./marco";
 import { Retrato } from "./retrato";
 
-// El cierre es una fila del tablero: un cuadro ancho en lima con la acción, y a los lados dos
+// El cierre es una fila del tablero: un cuadro ancho en maíz con la acción, y a los lados dos
 // cuadros angostos que se salen de la pantalla, uno con retrato y otro de color.
 export function Cierre({
   titulo,
