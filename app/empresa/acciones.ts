@@ -4,8 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { MODO_DEMO, necesidadEjemplo } from "@/lib/demo";
+import { esProcesoDemo } from "@/lib/demo-proceso";
+import { avanzarProcesoDemo } from "@/lib/demo-proceso-cookie";
 import { esForma } from "@/lib/formas";
 import { leerAcuerdo, leerAgenda, leerEvaluacion, leerMotivo, mensajeProceso } from "@/lib/procesos-formularios";
+import { CAPAS_LIBRES, componerReto, problemaRequisitoLibre } from "@/lib/reto";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 // Acciones de la empresa. Los pasos de una conexión pasan por funciones de la base que revisan
@@ -14,6 +17,18 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 export type Estado = { error?: string; aviso?: string };
 
 const DEMO = { aviso: "En la demostración no se guarda nada." };
+
+// En la demostración avanza de verdad un solo proceso (Alimentos del Oriente), guardado en este
+// navegador. Los demás ejemplos solo se muestran.
+async function pasoDemo(conexion: string, accion: string, extra: object, aviso: string): Promise<Estado> {
+  if (!esProcesoDemo(conexion)) {
+    return { aviso: "En la demostración avanza el proceso con Alimentos del Oriente. Este es solo de ejemplo." };
+  }
+  const r = await avanzarProcesoDemo("empresa", accion, extra as Record<string, unknown>);
+  if ("error" in r) return { error: r.error };
+  revalidatePath("/", "layout");
+  return { aviso };
+}
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const texto = (v: FormDataEntryValue | null, max: number) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, max);
 
@@ -70,7 +85,7 @@ export async function pedirConexion(_p: Estado, datos: FormData): Promise<Estado
 export async function quieroConocer(_p: Estado, datos: FormData): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Conexión no válida." };
-  if (MODO_DEMO) return DEMO;
+  if (MODO_DEMO) return pasoDemo(conexion, "quiero_conocer", {}, "Listo. Nuestro equipo los pone en contacto en las próximas 24 horas hábiles.");
   const { supabase } = await sesion();
   const { error } = await supabase.rpc("actuar_conexion", { conexion, accion: "quiero_conocer" });
   if (error) return { error: mensaje(error) };
@@ -83,7 +98,7 @@ export async function quieroConocer(_p: Estado, datos: FormData): Promise<Estado
 async function paso(datos: FormData, accion: string, extra: object, aviso: string): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Conexión no válida." };
-  if (MODO_DEMO) return DEMO;
+  if (MODO_DEMO) return pasoDemo(conexion, accion, extra, aviso);
   const { supabase } = await sesion();
   const { error } = await supabase.rpc("avanzar_proceso", { conexion, accion, datos: extra });
   if (error) return { error: mensajeProceso(error) };
@@ -121,9 +136,24 @@ export async function calificarProceso(_p: Estado, datos: FormData): Promise<Est
   return paso(datos, "calificar", { evaluacion: evaluacion.datos }, "Gracias. Tu calificación ayuda a otras organizaciones a confiar.");
 }
 
-// Buscar por un problema. Los requisitos se eligen de la taxonomía (sin IA: la IA está apagada).
+// Requisitos escritos a mano: «capa|etiqueta». Sin taxonomía; el equipo los revisa al curar.
+function leerLibres(datos: FormData, campo: string) {
+  return datos
+    .getAll(campo)
+    .map(String)
+    .map((v) => {
+      const [capa, ...resto] = v.split("|");
+      return { capa, etiqueta: texto(resto.join("|"), 60) };
+    })
+    .filter((l) => (CAPAS_LIBRES as string[]).includes(l.capa) && !problemaRequisitoLibre(l.etiqueta))
+    .slice(0, 10);
+}
+
+// Contar un reto. Los requisitos se eligen de la taxonomía (sin IA: la IA está apagada) o se
+// escriben a mano. Lo que intentaron y el plazo van en el mismo texto del reto.
 export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estado> {
-  const problema = texto(datos.get("problema"), 3000);
+  const reto = texto(datos.get("problema"), 2000);
+  const problema = componerReto(reto, texto(datos.get("intentado"), 800), String(datos.get("plazo") ?? ""));
   const formatos = datos.getAll("formatos").map(String).filter(esForma);
   const modalidad = ["presencial", "remoto", "mixto"].includes(String(datos.get("modalidad"))) ? String(datos.get("modalidad")) : null;
   const ubicacion = texto(datos.get("ubicacion"), 80) || null;
@@ -131,10 +161,16 @@ export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estad
   const presupuesto = presupuestoCrudo ? Number(presupuestoCrudo) : null;
   const obligatorios = datos.getAll("obligatorio").map(String).filter((v) => UUID.test(v));
   const deseables = datos.getAll("deseable").map(String).filter((v) => UUID.test(v) && !obligatorios.includes(v));
+  const libres = [
+    ...leerLibres(datos, "libre_obligatorio").map((l) => ({ ...l, obligatorio: true })),
+    ...leerLibres(datos, "libre_deseable").map((l) => ({ ...l, obligatorio: false })),
+  ];
 
-  if (problema.length < 20) return { error: "Cuéntanos el reto con un poco más de detalle." };
+  if (reto.length < 20) return { error: "Cuéntanos el reto con un poco más de detalle." };
   if (!formatos.length) return { error: "Elige al menos una forma de contratar." };
-  if (!obligatorios.length && !deseables.length) return { error: "Elige al menos un requisito de la lista." };
+  if (!obligatorios.length && !deseables.length && !libres.length) {
+    return { error: "Elige o escribe al menos una cosa que deba saber la persona." };
+  }
   if (MODO_DEMO) redirect(`/empresa/problema/${necesidadEjemplo.id}`);
 
   const { supabase } = await sesion();
@@ -154,6 +190,12 @@ export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estad
       tax.map((t) => ({ need_id: necesidad.id, capa: t.capa, etiqueta: t.etiqueta, taxonomy_id: t.id, obligatorio: obligatorios.includes(t.id) })),
     );
     if (errorReq) return { error: mensaje(errorReq) };
+  }
+  if (libres.length) {
+    const { error: errorLibres } = await supabase
+      .from("need_requirements")
+      .insert(libres.map((l) => ({ need_id: necesidad.id, capa: l.capa, etiqueta: l.etiqueta, taxonomy_id: null, obligatorio: l.obligatorio })));
+    if (errorLibres) return { error: mensaje(errorLibres) };
   }
   redirect(`/empresa/problema/${necesidad.id}`);
 }

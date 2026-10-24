@@ -40,6 +40,7 @@ const DEMO = [
   { href: "/empresa/explorar", texto: "Organización" },
   { href: "/equipo", texto: "Equipo de curaduría" },
   { href: "/gestor/registrar", texto: "Gestor territorial" },
+  { href: "/demo/mensajes", texto: "Mensajes al celular (diseño)" },
 ];
 
 const enlace = "inline-flex min-h-tap items-center text-lg underline-offset-4 hover:underline";

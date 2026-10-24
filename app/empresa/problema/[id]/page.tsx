@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 
 import { Desglose } from "@/components/empresa/estado";
 import { TarjetaPerfil } from "@/components/empresa/tarjeta-perfil";
+import { AvisoDemo } from "@/components/demo/aviso-demo";
 import { Pantalla } from "@/components/layout/pantalla";
 import { PasosEmpresa } from "@/components/procesos/pasos-empresa";
 import { obtenerNecesidad } from "@/lib/datos/consultas";
@@ -33,6 +34,7 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
       }
       intro={`«${necesidad.problema}»`}
     >
+      <AvisoDemo lado="empresa" />
       <div className="flex flex-wrap gap-2">
         {necesidad.formatos.map((f) => (
           <span key={f} className="rounded-sm bg-surface-strong px-2 py-1 text-sm font-bold">

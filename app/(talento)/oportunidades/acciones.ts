@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { MODO_DEMO } from "@/lib/demo";
+import { esProcesoDemo } from "@/lib/demo-proceso";
+import { avanzarProcesoDemo } from "@/lib/demo-proceso-cookie";
 import { leerEvaluacion, leerMotivo, mensajeProceso } from "@/lib/procesos-formularios";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
@@ -12,10 +14,31 @@ export type Estado = { error?: string; aviso?: string };
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DEMO = { aviso: "En la demostración no se guarda nada." };
 
+// En la demostración avanza de verdad un solo proceso (Alimentos del Oriente), guardado en este
+// navegador. Los demás ejemplos solo se muestran.
+async function pasoDemo(conexion: string, accion: string, extra: object, aviso: string): Promise<Estado> {
+  if (!esProcesoDemo(conexion)) {
+    return { aviso: "En la demostración avanza el proceso con Alimentos del Oriente. Este es solo de ejemplo." };
+  }
+  const r = await avanzarProcesoDemo("talento", accion, extra as Record<string, unknown>);
+  if ("error" in r) return { error: r.error };
+  revalidatePath("/", "layout");
+  return { aviso };
+}
+
 async function actuar(datos: FormData, accion: "me_interesa" | "no_me_interesa"): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Oportunidad no válida." };
-  if (MODO_DEMO) return DEMO;
+  if (MODO_DEMO) {
+    return pasoDemo(
+      conexion,
+      accion,
+      {},
+      accion === "no_me_interesa"
+        ? "Listo. No le compartimos nada a esa empresa."
+        : "¡Listo! Le contamos a la empresa. Si decide conocerte, alguien de nuestro equipo te llama.",
+    );
+  }
   const supabase = await crearClienteServidor();
   const {
     data: { user },
@@ -64,7 +87,7 @@ export async function reportarEmpresa(_p: Estado, datos: FormData): Promise<Esta
 async function paso(datos: FormData, accion: string, extra: object, aviso: string): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Oportunidad no válida." };
-  if (MODO_DEMO) return DEMO;
+  if (MODO_DEMO) return pasoDemo(conexion, accion, extra, aviso);
   const supabase = await crearClienteServidor();
   const {
     data: { user },
