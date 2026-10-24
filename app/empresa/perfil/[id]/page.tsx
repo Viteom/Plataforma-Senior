@@ -2,8 +2,8 @@ import { ArrowLeft, BadgeCheck, EyeOff, FileText, MapPin, Phone, Star } from "lu
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { EstadoConexion } from "@/components/empresa/estado";
 import { Pantalla } from "@/components/layout/pantalla";
+import { PasosEmpresa } from "@/components/procesos/pasos-empresa";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { Etiqueta } from "@/components/ui/etiqueta";
 import { nombreCapaEmpresa, ORDEN_CAPAS } from "@/lib/capas";
@@ -11,7 +11,7 @@ import { obtenerMiEmpresa, obtenerPerfil } from "@/lib/datos/consultas";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, modalidades, pesos } from "@/lib/formas";
 
-import { pedirConexion, quieroConocer } from "../../acciones";
+import { pedirConexion } from "../../acciones";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ICONO_EVIDENCIA = { referencia: Phone, archivo: FileText, evaluacion: Star };
@@ -140,12 +140,7 @@ export default async function FichaPerfil({ params }: { params: Promise<{ id: st
         )}
 
         {conexion ? (
-          <div className="flex flex-col gap-3">
-            <EstadoConexion estado={conexion.estado} />
-            {conexion.estado === "le_interesa" && (
-              <BotonAccion accion={quieroConocer} campos={{ conexion: conexion.id }} texto="Quiero conocer a esta persona" ancho="completo" />
-            )}
-          </div>
+          <PasosEmpresa c={conexion} />
         ) : puedePedir ? (
           <>
             <BotonAccion

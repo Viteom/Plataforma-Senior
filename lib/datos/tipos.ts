@@ -33,7 +33,34 @@ export type EvidenciaVista = { id: string; tipo: "referencia" | "archivo" | "eva
 export type MiEmpresa = { id: string; nombre: string; nit: string | null; verificada: boolean; estado: "activa" | "pausada" };
 
 // Estados como los ve la empresa (company_connections_view).
-export type EstadoEmpresa = "esperando" | "no_disponible" | "le_interesa" | "abierta" | "cerrada" | "pausada";
+export type EstadoEmpresa =
+  | "esperando"
+  | "no_disponible"
+  | "le_interesa"
+  | "sin_respuesta"
+  | "abierta"
+  | "conversacion"
+  | "acuerdo"
+  | "en_curso"
+  | "cerrada"
+  | "pausada";
+
+// Lo que las dos partes ven del proceso después de abrirse: conversación, acuerdo y cierre.
+export type DatosEtapas = {
+  conversacion_en: string | null;
+  conversacion_modo: "llamada" | "videollamada" | "presencial" | null;
+  conversacion_confirmada: boolean;
+  acuerdo_forma: FormaContratar | null;
+  acuerdo_horas_semana: number | null;
+  acuerdo_valor: number | null;
+  acuerdo_unidad: string | null;
+  acuerdo_inicio: string | null;
+  acuerdo_nota: string | null;
+  acuerdo_aceptado_en: string | null;
+  cierre_tipo: "terminado" | "no_sigue" | null;
+  cerrada_por: "empresa" | "talento" | "equipo" | null;
+  motivo_cierre: string | null; // solo si cerró la organización
+};
 
 export type ConexionEmpresa = {
   id: string;
@@ -45,7 +72,9 @@ export type ConexionEmpresa = {
   desglose: Record<string, number> | null;
   razon_curador: string | null;
   actualizado_en: string;
-};
+  dias_esperando?: number | null;
+  evaluacion_empresa?: number | null;
+} & Partial<DatosEtapas>;
 
 export type NecesidadVista = {
   id: string;
@@ -72,7 +101,8 @@ export type Oportunidad = {
   formatos: FormaContratar[] | null;
   modalidad: string | null;
   creado_en: string;
-};
+  evaluacion_talento?: number | null;
+} & Partial<DatosEtapas>;
 
 // Fila de experiences (lo público; el equipo ve además el estado y la aprobación).
 export type TipoCampo = "experiencia" | "oficio";

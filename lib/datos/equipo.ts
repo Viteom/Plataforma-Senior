@@ -239,7 +239,7 @@ export async function evidenciasYTarifas(): Promise<{ evidencias: EvidenciaPendi
 }
 
 export type SolicitudAyuda = { id: string; canal: string; motivo: string; estado: string; creado_en: string };
-export type AvisoEnCola = { id: string; estado: string; motivo_omitido: string | null; creado_en: string; persona: string };
+export type AvisoEnCola = { id: string; estado: string; plantilla: string; motivo_omitido: string | null; creado_en: string; persona: string };
 
 export async function ayudaYAvisos(): Promise<{ solicitudes: SolicitudAyuda[]; avisos: AvisoEnCola[] }> {
   if (MODO_DEMO) {
@@ -248,19 +248,20 @@ export async function ayudaYAvisos(): Promise<{ solicitudes: SolicitudAyuda[]; a
         { id: "00000000-0000-4000-9200-000000000001", canal: "conexion_abierta", motivo: "Conexión abierta: poner en contacto a la empresa con la persona.", estado: "abierta", creado_en: "2026-10-21T14:00:00Z" },
         { id: "00000000-0000-4000-9200-000000000002", canal: "orientacion_tarifa", motivo: "Pidió orientación sobre cuánto cobrar al crear su perfil.", estado: "abierta", creado_en: "2026-10-21T12:00:00Z" },
       ],
-      avisos: [{ id: "00000000-0000-4000-9300-000000000001", estado: "pendiente", motivo_omitido: null, creado_en: "2026-10-21T14:00:00Z", persona: "Ana Gómez (ejemplo)" }],
+      avisos: [{ id: "00000000-0000-4000-9300-000000000001", estado: "pendiente", plantilla: "acuerdo_propuesto", motivo_omitido: null, creado_en: "2026-10-21T14:00:00Z", persona: "Ana Gómez (ejemplo)" }],
     };
   }
   const supabase = await cliente();
   const [{ data: solicitudes }, { data: avisos }] = await Promise.all([
     supabase.from("help_requests").select("id, canal, motivo, estado, creado_en").neq("estado", "cerrada").order("creado_en").limit(100),
-    supabase.from("notifications").select("id, estado, motivo_omitido, creado_en, talent_profiles(nombre)").in("estado", ["pendiente", "omitido"]).order("creado_en").limit(100),
+    supabase.from("notifications").select("id, estado, plantilla, motivo_omitido, creado_en, talent_profiles(nombre)").in("estado", ["pendiente", "omitido"]).order("creado_en").limit(100),
   ]);
   return {
     solicitudes: (solicitudes ?? []) as SolicitudAyuda[],
     avisos: (avisos ?? []).map((a) => ({
       id: a.id as string,
       estado: a.estado as string,
+      plantilla: a.plantilla as string,
       motivo_omitido: a.motivo_omitido as string | null,
       creado_en: a.creado_en as string,
       persona: ((a.talent_profiles as unknown as { nombre: string } | null)?.nombre) ?? "",

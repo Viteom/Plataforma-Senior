@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { EstadoConexion } from "@/components/empresa/estado";
 import { TEXTO_SOLICITUD, TEXTO_TIPO } from "@/components/experiencias/textos";
 import { Pantalla } from "@/components/layout/pantalla";
-import { BotonAccion } from "@/components/ui/boton-accion";
+import { PasosEmpresa, situacionEmpresa } from "@/components/procesos/pasos-empresa";
 import { listarConexiones } from "@/lib/datos/consultas";
 import { listarSolicitudes } from "@/lib/datos/experiencias";
+import type { ConexionEmpresa, NecesidadVista, PerfilVista } from "@/lib/datos/tipos";
 import { MODO_DEMO } from "@/lib/demo";
 import { pesos } from "@/lib/formas";
-
-import { cerrarConexion } from "../acciones";
 
 export const metadata: Metadata = { title: "Mis procesos" };
 
@@ -22,94 +20,97 @@ const ESTADO_NECESIDAD = {
 
 const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-CO", { day: "numeric", month: "long" });
 
+// Cada conexión es un proceso: primero lo que te toca a ti, después lo que espera a la persona y
+// al final lo cerrado. Es una lista agrupada (no un tablero de arrastrar), que se lee igual en
+// celular y con lector de pantalla.
 export default async function Procesos() {
   const [{ conexiones, perfiles, necesidades }, solicitudes] = await Promise.all([listarConexiones(), listarSolicitudes()]);
-  const directas = conexiones.filter((c) => c.origen === "exploracion");
+  const conSituacion = conexiones.map((c) => ({ c, s: situacionEmpresa(c) }));
+  const grupo = (g: string) => conSituacion.filter(({ s }) => s.grupo === g).map(({ c }) => c);
+  const turno = grupo("turno");
+  const proceso = grupo("proceso");
+  const cerrados = grupo("cerrado");
+  const retos = new Map(necesidades.map((n) => [n.id, n]));
 
   return (
-    <Pantalla titulo="Mis procesos" intro="Tus búsquedas, los perfiles que pediste conocer y tus pedidos del campo.">
+    <Pantalla titulo="Mis procesos" intro="Cómo va cada persona que quieres conocer, tus retos y tus pedidos del campo.">
+      {conexiones.length === 0 && (
+        <p className="rounded-md bg-surface p-5 text-lg">
+          Todavía no tienes procesos.{" "}
+          <Link href="/empresa/explorar" className="font-bold underline underline-offset-4">
+            Explora perfiles
+          </Link>{" "}
+          o{" "}
+          <Link href="/empresa/problema/nuevo" className="font-bold underline underline-offset-4">
+            cuéntanos un reto
+          </Link>
+          .
+        </p>
+      )}
+
+      {turno.length > 0 && <Grupo id="te-toca" titulo="Te toca a ti" conexiones={turno} perfiles={perfiles} retos={retos} />}
+      {proceso.length > 0 && <Grupo id="en-proceso" titulo="En proceso" conexiones={proceso} perfiles={perfiles} retos={retos} />}
+
       <section aria-labelledby="busquedas" className="flex flex-col gap-3">
         <h2 id="busquedas" className="text-xl">
-          Búsquedas por problema
+          Tus retos
         </h2>
         {necesidades.length ? (
           <ul className="flex flex-col gap-3">
-            {necesidades.map((n) => (
-              <li key={n.id}>
-                <Link
-                  href={`/empresa/problema/${n.id}`}
-                  className="flex flex-col gap-1 rounded-md border-2 border-border-subtle p-4 transition-colors duration-150 hover:border-text"
-                >
-                  <span className="line-clamp-2 text-lg font-bold">{n.problema}</span>
-                  <span className="text-base text-text-muted">
-                    {ESTADO_NECESIDAD[n.estado]} · {fecha(n.creado_en)}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-text-muted">
-            Todavía no has buscado por un problema.{" "}
-            <Link href="/empresa/problema/nuevo" className="font-bold text-text underline underline-offset-4">
-              Buscar por un problema
-            </Link>
-          </p>
-        )}
-      </section>
-
-      <section aria-labelledby="directas" className="flex flex-col gap-3">
-        <h2 id="directas" className="text-xl">
-          Perfiles que pediste conocer
-        </h2>
-        {directas.length ? (
-          <ul className="flex flex-col gap-3">
-            {directas.map((c) => {
-              const perfil = perfiles.get(c.talent_id);
-              const nombre = perfil?.identidad_visible && perfil.nombre ? perfil.nombre : (perfil?.oficio ?? "Perfil");
+            {necesidades.map((n) => {
+              const suyas = conSituacion.filter(({ c }) => c.need_id === n.id);
+              const teToca = suyas.filter(({ s }) => s.grupo === "turno").length;
               return (
-                <li key={c.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <Link href={`/empresa/perfil/${c.talent_id}`} className="inline-flex min-h-tap items-center text-lg font-bold underline underline-offset-4">
-                      {nombre}
-                    </Link>
-                    <span className="text-base text-text-muted">{fecha(c.actualizado_en)}</span>
-                  </div>
-                  <EstadoConexion estado={c.estado} />
-                  {c.estado === "abierta" && (
-                    <details>
-                      <summary className="inline-flex min-h-tap items-center font-bold underline underline-offset-4">
-                        Terminar y calificar
-                      </summary>
-                      <BotonAccion accion={cerrarConexion} campos={{ conexion: c.id }} texto="Cerrar conexión" variant="secundario" className="mt-3">
-                        <fieldset>
-                          <legend className="mb-2 font-bold">¿Cómo te fue con esta persona?</legend>
-                          <div className="flex flex-wrap gap-2">
-                            {[1, 2, 3, 4, 5].map((n) => (
-                              <label key={n} className="flex min-h-tap min-w-tap items-center justify-center gap-2 rounded-md border-2 border-border px-3 has-[:checked]:border-text has-[:checked]:bg-surface-strong has-[:checked]:font-bold">
-                                <input type="radio" name="evaluacion" value={n} className="size-5 accent-[var(--color-primary)]" />
-                                {n}
-                              </label>
-                            ))}
-                          </div>
-                          <p className="mt-2 text-base text-text-muted">1 es muy mal, 5 es excelente.</p>
-                        </fieldset>
-                      </BotonAccion>
-                    </details>
-                  )}
+                <li key={n.id}>
+                  <Link
+                    href={`/empresa/problema/${n.id}`}
+                    className="flex flex-col gap-1 rounded-md border-2 border-border-subtle p-4 transition-colors duration-150 hover:border-text"
+                  >
+                    <span className="line-clamp-2 text-lg font-bold">{n.problema}</span>
+                    <span className="text-base text-text-muted">
+                      {ESTADO_NECESIDAD[n.estado]} · {fecha(n.creado_en)}
+                    </span>
+                    {suyas.length > 0 && (
+                      <span className="text-base font-bold">
+                        {suyas.length} {suyas.length === 1 ? "persona" : "personas"}
+                        {teToca > 0 && ` · ${teToca} ${teToca === 1 ? "espera" : "esperan"} tu respuesta`}
+                      </span>
+                    )}
+                  </Link>
                 </li>
               );
             })}
           </ul>
         ) : (
           <p className="text-text-muted">
-            Todavía no has pedido conocer a nadie.{" "}
-            <Link href="/empresa/explorar" className="font-bold text-text underline underline-offset-4">
-              Explorar perfiles
+            Todavía no has contado un reto.{" "}
+            <Link href="/empresa/problema/nuevo" className="font-bold text-text underline underline-offset-4">
+              Contar un reto
             </Link>
           </p>
         )}
       </section>
+
+      {cerrados.length > 0 && (
+        <details>
+          <summary className="inline-flex min-h-tap items-center text-xl font-bold underline underline-offset-4">
+            Cerrados ({cerrados.length})
+          </summary>
+          <ul className="mt-3 flex flex-col gap-3">
+            {cerrados.map((c) => {
+              const s = situacionEmpresa(c);
+              return (
+                <li key={c.id} className="flex flex-col gap-1 rounded-md border-2 border-border-subtle p-4">
+                  <p className="font-bold">{nombreDe(perfiles.get(c.talent_id))}</p>
+                  <p>{s.titulo}</p>
+                  {s.detalle && <p className="text-base text-text-muted">{s.detalle}</p>}
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      )}
+
       <section aria-labelledby="experiencias" className="flex flex-col gap-3">
         <h2 id="experiencias" className="text-xl">
           Talento del campo
@@ -151,5 +152,53 @@ export default async function Procesos() {
       </section>
       {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo.</p>}
     </Pantalla>
+  );
+}
+
+function nombreDe(perfil: PerfilVista | undefined) {
+  return perfil?.identidad_visible && perfil.nombre ? perfil.nombre : (perfil?.oficio ?? "Perfil");
+}
+
+function Grupo({
+  id,
+  titulo,
+  conexiones,
+  perfiles,
+  retos,
+}: {
+  id: string;
+  titulo: string;
+  conexiones: ConexionEmpresa[];
+  perfiles: Map<string, PerfilVista>;
+  retos: Map<string, NecesidadVista>;
+}) {
+  return (
+    <section aria-labelledby={id} className="flex flex-col gap-4">
+      <h2 id={id} className="text-xl">
+        {titulo}
+      </h2>
+      <ul className="flex flex-col gap-5">
+        {conexiones.map((c) => {
+          const reto = c.need_id ? retos.get(c.need_id) : undefined;
+          return (
+            <li key={c.id}>
+              <article className="flex flex-col gap-4 rounded-lg border-2 border-border-subtle p-5">
+                <div className="flex flex-col gap-1">
+                  <h3 className="text-xl">
+                    <Link href={`/empresa/perfil/${c.talent_id}`} className="underline underline-offset-4">
+                      {nombreDe(perfiles.get(c.talent_id))}
+                    </Link>
+                  </h3>
+                  <p className="line-clamp-2 text-base text-text-muted">
+                    {reto ? `Por tu reto: «${reto.problema}»` : "Desde Explorar perfiles"}
+                  </p>
+                </div>
+                <PasosEmpresa c={c} />
+              </article>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
