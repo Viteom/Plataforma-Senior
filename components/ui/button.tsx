@@ -13,7 +13,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primario: "bg-primary text-on-primary hover:bg-primary-hover active:bg-primary-hover",
-        // Sobre fondos cobalto o bosque, donde el primario no se distingue.
+        // Sobre fondos terracota o azul noche, donde el primario no se distingue.
         acento: "bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-hover",
         secundario: "border-2 border-text bg-bg text-text hover:bg-surface active:bg-surface-strong",
         suave: "bg-surface text-text hover:bg-surface-strong active:bg-surface-strong",

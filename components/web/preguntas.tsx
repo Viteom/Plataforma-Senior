@@ -3,7 +3,7 @@ import type { Pregunta } from "@/lib/web/contenido";
 import { MARCO, retraso } from "./marco";
 
 // Preguntas frecuentes: el título se queda quieto a la izquierda mientras pasan las preguntas.
-// Cada una es un cuadro relleno; la abierta se pone lima (y el + pasa a −). Una abierta a la vez.
+// Cada una es un cuadro relleno; la abierta se pone maíz (y el + pasa a −). Una abierta a la vez.
 export function Preguntas({ id = "preguntas", titulo = "Preguntas frecuentes", preguntas }: { id?: string; titulo?: string; preguntas: Pregunta[] }) {
   return (
     <section aria-labelledby={id} className="bg-bg py-24 lg:py-36">

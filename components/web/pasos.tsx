@@ -4,7 +4,7 @@ import type { Paso } from "@/lib/web/contenido";
 
 import { MARCO, retraso } from "./marco";
 
-// El orden lo lleva el color, de oscuro a claro: casi negro, bosque, cobalto, lima.
+// El orden lo lleva el color, de oscuro a claro: casi negro, azul noche, terracota, maíz.
 const COLORES = [
   "bg-text text-bg",
   "bg-deep text-on-deep",

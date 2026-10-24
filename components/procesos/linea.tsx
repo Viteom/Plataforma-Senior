@@ -63,7 +63,7 @@ function LineaCompleta({ actual, terminado }: { actual: number; terminado: boole
 
 const ICONO_TURNO = { tuyo: Hand, otro: Clock, equipo: UsersRound, nadie: null };
 
-// Qué está pasando y a quién le toca. Cuando te toca, el cuadro es lima y lo dice en palabras.
+// Qué está pasando y a quién le toca. Cuando te toca, el cuadro es maíz y lo dice en palabras.
 export function CuadroSituacion({ s, lado }: { s: Situacion; lado: Lado }) {
   const turno = textoTurno(s.turno, lado);
   const Icono = ICONO_TURNO[s.turno];
