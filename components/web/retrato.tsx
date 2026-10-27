@@ -3,7 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { Retrato as DatosRetrato } from "@/lib/web/contenido";
 
-// Retrato en grabado (líneas casi negro sobre transparente) puesto sobre un color plano, con el
+// Retrato de banco (líneas casi negro sobre transparente) puesto sobre un color plano, con el
 // borde blanco grueso del brandbook.
 export function Retrato({
   retrato,
@@ -21,6 +21,7 @@ export function Retrato({
   return (
     <figure className={cn("retrato overflow-hidden", fondo, className)}>
       <Image
+        unoptimized
         src={retrato.src}
         alt={retrato.alt}
         width={retrato.ancho}

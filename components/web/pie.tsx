@@ -43,7 +43,8 @@ const DEMO = [
   { href: "/demo/mensajes", texto: "Mensajes al celular (diseño)" },
 ];
 
-const enlace = "inline-flex min-h-tap items-center text-lg underline-offset-4 hover:underline";
+const enlace =
+  "inline-flex min-h-tap items-center text-lg underline-offset-4 hover:underline";
 
 // El cierre de todas las páginas: la salida humana es el titular («Te llamamos») y debajo, los
 // enlaces por público, la firma y los créditos de las fotos.
@@ -54,9 +55,15 @@ export function PieWeb() {
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex max-w-[40ch] flex-col gap-4">
             <Logo alto={36} negativo />
-            <p className="text-lg">Conectamos personas con trayectoria con organizaciones que buscan talento para nuevos retos. En Colombia.</p>
+            <p className="text-lg">
+              Conectamos personas con trayectoria con organizaciones que buscan
+              talento para nuevos retos. En Colombia.
+            </p>
           </div>
-          <a href="#contenido" className="inline-flex min-h-tap items-center gap-2 text-lg font-bold underline underline-offset-4">
+          <a
+            href="#contenido"
+            className="inline-flex min-h-tap items-center gap-2 text-lg font-bold underline underline-offset-4"
+          >
             <ArrowUp aria-hidden className="size-5" />
             Volver arriba
           </a>
@@ -87,18 +94,27 @@ export function PieWeb() {
           >
             Te llamamos
           </Link>
-          <p className="max-w-[44ch] text-lg">Deja tu celular en Ayuda y una persona del equipo te llama en la mañana o en la tarde.</p>
+          <p className="max-w-[44ch] text-lg">
+            Deja tu celular en Ayuda y una persona del equipo te llama en la
+            mañana o en la tarde.
+          </p>
         </div>
 
         {MODO_DEMO && (
-          <nav aria-labelledby="demo" className="flex flex-col gap-2 rounded-md bg-primary-hover p-5">
+          <nav
+            aria-labelledby="demo"
+            className="flex flex-col gap-2 rounded-md bg-primary-hover p-5"
+          >
             <h2 id="demo" className="text-lg font-bold">
               Demostración: entra a cada área
             </h2>
             <ul className="flex flex-wrap gap-x-6">
               {DEMO.map((d) => (
                 <li key={d.href}>
-                  <Link href={d.href} className={`${enlace} font-bold underline`}>
+                  <Link
+                    href={d.href}
+                    className={`${enlace} font-bold underline`}
+                  >
                     {d.texto}
                   </Link>
                 </li>
@@ -109,10 +125,13 @@ export function PieWeb() {
 
         <div className="flex flex-col gap-4 text-base lg:flex-row lg:items-end lg:justify-between">
           <p className="font-display text-titular font-extrabold tracking-tight">
-            Experiencia <span className="font-editorial font-normal italic">que abre posibilidades.</span>
+            Experiencia{" "}
+            <span className="font-editorial font-normal italic">
+              que abre posibilidades.
+            </span>
           </p>
           <p className="max-w-[60ch]">
-            Retratos de referencia y perfiles de ejemplo. Grabados hechos a partir de{" "}
+            Perfiles de ejemplo y fotografías de referencia de{" "}
             {CREDITOS.map((c, i) => (
               <span key={c.url}>
                 {i > 0 && " y "}
@@ -121,7 +140,8 @@ export function PieWeb() {
                 </a>
               </span>
             ))}
-            , de {CREDITOS[0].autor} en Wikimedia Commons ({CREDITOS[0].licencia}). Los grabados se comparten con la misma licencia.
+            . Fotografías ilustrativas de banco; no representan perfiles
+            registrados en Kánna. Consulta las condiciones en Pexels.
           </p>
         </div>
       </div>

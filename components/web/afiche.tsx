@@ -8,7 +8,7 @@ import { Retrato } from "./retrato";
 
 // Primera pantalla de cada página: el titular enorme arriba, a todo el ancho; debajo, la frase que
 // dice qué es y las acciones a la izquierda, y a la derecha un círculo gigante de color que entra
-// recortado por el borde, con el retrato en grabado encima. Nada se monta sobre el titular.
+// recortado por el borde, con el retrato de banco encima. Nada se monta sobre el titular.
 export function Afiche({
   titulo,
   texto,
@@ -35,10 +35,17 @@ export function Afiche({
         <div className="mt-8 grid gap-12 lg:mt-12 lg:grid-cols-12 lg:gap-6">
           <div className="relative z-10 flex flex-col gap-8 lg:col-span-5 lg:pb-16">
             <p className="max-w-[40ch] text-lg sm:text-xl">{texto}</p>
-            {acciones && <div className="flex flex-wrap items-center gap-x-6 gap-y-3">{acciones}</div>}
+            {acciones && (
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+                {acciones}
+              </div>
+            )}
             {nota && (
               <p className="flex max-w-[34ch] items-start gap-3 rounded-md bg-surface p-4 text-lg font-bold lg:mt-auto">
-                <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0 text-deep" />
+                <ShieldCheck
+                  aria-hidden
+                  className="mt-0.5 size-6 shrink-0 text-deep"
+                />
                 {nota}
               </p>
             )}

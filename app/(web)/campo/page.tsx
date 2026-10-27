@@ -23,29 +23,31 @@ export const metadata: Metadata = {
 const ENTRAR = MODO_DEMO ? "/empresa/campo" : "/entrar?para=empresa";
 
 const GRABADO_CAMPO = {
-  src: "/web/campo-sandona.webp",
+  src: "https://images.pexels.com/photos/4210854/pexels-photo-4210854.jpeg?auto=compress&cs=tinysrgb&w=1400",
   ancho: 1440,
   alto: 960,
-  alt: "Grabado de una artesana de Sandoná, Nariño, tejiendo paja toquilla",
+  alt: "Fotografía de banco ilustrativa; no corresponde a un perfil registrado",
 };
 
 const TEJIDO_CAMPO = {
-  src: "/web/campo-tejido.webp",
+  src: "https://images.pexels.com/photos/4210860/pexels-photo-4210860.jpeg?auto=compress&cs=tinysrgb&w=900",
   ancho: 800,
   alto: 1600,
-  alt: "Grabado de una artesana tejiendo paja toquilla en su casa, en Sandoná, Nariño",
+  alt: "Fotografía de banco ilustrativa; no corresponde a un perfil registrado",
 };
 
 const DETALLE_CAMPO = {
-  src: "/web/detalle-sandona.webp",
+  src: "https://images.pexels.com/photos/4210854/pexels-photo-4210854.jpeg?auto=compress&cs=tinysrgb&w=900",
   ancho: 560,
   alto: 560,
-  alt: "Grabado de unas manos tejiendo paja toquilla",
+  alt: "Fotografía de banco ilustrativa; no corresponde a un perfil registrado",
 };
 
 export default async function PaginaCampo() {
   // Solo lo publicado: nada sale sin la aprobación de quien lo hace.
-  const catalogo = (await listarExperiencias()).filter((e) => e.estado === "publicada");
+  const catalogo = (await listarExperiencias()).filter(
+    (e) => e.estado === "publicada",
+  );
 
   return (
     <>
@@ -53,7 +55,9 @@ export default async function PaginaCampo() {
         titulo={
           <>
             Talento{" "}
-            <span className="font-editorial font-normal tracking-normal text-primary italic">del campo</span>
+            <span className="font-editorial font-normal tracking-normal text-primary italic">
+              del campo
+            </span>
           </>
         }
         texto="Talleres y oficios por encargo con personas del territorio que no usan tecnología. Vasees los arma con ellas, y nada se publica sin su aprobación."
@@ -95,23 +99,37 @@ export default async function PaginaCampo() {
       <section aria-labelledby="catalogo" className="bg-bg py-24 lg:py-36">
         <div className={MARCO}>
           <div className="grid gap-6 lg:grid-cols-12">
-            <h2 id="catalogo" data-aparecer className="titular-marca text-afiche lg:col-span-7">
+            <h2
+              id="catalogo"
+              data-aparecer
+              className="titular-marca text-afiche lg:col-span-7"
+            >
               Lo que puedes pedir hoy
             </h2>
-            <p data-aparecer style={retraso(1)} className="max-w-[40ch] text-xl lg:col-span-4 lg:col-start-9 lg:self-end">
+            <p
+              data-aparecer
+              style={retraso(1)}
+              className="max-w-[40ch] text-xl lg:col-span-4 lg:col-start-9 lg:self-end"
+            >
               El catálogo crece a medida que cada persona aprueba su ficha.
             </p>
           </div>
           {catalogo.length === 0 ? (
-            <p className="mt-16 text-xl">Estamos armando las primeras fichas con las personas del territorio. Escríbenos y te contamos.</p>
+            <p className="mt-16 text-xl">
+              Estamos armando las primeras fichas con las personas del
+              territorio. Escríbenos y te contamos.
+            </p>
           ) : (
             <ul className="mt-16 flex flex-col gap-2">
               {catalogo.map((e, i) => {
                 const t = TEXTO_TIPO[e.tipo];
                 const datos = [
-                  e.sabedora_pueblo && `${t.quien}: ${[e.sabedora_nombre, e.sabedora_pueblo].filter(Boolean).join(", ")}`,
+                  e.sabedora_pueblo &&
+                    `${t.quien}: ${[e.sabedora_nombre, e.sabedora_pueblo].filter(Boolean).join(", ")}`,
                   e.duracion && `${t.duracion}: ${e.duracion}`,
-                  e.grupo_min && e.grupo_max && `${t.grupo}: de ${e.grupo_min} a ${e.grupo_max} ${t.unidad}`,
+                  e.grupo_min &&
+                    e.grupo_max &&
+                    `${t.grupo}: de ${e.grupo_min} a ${e.grupo_max} ${t.unidad}`,
                   e.precio_desde && `Desde ${pesos(e.precio_desde)}`,
                 ].filter(Boolean) as string[];
                 return (
@@ -154,12 +172,25 @@ export default async function PaginaCampo() {
         titulo="Cómo se pide"
         texto="Del pedido al reporte final, Vasees acompaña cada paso."
         pasos={[
-          { titulo: "Pides una cotización", texto: "Eliges el taller u oficio, cuántas personas o piezas y en qué mes." },
-          { titulo: "Te enviamos el valor", texto: "El equipo de Vasees habla con quien lo hace y te manda la cotización." },
-          { titulo: "Confirmas", texto: "Acordamos la fecha, el lugar o la entrega. Vasees acompaña todo el proceso." },
+          {
+            titulo: "Pides una cotización",
+            texto:
+              "Eliges el taller u oficio, cuántas personas o piezas y en qué mes.",
+          },
+          {
+            titulo: "Te enviamos el valor",
+            texto:
+              "El equipo de Vasees habla con quien lo hace y te manda la cotización.",
+          },
+          {
+            titulo: "Confirmas",
+            texto:
+              "Acordamos la fecha, el lugar o la entrega. Vasees acompaña todo el proceso.",
+          },
           {
             titulo: "Recibes el reporte",
-            texto: "Cuántas personas participaron, cuántas horas y cuánto recibió quien lo hizo.",
+            texto:
+              "Cuántas personas participaron, cuántas horas y cuánto recibió quien lo hizo.",
           },
         ]}
         iconos={[ClipboardList, Send, Handshake, FileCheck2]}
@@ -173,11 +204,13 @@ export default async function PaginaCampo() {
           },
           {
             pregunta: "¿Se publica algo sin su permiso?",
-            respuesta: "No. Cada taller u oficio se publica solo cuando quien lo hace aprueba su ficha.",
+            respuesta:
+              "No. Cada taller u oficio se publica solo cuando quien lo hace aprueba su ficha.",
           },
           {
             pregunta: "¿Cómo sé qué recibe quien lo hace?",
-            respuesta: "En la cotización te contamos qué parte del pago le llega, y el reporte final lo confirma.",
+            respuesta:
+              "En la cotización te contamos qué parte del pago le llega, y el reporte final lo confirma.",
           },
           {
             pregunta: "¿Pueden venir a nuestra sede?",

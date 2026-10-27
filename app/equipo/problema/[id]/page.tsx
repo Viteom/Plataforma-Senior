@@ -9,7 +9,11 @@ import { necesidadParaCurar } from "@/lib/datos/equipo";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, pesos } from "@/lib/formas";
 
-import { calcularPropuestos } from "../../acciones";
+import {
+  calcularPropuestos,
+  revisarCondicionesReto,
+  completarCondicionesReto,
+} from "../../acciones";
 import { ElegirPropuestos } from "./elegir";
 
 export const metadata: Metadata = { title: "Curar búsqueda" };
@@ -25,7 +29,11 @@ const ESTADO_PERSONA: Record<string, string> = {
   pausada: "En pausa",
 };
 
-export default async function CurarProblema({ params }: { params: Promise<{ id: string }> }) {
+export default async function CurarProblema({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const datos = await necesidadParaCurar(id);
@@ -38,7 +46,10 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
     <Pantalla
       titulo={`Búsqueda de ${empresa.nombre}`}
       antesDelTitulo={
-        <Link href="/equipo" className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline-offset-4 hover:underline">
+        <Link
+          href="/equipo"
+          className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline-offset-4 hover:underline"
+        >
           <ArrowLeft aria-hidden className="size-5" />
           Panel
         </Link>
@@ -46,12 +57,21 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
       intro={`«${necesidad.problema}»`}
     >
       {!empresa.verificada && (
-        <p role="status" className="flex items-start gap-3 rounded-md border-2 border-danger p-4">
-          <AlertTriangle aria-hidden className="mt-0.5 size-6 shrink-0 text-danger" />
+        <p
+          role="status"
+          className="flex items-start gap-3 rounded-md border-2 border-danger p-4"
+        >
+          <AlertTriangle
+            aria-hidden
+            className="mt-0.5 size-6 shrink-0 text-danger"
+          />
           <span>
-            <span className="font-bold">Empresa sin verificar.</span> Puedes preparar la lista, pero no se envía a nadie hasta
-            verificarla en{" "}
-            <Link href="/equipo/empresas" className="font-bold underline underline-offset-4">
+            <span className="font-bold">Empresa sin verificar.</span> Puedes
+            preparar la lista, pero no se envía a nadie hasta verificarla en{" "}
+            <Link
+              href="/equipo/empresas"
+              className="font-bold underline underline-offset-4"
+            >
               Empresas
             </Link>
             .
@@ -59,23 +79,135 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
         </p>
       )}
 
+      <section className="flex flex-col gap-3 rounded-md bg-surface p-4">
+        <h2 className="text-xl">Revisión de trabajo digno</h2>
+        <p>Estado: {necesidad.dignidad_estado ?? "pendiente"}</p>
+        <p>
+          Jornada: {necesidad.jornada_horas ?? "por completar"} horas/semana.
+          Remuneración: {necesidad.remuneracion ?? "por completar"} ·{" "}
+          {necesidad.remuneracion_unidad ?? "por completar"}.
+        </p>
+        <p>
+          {necesidad.condiciones ??
+            "La organización debe completar tareas, descansos, exigencias y acompañamiento."}
+        </p>
+        <p>
+          Confirma remuneración justa, descansos, seguridad, ajustes acordables
+          y una persona responsable. La edad o un diagnóstico no determinan la
+          posibilidad de trabajar.
+        </p>
+        <details>
+          <summary className="min-h-tap cursor-pointer font-bold">
+            Completar o corregir condiciones con la organización
+          </summary>
+          <BotonAccion
+            accion={completarCondicionesReto}
+            campos={{
+              reto: id,
+              version: String(necesidad.revision_version ?? 1),
+            }}
+            texto="Guardar condiciones para revisión"
+          >
+            <label className="flex flex-col gap-2">
+              Horas a la semana
+              <input
+                type="number"
+                name="jornada_horas"
+                min={1}
+                max={48}
+                required
+                defaultValue={necesidad.jornada_horas ?? undefined}
+                className="min-h-action border-2 border-border bg-bg px-3"
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              Remuneración en pesos
+              <input
+                type="number"
+                name="remuneracion"
+                min={1}
+                max={1000000000}
+                required
+                defaultValue={necesidad.remuneracion ?? undefined}
+                className="min-h-action border-2 border-border bg-bg px-3"
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              Unidad
+              <select
+                name="remuneracion_unidad"
+                defaultValue={necesidad.remuneracion_unidad ?? "proyecto"}
+                className="min-h-action border-2 border-border bg-bg px-3"
+              >
+                <option value="hora">Hora</option>
+                <option value="mes">Mes</option>
+                <option value="proyecto">Proyecto</option>
+              </select>
+            </label>
+            <label className="flex flex-col gap-2">
+              Condiciones
+              <textarea
+                name="condiciones"
+                minLength={20}
+                maxLength={1500}
+                required
+                defaultValue={necesidad.condiciones ?? ""}
+                className="min-h-28 border-2 border-border bg-bg p-3"
+              />
+            </label>
+          </BotonAccion>
+        </details>
+        <BotonAccion
+          accion={revisarCondicionesReto}
+          campos={{
+            reto: id,
+            version: String(necesidad.revision_version ?? 1),
+            decision: "aprobar",
+          }}
+          texto="Autorizar estas condiciones"
+        />
+        <BotonAccion
+          accion={revisarCondicionesReto}
+          campos={{
+            reto: id,
+            version: String(necesidad.revision_version ?? 1),
+            decision: "ajustar",
+          }}
+          texto="Pedir ajustes"
+          variant="secundario"
+        />
+      </section>
       <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
         <div>
           <dt className="text-base text-text-muted">Forma de contratar</dt>
-          <dd className="font-bold">{necesidad.formatos.map(etiquetaForma).join(", ") || "Cualquiera"}</dd>
+          <dd className="font-bold">
+            {necesidad.formatos.map(etiquetaForma).join(", ") || "Cualquiera"}
+          </dd>
         </div>
         <div>
           <dt className="text-base text-text-muted">Dónde</dt>
-          <dd className="font-bold">{[necesidad.modalidad, necesidad.ubicacion].filter(Boolean).join(" · ") || "Sin indicar"}</dd>
+          <dd className="font-bold">
+            {[necesidad.modalidad, necesidad.ubicacion]
+              .filter(Boolean)
+              .join(" · ") || "Sin indicar"}
+          </dd>
         </div>
         <div>
           <dt className="text-base text-text-muted">Presupuesto</dt>
-          <dd className="font-bold">{necesidad.presupuesto ? pesos(necesidad.presupuesto) : "Sin indicar"}</dd>
+          <dd className="font-bold">
+            {necesidad.presupuesto
+              ? pesos(necesidad.presupuesto)
+              : "Sin indicar"}
+          </dd>
         </div>
         <div>
           <dt className="text-base text-text-muted">Requisitos</dt>
           <dd className="font-bold">
-            {necesidad.requisitos.map((r) => `${r.etiqueta}${r.obligatorio ? " (obligatorio)" : ""}`).join(", ") || "Ninguno"}
+            {necesidad.requisitos
+              .map(
+                (r) => `${r.etiqueta}${r.obligatorio ? " (obligatorio)" : ""}`,
+              )
+              .join(", ") || "Ninguno"}
           </dd>
         </div>
       </dl>
@@ -96,7 +228,9 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
           {enCola.length > 0 ? (
             <ElegirPropuestos need={necesidad.id} propuestas={enCola} />
           ) : (
-            <p className="text-text-muted">Calcula el puntaje para ver los 10 mejores perfiles publicados.</p>
+            <p className="text-text-muted">
+              Calcula el puntaje para ver los 10 mejores perfiles publicados.
+            </p>
           )}
         </section>
       )}
@@ -108,7 +242,10 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
           </h2>
           <ul className="flex flex-col gap-2">
             {enviadas.map((p) => (
-              <li key={p.id} className="flex flex-wrap justify-between gap-2 rounded-md bg-surface px-4 py-3">
+              <li
+                key={p.id}
+                className="flex flex-wrap justify-between gap-2 rounded-md bg-surface px-4 py-3"
+              >
                 <span className="font-bold">{p.nombre}</span>
                 <span>{ESTADO_PERSONA[p.estado] ?? p.estado}</span>
               </li>
@@ -116,7 +253,12 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
           </ul>
         </section>
       )}
-      {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo: el puntaje se calcula de verdad con los perfiles de ejemplo.</p>}
+      {MODO_DEMO && (
+        <p className="text-base text-text-muted">
+          Datos de ejemplo: el puntaje se calcula de verdad con los perfiles de
+          ejemplo.
+        </p>
+      )}
     </Pantalla>
   );
 }

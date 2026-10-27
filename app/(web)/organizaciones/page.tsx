@@ -10,11 +10,16 @@ import { Pasos } from "@/components/web/pasos";
 import { Declaracion, DosPuertas, ListaGrande } from "@/components/web/piezas";
 import { Preguntas } from "@/components/web/preguntas";
 import { MODO_DEMO } from "@/lib/demo";
-import { PASOS_ORGANIZACION, PREGUNTAS_ORGANIZACION, RETRATOS } from "@/lib/web/contenido";
+import {
+  PASOS_ORGANIZACION,
+  PREGUNTAS_ORGANIZACION,
+  RETRATOS,
+} from "@/lib/web/contenido";
 
 export const metadata: Metadata = {
   title: "Para organizaciones",
-  description: "Encuentra nuevas perspectivas para los retos de tu organización, con talento con trayectoria.",
+  description:
+    "Encuentra nuevas perspectivas para los retos de tu organización, con talento con trayectoria.",
 };
 
 const ENTRAR = MODO_DEMO ? "/empresa/explorar" : "/entrar?para=empresa";
@@ -26,7 +31,9 @@ export default function PaginaOrganizaciones() {
         titulo={
           <>
             Otra mirada{" "}
-            <span className="font-editorial font-normal tracking-normal text-primary italic">para tu reto</span>
+            <span className="font-editorial font-normal tracking-normal text-primary italic">
+              para tu reto
+            </span>
           </>
         }
         texto="Conecta con personas que aportan conocimientos, capacidades y experiencias diversas. Verificamos tu organización y te acompañamos en cada conversación."
@@ -35,7 +42,11 @@ export default function PaginaOrganizaciones() {
             <Button asChild className="active:scale-[0.97]">
               <Link href={ENTRAR}>Encontrar talento</Link>
             </Button>
-            <Button asChild variant="secundario" className="active:scale-[0.97]">
+            <Button
+              asChild
+              variant="secundario"
+              className="active:scale-[0.97]"
+            >
               <Link href="/campo">Talento del campo</Link>
             </Button>
           </>
@@ -46,12 +57,14 @@ export default function PaginaOrganizaciones() {
       />
       <Declaracion id="perspectivas" titulo="Un reto, otras miradas">
         <p>
-          Un reto no siempre necesita a alguien con la respuesta preparada. A veces necesita conocimientos
-          complementarios, mejores preguntas y otra manera de mirar.
+          Un reto no siempre necesita a alguien con la respuesta preparada. A
+          veces necesita conocimientos complementarios, mejores preguntas y otra
+          manera de mirar.
         </p>
         <p>
-          En Kánna encuentras personas por lo que saben hacer y por los retos que ya han resuelto: la apertura de una
-          planta, una crisis de caja, la formación de un equipo nuevo.
+          En Kánna encuentras personas por lo que saben hacer y por los retos
+          que ya han resuelto: la apertura de una planta, una crisis de caja, la
+          formación de un equipo nuevo.
         </p>
       </Declaracion>
       <DosPuertas
@@ -90,30 +103,57 @@ export default function PaginaOrganizaciones() {
         titulo="Reglas que cuidan a las dos partes"
         color="bg-text text-bg"
         items={[
-          { titulo: "Verificamos tu NIT.", texto: "Solo las organizaciones verificadas pueden invitar a conversar." },
+          {
+            titulo: "Verificamos tu NIT.",
+            texto:
+              "Solo las organizaciones verificadas pueden invitar a conversar.",
+          },
           {
             titulo: "La edad no entra en la búsqueda.",
-            texto: "Buscas por capacidades. Ni la edad ni la foto ordenan los perfiles.",
+            texto:
+              "Buscas por capacidades. Ni la edad ni la foto ordenan los perfiles.",
           },
-          { titulo: "La persona decide.", texto: "Cada invitación se acepta o no. Su nombre aparece cuando acepta." },
-          { titulo: "Nadie pide dinero.", texto: "Ninguna organización le cobra a una persona por una oportunidad." },
+          {
+            titulo: "La persona decide.",
+            texto:
+              "Cada invitación se acepta o no. Su nombre aparece cuando acepta.",
+          },
+          {
+            titulo: "Nadie pide dinero.",
+            texto:
+              "Ninguna organización le cobra a una persona por una oportunidad.",
+          },
         ]}
       />
       <Mosaico
         id="campo"
-        imagen="/web/campo-sandona.webp"
-        imagenCelular="/web/campo-tejido.webp"
+        imagen="https://images.pexels.com/photos/4210854/pexels-photo-4210854.jpeg?auto=compress&cs=tinysrgb&w=1400"
+        imagenCelular="https://images.pexels.com/photos/4210860/pexels-photo-4210860.jpeg?auto=compress&cs=tinysrgb&w=900"
         descripcion="Grabado de una artesana de Sandoná, Nariño, tejiendo paja toquilla."
         celdas={[
-          { tipo: "titulo", texto: "Talento del campo", color: "bg-text text-bg" },
+          {
+            tipo: "titulo",
+            texto: "Talento del campo",
+            color: "bg-text text-bg",
+          },
           {
             tipo: "dato",
             texto: "Talleres para tu equipo, en tu sede o en el territorio",
             corto: "Talleres para equipos",
             color: "bg-bg text-text",
           },
-          { tipo: "dato", texto: "Regalos y piezas por encargo, hechos a mano", corto: "Piezas por encargo", color: "bg-bg text-text" },
-          { tipo: "dato", texto: "Un reporte de impacto al terminar", corto: "Reporte de impacto", color: "bg-bg text-text" },
+          {
+            tipo: "dato",
+            texto: "Regalos y piezas por encargo, hechos a mano",
+            corto: "Piezas por encargo",
+            color: "bg-bg text-text",
+          },
+          {
+            tipo: "dato",
+            texto: "Un reporte de impacto al terminar",
+            corto: "Reporte de impacto",
+            color: "bg-bg text-text",
+          },
           {
             tipo: "accion",
             texto: "Conocer Talento del campo",

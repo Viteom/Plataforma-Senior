@@ -28,9 +28,20 @@ export type PerfilVista = {
   evidencias: number;
 };
 
-export type EvidenciaVista = { id: string; tipo: "referencia" | "archivo" | "evaluacion"; descripcion: string | null; nota_equipo: string | null };
+export type EvidenciaVista = {
+  id: string;
+  tipo: "referencia" | "archivo" | "evaluacion";
+  descripcion: string | null;
+  nota_equipo: string | null;
+};
 
-export type MiEmpresa = { id: string; nombre: string; nit: string | null; verificada: boolean; estado: "activa" | "pausada" };
+export type MiEmpresa = {
+  id: string;
+  nombre: string;
+  nit: string | null;
+  verificada: boolean;
+  estado: "activa" | "pausada";
+};
 
 // Estados como los ve la empresa (company_connections_view).
 export type EstadoEmpresa =
@@ -47,6 +58,7 @@ export type EstadoEmpresa =
 
 // Lo que las dos partes ven del proceso después de abrirse: conversación, acuerdo y cierre.
 export type DatosEtapas = {
+  acuerdo_revisado_en?: string | null;
   conversacion_en: string | null;
   conversacion_modo: "llamada" | "videollamada" | "presencial" | null;
   conversacion_confirmada: boolean;
@@ -81,6 +93,13 @@ export type ConexionEmpresa = {
 } & Partial<DatosEtapas>;
 
 export type NecesidadVista = {
+  revision_version?: number;
+  jornada_horas?: number | null;
+  remuneracion?: number | null;
+  remuneracion_unidad?: string | null;
+  condiciones?: string | null;
+  dignidad_estado?: string;
+
   id: string;
   problema: string;
   formatos: FormaContratar[];
@@ -135,7 +154,8 @@ export type ExperienciaVista = {
   aprobada_por_sabedora_en: string | null;
 };
 
-export type EstadoSolicitud = "recibida" | "cotizada" | "confirmada" | "realizada" | "reporte_enviado";
+export type EstadoSolicitud =
+  "recibida" | "cotizada" | "confirmada" | "realizada" | "reporte_enviado";
 
 export type SolicitudExperiencia = {
   id: string;
@@ -149,5 +169,9 @@ export type SolicitudExperiencia = {
   estado: EstadoSolicitud;
   valor_cotizado: number | null;
   creado_en: string;
-  impacto: { personas_impactadas: number; horas: number; pago_persona: number } | null;
+  impacto: {
+    personas_impactadas: number;
+    horas: number;
+    pago_persona: number;
+  } | null;
 };

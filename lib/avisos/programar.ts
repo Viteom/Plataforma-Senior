@@ -4,12 +4,18 @@ import { MARCA } from "@/lib/marca";
 // cuándo. El envío real (Twilio) es de pago y está apagado; mientras tanto la cola queda visible
 // para el equipo en /equipo/ayuda, que puede llamar a la persona.
 
-export type AvisoPendiente = { id: string; userId: string | null; creadoEn: Date; plantilla?: string };
+export type AvisoPendiente = {
+  id: string;
+  userId: string | null;
+  creadoEn: Date;
+  plantilla?: string;
+};
 
 // Qué dice cada aviso en la cola del equipo (y por qué se envía).
 export const TEXTO_PLANTILLA: Record<string, string> = {
   oportunidad_nueva: "Oportunidad nueva",
   conversacion_agendada: "La organización agendó una conversación",
+  acuerdo_autorizado: "Kánna revisó el acuerdo: la persona ya puede decidir",
   acuerdo_propuesto: "La organización propuso un acuerdo",
   proceso_cerrado: "La organización decidió no seguir",
 };
@@ -57,7 +63,10 @@ export function decidirEnvios(
   const porPersona = new Map<string, AvisoPendiente[]>();
   for (const p of pendientes) {
     if (!p.userId) {
-      decision.omitir.push({ id: p.id, motivo: "La persona no tiene cuenta propia: llamarla." });
+      decision.omitir.push({
+        id: p.id,
+        motivo: "La persona no tiene cuenta propia: llamarla.",
+      });
       continue;
     }
     porPersona.set(p.userId, [...(porPersona.get(p.userId) ?? []), p]);
@@ -70,14 +79,24 @@ export function decidirEnvios(
       continue;
     }
     // Varios avisos: un solo SMS que los agrupa. Si alguno es una oportunidad nueva, se dice eso.
-    const nueva = avisos.some((a) => (a.plantilla ?? "oportunidad_nueva") === "oportunidad_nueva");
-    decision.enviar.push({ userId, ids, texto: nueva ? textoOportunidad(enlace) : textoNovedad(enlace) });
+    const nueva = avisos.some(
+      (a) => (a.plantilla ?? "oportunidad_nueva") === "oportunidad_nueva",
+    );
+    decision.enviar.push({
+      userId,
+      ids,
+      texto: nueva ? textoOportunidad(enlace) : textoNovedad(enlace),
+    });
   }
   return decision;
 }
 
 // Oportunidades sin respuesta después de 3 días: alguien del equipo llama (brief).
-export function necesitanSeguimiento<T extends { enviadaEn: Date; conSeguimiento: boolean }>(conexiones: T[], ahora: Date): T[] {
+export function necesitanSeguimiento<
+  T extends { enviadaEn: Date; conSeguimiento: boolean },
+>(conexiones: T[], ahora: Date): T[] {
   const limite = ahora.getTime() - DIAS_SEGUIMIENTO * 24 * 3600_000;
-  return conexiones.filter((c) => !c.conSeguimiento && c.enviadaEn.getTime() <= limite);
+  return conexiones.filter(
+    (c) => !c.conSeguimiento && c.enviadaEn.getTime() <= limite,
+  );
 }
