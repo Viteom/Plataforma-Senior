@@ -54,7 +54,7 @@ export function HuellaViva() {
               <div className="retrato hidden size-24 shrink-0 overflow-hidden bg-accent group-has-[#vista-visible:checked]/vista:block sm:size-28">
                 <Image
                   src={RETRATOS.sombrero.src}
-                  alt="Foto de perfil de un hombre con sombrero"
+                  alt="Foto de perfil de un artesano con gafas"
                   width={300}
                   height={300}
                   className="h-full w-full object-cover object-[30%_center]"

@@ -112,7 +112,7 @@ export function PieWeb() {
             Experiencia <span className="font-editorial font-normal italic">que abre posibilidades.</span>
           </p>
           <p className="max-w-[60ch]">
-            Retratos de referencia y perfiles de ejemplo. Las fotos del campo son{" "}
+            Perfiles de ejemplo. Los retratos son fotos de banco de Pexels, de uso libre. Las fotos del campo son{" "}
             {CREDITOS.map((c, i) => (
               <span key={c.url}>
                 {i > 0 && " y "}
