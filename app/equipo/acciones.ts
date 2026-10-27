@@ -599,3 +599,67 @@ export async function revisarAcuerdoTrabajo(_p: Estado, datos: FormData): Promis
     aviso: "Condiciones revisadas. La persona ya puede decidir si acepta.",
   };
 }
+
+// ── Semáforo de trabajo digno ───────────────────────────────────────────────
+
+export async function revisarMuestra(_p: Estado, datos: FormData): Promise<Estado> {
+  const reto = String(datos.get("reto") ?? "");
+  if (!UUID.test(reto)) return { error: "Reto no válido." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const { error } = await supabase.rpc("revisar_muestra", { reto });
+  if (error) return { error: "No pudimos marcarlo. Puede que otra persona ya lo haya revisado." };
+  revalidatePath(`/equipo/problema/${reto}`);
+  revalidatePath("/equipo");
+  return { aviso: "Listo: la aprobación automática quedó confirmada." };
+}
+
+// Solo administración: RLS rechaza a cualquier otra persona aunque llegue hasta aquí.
+export async function guardarParametro(_p: Estado, datos: FormData): Promise<Estado> {
+  const clave = texto(datos.get("clave"), 60);
+  const valor = Number(String(datos.get("valor") ?? "").replace(",", "."));
+  if (!/^[a-z_]+$/.test(clave) || !Number.isFinite(valor) || valor < 0) return { error: "Escribe un número válido." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase, user } = await equipo();
+  const { data, error } = await supabase
+    .from("parametros_trabajo_digno")
+    .update({ valor, actualizado_por: user.id, actualizado_en: new Date().toISOString() })
+    .eq("clave", clave)
+    .select("clave");
+  if (error || !data?.length) return { error: "No pudimos guardarlo. Solo administración cambia los umbrales." };
+  revalidatePath("/equipo/semaforo");
+  return { aviso: "Guardado. Aplica a los retos y acuerdos nuevos o que cambien." };
+}
+
+export async function crearReglaTexto(_p: Estado, datos: FormData): Promise<Estado> {
+  const patron = texto(datos.get("patron"), 200).toLowerCase();
+  const motivo = texto(datos.get("motivo"), 200);
+  const color = datos.get("color") === "rojo" ? "rojo" : "amarillo";
+  if (patron.length < 3 || motivo.length < 5) return { error: "Escribe la expresión y el motivo." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const { error } = await supabase.from("reglas_texto_digno").insert({ patron, motivo, color });
+  if (error)
+    return {
+      error: error.message.includes("no es válida")
+        ? "La expresión no es válida. Revisa paréntesis y barras."
+        : "No pudimos guardarla. Solo administración cambia las reglas.",
+    };
+  revalidatePath("/equipo/semaforo");
+  return { aviso: "Regla guardada." };
+}
+
+export async function cambiarReglaTexto(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = Number(datos.get("id"));
+  if (!Number.isInteger(id) || id < 1) return { error: "Regla no válida." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const { data, error } = await supabase
+    .from("reglas_texto_digno")
+    .update({ activa: datos.get("activa") === "si" })
+    .eq("id", id)
+    .select("id");
+  if (error || !data?.length) return { error: "No pudimos cambiarla. Solo administración cambia las reglas." };
+  revalidatePath("/equipo/semaforo");
+  return { aviso: datos.get("activa") === "si" ? "Regla activada." : "Regla apagada." };
+}

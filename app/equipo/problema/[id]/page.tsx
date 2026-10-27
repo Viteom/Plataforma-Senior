@@ -3,13 +3,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { Semaforo } from "@/components/equipo/semaforo";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { necesidadParaCurar } from "@/lib/datos/equipo";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, pesos } from "@/lib/formas";
 
-import { calcularPropuestos, revisarCondicionesReto, completarCondicionesReto } from "../../acciones";
+import { calcularPropuestos, revisarCondicionesReto, completarCondicionesReto, revisarMuestra } from "../../acciones";
 import { ElegirPropuestos } from "./elegir";
 
 export const metadata: Metadata = { title: "Curar búsqueda" };
@@ -64,6 +65,20 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
 
       <section className="flex flex-col gap-3 rounded-md bg-surface p-4">
         <h2 className="text-xl">Revisión de trabajo digno</h2>
+        <Semaforo
+          color={necesidad.semaforo}
+          motivos={necesidad.semaforo_motivos}
+          automatico={necesidad.dignidad_automatica}
+        />
+        {necesidad.en_muestra && (
+          <div className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4">
+            <p>
+              Este reto se aprobó solo y salió en la muestra de control. Revisa que las condiciones de verdad sean
+              dignas; si algo falla, pide ajustes y cuéntale al equipo para corregir las reglas.
+            </p>
+            <BotonAccion accion={revisarMuestra} campos={{ reto: id }} texto="La aprobación automática estuvo bien" />
+          </div>
+        )}
         <p>Estado: {necesidad.dignidad_estado ?? "pendiente"}</p>
         <p>
           Jornada: {necesidad.jornada_horas ?? "por completar"} horas/semana. Remuneración:{" "}

@@ -175,13 +175,9 @@ describe("el proceso completo", () => {
     const [ev] = await filas(db, "select tipo, estado from evidence where talent_id = $1", [perfil]);
     expect(ev).toEqual({ tipo: "evaluacion", estado: "verificada" });
 
-    // La persona recibe aviso en cada paso que la necesita.
-    expect(await avisos(id)).toEqual([
-      "oportunidad_nueva",
-      "conversacion_agendada",
-      "acuerdo_propuesto",
-      "acuerdo_autorizado",
-    ]);
+    // La persona recibe aviso en cada paso que la necesita. El acuerdo cumplió el semáforo y se
+    // aprobó solo al proponerse: basta el aviso de la propuesta, sin un segundo SMS.
+    expect(await avisos(id)).toEqual(["oportunidad_nueva", "conversacion_agendada", "acuerdo_propuesto"]);
     // El nombre sigue visible para la organización después de terminar.
     const [p] = await como(db, u.empresa, (tx) =>
       filas(tx, "select nombre from company_talent_view where id = $1", [perfil]),

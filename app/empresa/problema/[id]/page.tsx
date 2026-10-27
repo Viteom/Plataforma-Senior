@@ -51,8 +51,19 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
       {necesidad.dignidad_estado === "ajustes" && (
         <p className="flex items-start gap-3 rounded-md bg-accent p-5 text-lg text-on-accent">
           <Clock aria-hidden className="mt-1 size-6 shrink-0" />
-          Kánna pidió ajustar las condiciones de este reto antes de enviarlo. Te escribimos para acordar la jornada, el
-          pago o el acompañamiento.
+          <span className="flex flex-col gap-2">
+            <span>
+              Kánna pidió ajustar las condiciones de este reto antes de enviarlo. Te escribimos para acordar la jornada,
+              el pago o el acompañamiento.
+            </span>
+            {necesidad.semaforo_motivos && necesidad.semaforo_motivos.length > 0 && (
+              <span className="flex flex-col gap-1">
+                {necesidad.semaforo_motivos.map((m) => (
+                  <span key={m}>· {m}</span>
+                ))}
+              </span>
+            )}
+          </span>
         </p>
       )}
 

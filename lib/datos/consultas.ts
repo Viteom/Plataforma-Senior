@@ -174,7 +174,7 @@ export async function obtenerNecesidad(id: string): Promise<{
   const { data: necesidad } = await supabase
     .from("needs")
     .select(
-      "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, dignidad_estado, need_requirements(capa, etiqueta, obligatorio)",
+      "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, dignidad_estado, semaforo_motivos, need_requirements(capa, etiqueta, obligatorio)",
     )
     .eq("id", id)
     .maybeSingle();

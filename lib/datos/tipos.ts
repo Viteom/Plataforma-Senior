@@ -99,6 +99,10 @@ export type NecesidadVista = {
   remuneracion_unidad?: string | null;
   condiciones?: string | null;
   dignidad_estado?: string;
+  semaforo?: string | null;
+  semaforo_motivos?: string[];
+  dignidad_automatica?: boolean;
+  en_muestra?: boolean;
 
   id: string;
   problema: string;

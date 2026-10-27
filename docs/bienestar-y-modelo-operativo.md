@@ -55,6 +55,28 @@ La migración no cambia procesos ya enviados ni presupone que las condiciones hi
 aprobadas. Los retos históricos con información incompleta requieren completarla antes de la
 nueva autorización. El equipo puede completarla desde la pantalla de curaduría y autorizar la versión revisada.
 
+### Semáforo automático (migración `20261031000008`)
+
+Revisar cada reto a mano no escala. La base evalúa sola cada reto y cada acuerdo al crearlo o
+cambiarlo:
+
+- **Verde**: cumple todo y se aprueba sin esperar al equipo. Una parte (10 % por defecto) entra a
+  una muestra de control que el equipo confirma desde la página del reto.
+- **Amarillo**: queda pendiente en la cola del equipo. Pasa cuando el pago está cerca del mínimo,
+  la jornada es larga, faltan descansos o quién acompaña, hay trabajo de noche, en alturas o con
+  carga, la organización tiene reportes de trato o pago, o es su primer reto.
+- **Rojo**: vuelve a la organización con los motivos. Pasa cuando el pago por hora queda bajo el
+  mínimo legal, la jornada supera el máximo, el texto pide edad o «buena presencia», pide dinero a
+  la persona o no paga.
+
+Los acuerdos se comparan además con el reto aprobado: si el pago baja o la jornada sube más del
+margen, pasan a amarillo. Un acuerdo aprobado solo no envía un segundo SMS: basta el de la propuesta.
+
+Los umbrales (`parametros_trabajo_digno`) y las expresiones (`reglas_texto_digno`) se editan en
+`/equipo/semaforo`; solo administración puede cambiarlos y una expresión inválida no se guarda.
+Ninguna regla mira la edad ni la salud de la persona. Los valores iniciales (salario mínimo de
+1.423.500 pesos y jornada máxima de 42 horas) deben confirmarse con asesoría laboral antes del piloto.
+
 ## Pagos: diseño acordado, cobros desactivados
 
 La organización debe conocer, antes de aceptar, tres cifras separadas:

@@ -30,12 +30,15 @@ export type Conteos = {
   avisos: number;
   cotizaciones: number;
   etiquetas: number;
+  amarillos: number;
+  muestra: number;
 };
 export type NecesidadEnCola = {
   id: string;
   problema: string;
   empresa: string;
   creado_en: string;
+  semaforo?: string | null;
 };
 
 export async function panelEquipo(): Promise<{
@@ -53,6 +56,8 @@ export async function panelEquipo(): Promise<{
         avisos: 1,
         cotizaciones: 1,
         etiquetas: 1,
+        amarillos: 0,
+        muestra: 0,
       },
       cola: [
         {
@@ -66,7 +71,7 @@ export async function panelEquipo(): Promise<{
   }
   const supabase = await cliente();
   const cuenta = { count: "exact" as const, head: true };
-  const [r1, r2, r3, r4, r5, r6, r7, r8, { data: cola }] = await Promise.all([
+  const [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, { data: cola }] = await Promise.all([
     supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
     supabase.from("companies").select("*", cuenta).is("verificada_en", null),
     supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
@@ -80,13 +85,15 @@ export async function panelEquipo(): Promise<{
       .eq("confirmada", true)
       .is("taxonomy_id", null)
       .is("aprobada_en", null),
+    supabase.from("needs").select("*", cuenta).eq("dignidad_estado", "pendiente").eq("semaforo", "amarillo"),
+    supabase.from("needs").select("*", cuenta).eq("en_muestra", true),
     supabase
       .from("needs")
-      .select("id, problema, creado_en, companies(nombre)")
+      .select("id, problema, creado_en, semaforo, companies(nombre)")
       .eq("estado", "en_curaduria")
       .order("creado_en"),
   ]);
-  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas] = [
+  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas, amarillos, muestra] = [
     r1,
     r2,
     r3,
@@ -95,6 +102,8 @@ export async function panelEquipo(): Promise<{
     r6,
     r7,
     r8,
+    r9,
+    r10,
   ].map((r) => r.count ?? 0);
   return {
     conteos: {
@@ -106,12 +115,15 @@ export async function panelEquipo(): Promise<{
       avisos,
       cotizaciones,
       etiquetas,
+      amarillos,
+      muestra,
     },
     cola: (cola ?? []).map((n) => ({
       id: n.id as string,
       problema: n.problema as string,
       empresa: (n.companies as unknown as { nombre: string } | null)?.nombre ?? "",
       creado_en: n.creado_en as string,
+      semaforo: (n.semaforo as string | null) ?? null,
     })),
   };
 }
@@ -184,7 +196,7 @@ export async function necesidadParaCurar(id: string): Promise<{
   const { data: n } = await supabase
     .from("needs")
     .select(
-      "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, revision_version, jornada_horas, remuneracion, remuneracion_unidad, condiciones, dignidad_estado, need_requirements(capa, etiqueta, obligatorio), companies(nombre, verificada_en)",
+      "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, revision_version, jornada_horas, remuneracion, remuneracion_unidad, condiciones, dignidad_estado, semaforo, semaforo_motivos, dignidad_automatica, en_muestra, need_requirements(capa, etiqueta, obligatorio), companies(nombre, verificada_en)",
     )
     .eq("id", id)
     .maybeSingle();
