@@ -3,8 +3,8 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import type { Retrato as DatosRetrato } from "@/lib/web/contenido";
 
-// Retrato en grabado (líneas casi negro sobre transparente) puesto sobre un color plano, con el
-// borde blanco grueso del brandbook.
+// Fotografía a color, sin filtros, recortada sobre un color plano y con el borde blanco grueso
+// del brandbook.
 export function Retrato({
   retrato,
   fondo = "bg-accent",

@@ -9,8 +9,8 @@ import { MARCO, retraso } from "./marco";
 // Cada retrato lleva pegada debajo su franja con el oficio, como una etiqueta colgada de una
 // pieza. Los colores de la franja rotan para que dos vecinas nunca coincidan.
 const FRANJAS = [
-  "bg-text text-bg",
   "bg-primary text-on-primary",
+  "bg-surface-strong text-text",
   "bg-deep text-on-deep",
   "bg-accent text-on-accent",
   "bg-surface-strong text-text",

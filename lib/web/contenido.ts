@@ -12,11 +12,11 @@ export const MENU_WEB = [
 export type Retrato = { src: string; ancho: number; alto: number; alt: string };
 
 export const RETRATOS = {
-  libro: { src: "/web/retrato-libro.webp", ancho: 900, alto: 1350, alt: "Retrato en grabado de un hombre de pie en su biblioteca, con un libro en la mano" },
-  sombrero: { src: "/web/retrato-sombrero.webp", ancho: 900, alto: 599, alt: "Retrato en grabado de un hombre con sombrero que sonríe" },
-  azul: { src: "/web/retrato-azul.webp", ancho: 900, alto: 599, alt: "Retrato en grabado de una mujer que sonríe mirando a un lado" },
-  rojo: { src: "/web/retrato-rojo.webp", ancho: 900, alto: 897, alt: "Retrato en grabado de una mujer de cabello claro que mira de frente" },
-  cocina: { src: "/web/retrato-cocina.webp", ancho: 900, alto: 1350, alt: "Retrato en grabado de un cocinero con delantal que prepara empanadas" },
+  libro: { src: "/web/retrato-libro.webp", ancho: 900, alto: 1350, alt: "Fotografía de un hombre de pie en su biblioteca, con un libro en la mano" },
+  sombrero: { src: "/web/retrato-sombrero.webp", ancho: 900, alto: 599, alt: "Fotografía de un hombre con sombrero que sonríe" },
+  azul: { src: "/web/retrato-azul.webp", ancho: 900, alto: 599, alt: "Fotografía de una mujer que sonríe mirando a un lado" },
+  rojo: { src: "/web/retrato-rojo.webp", ancho: 900, alto: 897, alt: "Fotografía de una mujer de cabello claro que mira de frente" },
+  cocina: { src: "/web/retrato-cocina.webp", ancho: 900, alto: 1350, alt: "Fotografía de un cocinero con delantal que prepara empanadas" },
 } satisfies Record<string, Retrato>;
 
 // Perfiles de ejemplo para la galería de oficios: oficio, capacidades y forma de trabajar.

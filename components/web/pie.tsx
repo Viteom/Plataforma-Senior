@@ -49,7 +49,7 @@ const enlace = "inline-flex min-h-tap items-center text-lg underline-offset-4 ho
 // enlaces por público, la firma y los créditos de las fotos.
 export function PieWeb() {
   return (
-    <footer className="bg-primary text-on-primary">
+    <footer className="bg-deep text-on-deep">
       <div className={`${MARCO} flex flex-col gap-16 pt-12 pb-10 lg:gap-24`}>
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex max-w-[40ch] flex-col gap-4">
@@ -91,7 +91,7 @@ export function PieWeb() {
         </div>
 
         {MODO_DEMO && (
-          <nav aria-labelledby="demo" className="flex flex-col gap-2 rounded-md bg-primary-hover p-5">
+          <nav aria-labelledby="demo" className="flex flex-col gap-2 rounded-md bg-primary p-5">
             <h2 id="demo" className="text-lg font-bold">
               Demostración: entra a cada área
             </h2>
@@ -112,7 +112,7 @@ export function PieWeb() {
             Experiencia <span className="font-editorial font-normal italic">que abre posibilidades.</span>
           </p>
           <p className="max-w-[60ch]">
-            Retratos de referencia y perfiles de ejemplo. Grabados hechos a partir de{" "}
+            Retratos de referencia y perfiles de ejemplo. Las fotos del campo son{" "}
             {CREDITOS.map((c, i) => (
               <span key={c.url}>
                 {i > 0 && " y "}
@@ -121,7 +121,7 @@ export function PieWeb() {
                 </a>
               </span>
             ))}
-            , de {CREDITOS[0].autor} en Wikimedia Commons ({CREDITOS[0].licencia}). Los grabados se comparten con la misma licencia.
+            , de {CREDITOS[0].autor} en Wikimedia Commons ({CREDITOS[0].licencia}).
           </p>
         </div>
       </div>

@@ -6,12 +6,12 @@ import sharp from "sharp";
 
 const archivo = (nombre) => readFileSync(`public/marca/${nombre}`);
 
-// Maskable: Android recorta en círculo, así que el símbolo va al 60 % sobre cobalto.
+// Maskable: Android recorta en círculo, así que el símbolo va al 60 % sobre azul noche.
 const simbolo = readFileSync("public/marca/kanna-simbolo-negativo.svg", "utf8")
   .replace(/^<svg[^>]*>/, "")
   .replace(/<\/svg>\s*$/, "");
 const maskable = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#A0330F"/>
+  <rect width="512" height="512" fill="#1E2A47"/>
   <g transform="translate(102 102) scale(2.85)"><g transform="translate(4 4)">${simbolo}</g></g>
 </svg>`;
 

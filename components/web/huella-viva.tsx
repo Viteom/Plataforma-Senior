@@ -14,7 +14,7 @@ const pildora = "inline-flex min-h-tap items-center rounded-full bg-surface px-4
 
 export function HuellaViva() {
   return (
-    <section aria-labelledby="tu-decides" className="group/vista bg-primary py-24 text-on-primary lg:py-36">
+    <section aria-labelledby="tu-decides" className="group/vista bg-surface py-24 text-text lg:py-36">
       <div className="mx-auto grid w-full max-w-web gap-14 px-4 md:px-8 lg:grid-cols-12 lg:gap-6">
         <div className="flex flex-col gap-8 lg:col-span-5">
           <h2 id="tu-decides" data-aparecer className="titular-marca text-afiche">
@@ -26,13 +26,13 @@ export function HuellaViva() {
           </p>
           <fieldset data-aparecer style={retraso(2)}>
             <legend className="mb-3 text-lg font-bold">Cómo te ve una organización</legend>
-            <div className="inline-flex flex-wrap gap-2 rounded-full bg-primary-hover p-1.5">
-              <label className="inline-flex min-h-action items-center gap-2 rounded-full px-6 text-lg font-bold transition-colors duration-150 hover:bg-primary has-[:checked]:bg-accent has-[:checked]:text-on-accent has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white">
+            <div className="inline-flex flex-wrap gap-2 rounded-full bg-surface-strong p-1.5">
+              <label className="inline-flex min-h-action items-center gap-2 rounded-full px-6 text-lg font-bold transition-colors duration-150 hover:bg-bg has-[:checked]:bg-accent has-[:checked]:text-on-accent has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus">
                 <input type="radio" name="vista" value="reservado" defaultChecked className="sr-only" />
                 <EyeOff aria-hidden className="size-6" />
                 Reservado
               </label>
-              <label className="inline-flex min-h-action items-center gap-2 rounded-full px-6 text-lg font-bold transition-colors duration-150 hover:bg-primary has-[:checked]:bg-accent has-[:checked]:text-on-accent has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-white">
+              <label className="inline-flex min-h-action items-center gap-2 rounded-full px-6 text-lg font-bold transition-colors duration-150 hover:bg-bg has-[:checked]:bg-accent has-[:checked]:text-on-accent has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-focus">
                 <input id="vista-visible" type="radio" name="vista" value="visible" className="sr-only" />
                 <Eye aria-hidden className="size-6" />
                 Visible
@@ -54,7 +54,7 @@ export function HuellaViva() {
               <div className="retrato hidden size-24 shrink-0 overflow-hidden bg-accent group-has-[#vista-visible:checked]/vista:block sm:size-28">
                 <Image
                   src={RETRATOS.sombrero.src}
-                  alt="Foto de perfil en grabado de un hombre con sombrero"
+                  alt="Foto de perfil de un hombre con sombrero"
                   width={300}
                   height={300}
                   className="h-full w-full object-cover object-[30%_center]"
