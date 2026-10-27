@@ -14,9 +14,9 @@ export function Afiche({
   texto,
   acciones,
   retrato,
-  forma = "bg-primary",
-  fondoRetrato = "bg-accent",
-  formatoRetrato = "aspect-[2/3] h-[min(36rem,62svh)]",
+  forma = "bg-accent",
+  fondoRetrato = "bg-surface",
+  formatoRetrato = "aspect-[2/3] h-[min(42rem,68svh)]",
   nota,
 }: {
   titulo: React.ReactNode;
@@ -33,11 +33,11 @@ export function Afiche({
       <div className={cn(MARCO, "relative pt-6 lg:pt-10")}>
         <h1 className="titular-marca text-gigante">{titulo}</h1>
         <div className="mt-8 grid gap-12 lg:mt-12 lg:grid-cols-12 lg:gap-6">
-          <div className="relative z-10 flex flex-col gap-8 lg:col-span-5 lg:pb-16">
+          <div className="relative z-10 flex flex-col gap-8 lg:col-span-5 lg:self-center lg:pb-16">
             <p className="max-w-[40ch] text-lg sm:text-xl">{texto}</p>
             {acciones && <div className="flex flex-wrap items-center gap-x-6 gap-y-3">{acciones}</div>}
             {nota && (
-              <p className="flex max-w-[34ch] items-start gap-3 rounded-md bg-surface p-4 text-lg font-bold lg:mt-auto">
+              <p className="flex max-w-[34ch] items-start gap-3 rounded-md bg-surface p-4 text-lg font-bold">
                 <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0 text-deep" />
                 {nota}
               </p>

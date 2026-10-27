@@ -3,10 +3,11 @@
 /*
   Tokens de marca Kánna (brandbook: https://claude.ai/artifact/V7A3pmoq1R8xU4WdwoU1cv).
   Cambiar solo estos valores, nunca colores literales en componentes.
-  Paleta «Tierra y maíz» (24 oct 2026; reemplaza cobalto, lima y bosque).
-  Contrastes verificados (WCAG 2.2 AA): terracota/crema 6,2:1, blanco/terracota 7,1:1,
-  azul noche/maíz 10,2:1, crema/azul noche 12,4:1, tinta suave/crema 6,7:1, maíz/terracota 5,1:1.
-  Prohibido: terracota sobre azul noche (2:1) y maíz sobre crema o blanco (no se lee).
+  Paleta «Azul noche y maíz» (27 oct 2026; reemplaza tierra y maíz).
+  Contrastes verificados (WCAG 2.2 AA): azul noche/crema 12,4:1, blanco/azul noche 14,2:1,
+  azul noche/maíz 10,2:1, crema/noche profunda 14,7:1, maíz/noche profunda 12,0:1, tinta suave/crema 6,7:1.
+  Prohibido: azul noche sobre noche profunda (1,2:1) y maíz sobre crema o blanco (no se lee).
+  Proporción: casi todo crema, dos momentos oscuros (noche profunda) por página como máximo.
   El maíz es la «cana»: escaso, nunca como texto sobre crema ni blanco.
 */
 @theme {
@@ -19,16 +20,16 @@
   --color-text-muted: #5a5249;
   --color-border: #7d746a; /* borde de controles, 4:1 sobre crema */
   --color-border-subtle: #dcd0bd;
-  --color-primary: #a0330f; /* terracota */
-  --color-primary-hover: #86290a;
+  --color-primary: #1e2a47; /* azul noche: marca y acciones */
+  --color-primary-hover: #2c3b60;
   --color-on-primary: #ffffff;
   --color-accent: #fad86a; /* maíz */
   --color-on-accent: #1e2a47;
   --color-accent-hover: #f2c94c;
-  --color-deep: #1e2a47; /* azul noche: confianza y Talento del campo */
+  --color-deep: #141d33; /* noche profunda: momentos oscuros (confianza, pie) */
   --color-on-deep: #f6efe4;
-  --color-focus: #a0330f;
-  --color-danger: #b42318; /* siempre con ícono y palabra: se parece a la terracota */
+  --color-focus: #1e2a47;
+  --color-danger: #b42318; /* siempre con ícono y palabra */
   --color-success: #1e2a47;
   --color-white: #ffffff;
   --color-transparent: transparent;
