@@ -7,6 +7,9 @@ import { Calificacion, Motivos } from "@/components/procesos/campos";
 import { CuadroSituacion, LineaProceso } from "@/components/procesos/linea";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { Campo, Textarea } from "@/components/ui/campo";
+import { crearClienteServidor } from "@/lib/supabase/server";
+import { acuerdosActuales, fechaColombia } from "@/lib/bienestar/resumen";
+import type { CargaAcuerdo } from "@/lib/bienestar/resumen";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import type { Oportunidad } from "@/lib/datos/tipos";
 import { MODO_DEMO } from "@/lib/demo";
@@ -31,7 +34,44 @@ export const metadata: Metadata = { title: "Oportunidades" };
 const enlace = "inline-flex min-h-tap items-center gap-2 font-bold underline underline-offset-4";
 
 export default async function Oportunidades() {
-  const oportunidades = (await listarOportunidades()).map((o) => ({
+  const filas = await listarOportunidades();
+  const supabase = MODO_DEMO ? null : await crearClienteServidor();
+  const cargas = new Map<string, CargaAcuerdo>();
+  if (supabase)
+    await Promise.all(
+      filas
+        .filter((o) => o.estado === "acuerdo")
+        .map(async (o) => {
+          const { data, error } = await supabase.rpc("previsualizar_carga", {
+            conexion: o.id,
+            version: o.acuerdo_version,
+          });
+          if (!error && data) cargas.set(o.id, data as CargaAcuerdo);
+        }),
+    );
+  if (MODO_DEMO)
+    for (const o of filas.filter((o) => o.estado === "acuerdo")) {
+      const fecha = o.acuerdo_inicio && o.acuerdo_inicio > fechaColombia() ? o.acuerdo_inicio : fechaColombia();
+      const otros = acuerdosActuales(
+        filas.filter((p) => p.id !== o.id),
+        fecha,
+      );
+      const previas = otros.reduce((s, p) => s + Number(p.acuerdo_horas_semana ?? 0), 0);
+      const sinHoras =
+        otros.filter((p) => p.acuerdo_horas_semana == null).length + (o.acuerdo_horas_semana == null ? 1 : 0);
+      const total = previas + Number(o.acuerdo_horas_semana ?? 0);
+      cargas.set(o.id, {
+        fecha,
+        horas_previas: previas,
+        horas_nuevas: o.acuerdo_horas_semana ?? null,
+        total,
+        sin_horas: sinHoras,
+        limite: 20,
+        requiere_confirmacion: sinHoras > 0 || total > 20,
+        token: "demo",
+      });
+    }
+  const oportunidades = filas.map((o) => ({
     o,
     s: situacion({ ...o, evaluacion_propia: o.evaluacion_talento }, "talento"),
   }));
@@ -68,7 +108,7 @@ export default async function Oportunidades() {
           <ul className="flex flex-col gap-5">
             {turno.map(({ o, s }) => (
               <li key={o.id}>
-                <TarjetaProceso o={o} s={s} />
+                <TarjetaProceso o={o} s={s} carga={cargas.get(o.id)} />
               </li>
             ))}
           </ul>
@@ -83,7 +123,7 @@ export default async function Oportunidades() {
           <ul className="flex flex-col gap-5">
             {proceso.map(({ o, s }) => (
               <li key={o.id}>
-                <TarjetaProceso o={o} s={s} />
+                <TarjetaProceso o={o} s={s} carga={cargas.get(o.id)} />
               </li>
             ))}
           </ul>
@@ -111,11 +151,15 @@ export default async function Oportunidades() {
   );
 }
 
-function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
+function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?: CargaAcuerdo }) {
   const campos = { conexion: o.id };
   // La persona responde a la fecha y al acuerdo que está viendo (ver la migración de revisión).
   const conFecha = { ...campos, version: String(o.conversacion_version ?? 0) };
-  const conAcuerdo = { ...campos, version: String(o.acuerdo_version ?? 0) };
+  const conAcuerdo = {
+    ...campos,
+    version: String(o.acuerdo_version ?? 0),
+    carga_token: carga?.token ?? "",
+  };
   const nueva = o.estado === "enviada_talento";
   const abierta = ["abierta", "conversacion", "acuerdo", "en_curso"].includes(o.estado);
 
@@ -140,7 +184,9 @@ function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
       {(nueva || o.problema) && (
         <p className="text-lg">{o.problema ? `«${o.problema}»` : "Vio tu perfil y quiere conocerte."}</p>
       )}
-      {nueva && o.formatos && o.formatos.length > 0 && <p className="text-base">Busca: {o.formatos.map(etiquetaForma).join(", ")}</p>}
+      {nueva && o.formatos && o.formatos.length > 0 && (
+        <p className="text-base">Busca: {o.formatos.map(etiquetaForma).join(", ")}</p>
+      )}
 
       {s.etapa && <LineaProceso etapa={s.etapa} />}
       <CuadroSituacion s={s} lado="talento" />
@@ -153,25 +199,90 @@ function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
       {nueva && (
         <>
           <BotonAccion accion={meInteresa} campos={campos} texto="Me interesa" ancho="completo" />
-          <BotonAccion accion={noMeInteresa} campos={campos} texto="No me interesa" variant="secundario" ancho="completo" />
+          <BotonAccion
+            accion={noMeInteresa}
+            campos={campos}
+            texto="No me interesa"
+            variant="secundario"
+            ancho="completo"
+          />
         </>
       )}
       {o.estado === "conversacion" && !o.conversacion_confirmada && (
         <>
           <BotonAccion accion={confirmarFecha} campos={conFecha} texto="Sí, me sirve" ancho="completo" />
-          <BotonAccion accion={otraFecha} campos={conFecha} texto="Necesito otra fecha" variant="secundario" ancho="completo" />
+          <BotonAccion
+            accion={otraFecha}
+            campos={conFecha}
+            texto="Necesito otra fecha"
+            variant="secundario"
+            ancho="completo"
+          />
         </>
       )}
       {o.estado === "acuerdo" && (
         <>
-          <BotonAccion accion={aceptarAcuerdo} campos={conAcuerdo} texto="Acepto el acuerdo" ancho="completo" />
-          <BotonAccion accion={ajustarAcuerdo} campos={conAcuerdo} texto="Quiero ajustarlo" variant="secundario" ancho="completo" />
+          {MODO_DEMO || (o.acuerdo_revisado_en && carga) ? (
+            <BotonAccion accion={aceptarAcuerdo} campos={conAcuerdo} texto="Acepto el acuerdo" ancho="completo">
+              {carga && (
+                <div className="flex flex-col gap-2 rounded-md bg-surface p-4">
+                  <p className="font-bold">Revisa tu tiempo antes de aceptar</p>
+                  <p>
+                    Al inicio de este acuerdo ({carga.fecha}), tienes {carga.horas_previas} horas semanales pactadas en
+                    otros acuerdos. Este suma {carga.horas_nuevas ?? "horas por definir"}.
+                  </p>
+                  <p>
+                    Total con horas conocidas: {carga.total}.{" "}
+                    {carga.limite === null
+                      ? "No has elegido un límite personal."
+                      : `Tu límite personal es ${carga.limite} horas.`}
+                  </p>
+                  {carga.sin_horas > 0 && (
+                    <p>Hay {carga.sin_horas} acuerdos sin horas definidas. Revisa su dedicación con el equipo.</p>
+                  )}
+                  <p>La proyección no incluye trabajos fuera de Kánna ni descuenta finales todavía no registrados.</p>
+                  {carga.requiere_confirmacion && (
+                    <label className="flex min-h-tap items-start gap-3">
+                      <input
+                        type="checkbox"
+                        name="confirmar_carga"
+                        value="si"
+                        required
+                        className="mt-1 size-6 shrink-0"
+                      />
+                      Revisé esta carga y quiero continuar con estas condiciones. Puedo pedir ajustes en lugar de
+                      aceptar.
+                    </label>
+                  )}
+                </div>
+              )}
+            </BotonAccion>
+          ) : (
+            <p role="status">
+              {o.acuerdo_revisado_en
+                ? "No pudimos calcular tu carga de trabajo. Recarga la página; puedes pedir ajustes mientras tanto."
+                : "Kánna está revisando las condiciones. Te avisamos cuando puedas decidir; puedes pedir ajustes mientras tanto."}
+            </p>
+          )}
+          <BotonAccion
+            accion={ajustarAcuerdo}
+            campos={conAcuerdo}
+            texto="Quiero ajustarlo"
+            variant="secundario"
+            ancho="completo"
+          />
         </>
       )}
       {o.estado === "en_curso" && (
         <details>
           <summary className={enlace}>Ya terminamos</summary>
-          <BotonAccion accion={terminar} campos={campos} texto="Marcar como terminado" variant="secundario" className="mt-3">
+          <BotonAccion
+            accion={terminar}
+            campos={campos}
+            texto="Marcar como terminado"
+            variant="secundario"
+            className="mt-3"
+          >
             <Calificacion pregunta="¿Cómo te fue con esta organización?" />
           </BotonAccion>
         </details>
@@ -185,7 +296,13 @@ function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
       {abierta && (
         <details>
           <summary className={enlace}>No quiero seguir</summary>
-          <BotonAccion accion={noSeguir} campos={campos} texto="Cerrar este proceso" variant="secundario" className="mt-3">
+          <BotonAccion
+            accion={noSeguir}
+            campos={campos}
+            texto="Cerrar este proceso"
+            variant="secundario"
+            className="mt-3"
+          >
             <Motivos lado="talento" />
           </BotonAccion>
         </details>
@@ -196,8 +313,18 @@ function TarjetaProceso({ o, s }: { o: Oportunidad; s: Situacion }) {
             <Flag aria-hidden className="size-5" />
             Reportar esta empresa
           </summary>
-          <BotonAccion accion={reportarEmpresa} campos={campos} texto="Enviar reporte" variant="secundario" className="mt-3">
-            <Campo id={`motivo-${o.id}`} etiqueta="¿Qué pasó?" ayuda="Por ejemplo: me pidieron plata o mis datos del banco.">
+          <BotonAccion
+            accion={reportarEmpresa}
+            campos={campos}
+            texto="Enviar reporte"
+            variant="secundario"
+            className="mt-3"
+          >
+            <Campo
+              id={`motivo-${o.id}`}
+              etiqueta="¿Qué pasó?"
+              ayuda="Por ejemplo: me pidieron plata o mis datos del banco."
+            >
               {(p) => <Textarea {...p} name="motivo" rows={3} className={`${p.className} min-h-28`} />}
             </Campo>
           </BotonAccion>

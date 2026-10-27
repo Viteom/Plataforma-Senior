@@ -6,7 +6,10 @@ import { MOTIVOS_NO_SEGUIR, type Lado } from "@/lib/procesos";
 
 type Resultado<T> = { error: string } | { datos: T };
 
-const texto = (v: FormDataEntryValue | null) => String(v ?? "").replace(/\s+/g, " ").trim();
+const texto = (v: FormDataEntryValue | null) =>
+  String(v ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 export const UNIDADES_ACUERDO = [
   { valor: "hora", etiqueta: "Por hora" },
@@ -31,7 +34,8 @@ export function leerAgenda(datos: FormData, ahora = new Date()): Resultado<{ fec
   const modo = texto(datos.get("modo"));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return { error: "Elige el día de la conversación." };
   if (!/^\d{2}:\d{2}$/.test(hora)) return { error: "Elige la hora de la conversación." };
-  if (!MODOS_CONVERSACION.some((m) => m.valor === modo)) return { error: "Elige si es por llamada, videollamada o en persona." };
+  if (!MODOS_CONVERSACION.some((m) => m.valor === modo))
+    return { error: "Elige si es por llamada, videollamada o en persona." };
   const fecha = new Date(`${dia}T${hora}:00-05:00`);
   if (Number.isNaN(fecha.getTime())) return { error: "Revisa el día y la hora." };
   if (fecha.getTime() <= ahora.getTime()) return { error: "Elige un día y una hora que todavía no hayan pasado." };
@@ -57,17 +61,21 @@ export function leerAcuerdo(datos: FormData, ahora = new Date()): Resultado<Acue
 
   if (!esForma(forma)) return { error: "Elige cómo van a trabajar." };
   const horas = horasTexto ? Number(horasTexto) : null;
-  if (horas !== null && (!Number.isInteger(horas) || horas < 1 || horas > 60)) return { error: "Las horas a la semana van de 1 a 60." };
+  if (horas !== null && (!Number.isInteger(horas) || horas < 1 || horas > 60))
+    return { error: "Las horas a la semana van de 1 a 60." };
   if (!valor || valor <= 0) return { error: "Escribe el valor: en Kánna el trabajo siempre se paga." };
   if (valor > 1_000_000_000) return { error: "Revisa el valor: parece demasiado alto." };
-  if (!UNIDADES_ACUERDO.some((u) => u.valor === unidad)) return { error: "Elige si el valor es por hora, al mes o por proyecto." };
+  if (!UNIDADES_ACUERDO.some((u) => u.valor === unidad))
+    return { error: "Elige si el valor es por hora, al mes o por proyecto." };
   if (inicio && (!/^\d{4}-\d{2}-\d{2}$/.test(inicio) || inicio < hoyColombia(ahora))) {
     return { error: "La fecha de inicio no puede ser pasada." };
   }
   if (nota && nota.length > 300) return { error: "La nota puede tener máximo 300 letras." };
   // El contacto lo pone el equipo: nada de teléfonos ni correos en el acuerdo.
   if (nota && /\d{7,}|@/.test(nota.replace(/[\s.-]/g, ""))) {
-    return { error: "No escribas teléfonos ni correos en la nota: nuestro equipo los pone en contacto." };
+    return {
+      error: "No escribas teléfonos ni correos en la nota: nuestro equipo los pone en contacto.",
+    };
   }
   return { datos: { forma, horas, valor, unidad, inicio, nota } };
 }
@@ -87,8 +95,15 @@ export function leerEvaluacion(datos: FormData): Resultado<number> {
 // Errores de la base, en palabras para quien usa la app.
 export function mensajeProceso(error: { message?: string } | null): string {
   const m = error?.message ?? "";
-  if (/acuerdo cambió/.test(m)) return "La organización cambió el acuerdo mientras lo mirabas. Recarga la página y revisa el nuevo antes de aceptar.";
-  if (/fecha cambió/.test(m)) return "La organización cambió la fecha mientras la mirabas. Recarga la página y revisa la nueva.";
+  if (/tu carga cambió/.test(m))
+    return "Tu carga cambió. Recarga la página y vuelve a revisar tus horas antes de aceptar.";
+  if (/revisa la carga/.test(m)) return "Revisa las horas y confirma tu decisión, o pide ajustar el acuerdo.";
+  if (/Kánna debe revisar/.test(m))
+    return "Nuestro equipo está revisando las condiciones. Te avisamos cuando puedas continuar.";
+  if (/acuerdo cambió/.test(m))
+    return "La organización cambió el acuerdo mientras lo mirabas. Recarga la página y revisa el nuevo antes de aceptar.";
+  if (/fecha cambió/.test(m))
+    return "La organización cambió la fecha mientras la mirabas. Recarga la página y revisa la nueva.";
   if (/futura/.test(m)) return "Elige un día y una hora que todavía no hayan pasado.";
   if (/valor/.test(m)) return "El acuerdo necesita un valor: en Kánna el trabajo siempre se paga.";
   if (/sin respuesta/.test(m)) return "Pasaron 14 días: la persona ya no espera esta respuesta.";

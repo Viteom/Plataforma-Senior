@@ -4,6 +4,7 @@ import { Mic, PenLine, Phone, Plus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 
+import { ImportarHojaVida } from "@/components/perfil/importar-hoja-vida";
 import { ChipAlternable } from "@/components/huella/chip";
 import { Dictado } from "@/components/huella/dictado";
 import { Pantalla } from "@/components/layout/pantalla";
@@ -11,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Campo, Textarea } from "@/components/ui/campo";
 import { Opcion } from "@/components/ui/opcion";
 import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre } from "@/lib/capas";
-import type { EntradaTaxonomia } from "@/lib/ia/huella";
 import { prepararHistoria } from "@/lib/ia/preparar";
 import type { Capa } from "@/lib/ia/tipos";
 
@@ -20,27 +20,53 @@ import { confirmarHuella, guardarHistoria, type EstadoHuella } from "./acciones"
 type Modo = "escribir" | "dictar" | "llamada";
 
 const modos = [
-  { valor: "escribir" as const, titulo: "Escribirla", descripcion: "A tu ritmo, con tus palabras.", icono: PenLine },
-  { valor: "dictar" as const, titulo: "Contarla hablando", descripcion: "El celular escribe lo que dices.", icono: Mic },
-  { valor: "llamada" as const, titulo: "Que me llamen", descripcion: "Una persona del equipo te ayuda por teléfono.", icono: Phone },
+  {
+    valor: "escribir" as const,
+    titulo: "Escribirla",
+    descripcion: "A tu ritmo, con tus palabras.",
+    icono: PenLine,
+  },
+  {
+    valor: "dictar" as const,
+    titulo: "Contarla hablando",
+    descripcion: "El celular escribe lo que dices.",
+    icono: Mic,
+  },
+  {
+    valor: "llamada" as const,
+    titulo: "Que me llamen",
+    descripcion: "Una persona del equipo te ayuda por teléfono.",
+    icono: Phone,
+  },
 ];
 
-type Props = { taxonomia: EntradaTaxonomia[]; ia: boolean; nombre: string | null };
+type Props = { ia: boolean; nombre: string | null; historiaInicial?: string };
 
-export function FormularioHuella({ taxonomia, ia, nombre }: Props) {
+export function FormularioHuella({ ia, nombre, historiaInicial }: Props) {
   const [estado, guardar, guardando] = useActionState<EstadoHuella, FormData>(guardarHistoria, {});
 
-  if (estado.historiaId) return <Confirmar estado={estado} taxonomia={taxonomia} />;
-  return <Contar ia={ia} nombre={nombre} estado={estado} guardar={guardar} guardando={guardando} />;
+  if (estado.historiaId) return <Confirmar estado={estado} />;
+  return (
+    <Contar
+      historiaInicial={historiaInicial}
+      ia={ia}
+      nombre={nombre}
+      estado={estado}
+      guardar={guardar}
+      guardando={guardando}
+    />
+  );
 }
 
 function Contar({
+  historiaInicial,
   ia,
   nombre,
   estado,
   guardar,
   guardando,
 }: {
+  historiaInicial?: string;
   ia: boolean;
   nombre: string | null;
   estado: EstadoHuella;
@@ -48,10 +74,13 @@ function Contar({
   guardando: boolean;
 }) {
   const [modo, setModo] = useState<Modo>("escribir");
-  const [historia, setHistoria] = useState("");
+  const [historia, setHistoria] = useState(historiaInicial ?? "");
 
   // Lo mismo que hará el servidor antes de enviarla al asistente: se lo contamos a la persona.
-  const revision = useMemo(() => (ia && historia.length > 20 ? prepararHistoria(historia, nombre) : null), [ia, historia, nombre]);
+  const revision = useMemo(
+    () => (ia && historia.length > 20 ? prepararHistoria(historia, nombre) : null),
+    [ia, historia, nombre],
+  );
   const quitados = revision
     ? [
         revision.reemplazos.fechas + revision.reemplazos.tiempos > 0 && "las fechas y edades",
@@ -60,13 +89,21 @@ function Contar({
         revision.reemplazos.nombre > 0 && "tu nombre",
       ].filter((x): x is string => Boolean(x))
     : [];
-  const listaQuitados = new Intl.ListFormat("es", { type: "conjunction" }).format(quitados);
+  const listaQuitados = new Intl.ListFormat("es", {
+    type: "conjunction",
+  }).format(quitados);
 
   return (
     <Pantalla
       titulo="Cuéntanos un reto difícil que resolviste"
       intro="¿Qué pasó, qué hiciste y cómo terminó? Con eso armamos tu huella de experiencia: lo que las empresas ven de ti."
     >
+      <ImportarHojaVida
+        onConfirmar={(d) => {
+          setHistoria(d.historia);
+          setModo("escribir");
+        }}
+      />
       <fieldset className="flex flex-col gap-3">
         <legend className="mb-3 text-lg font-bold">¿Cómo prefieres contarla?</legend>
         {modos.map(({ valor, titulo, descripcion, icono: Icono }) => (
@@ -103,7 +140,13 @@ function Contar({
             error={estado.error}
           >
             {(p) => (
-              <Textarea {...p} name="historia" rows={8} value={historia} onChange={(e) => setHistoria(e.target.value)} />
+              <Textarea
+                {...p}
+                name="historia"
+                rows={8}
+                value={historia}
+                onChange={(e) => setHistoria(e.target.value)}
+              />
             )}
           </Campo>
 
@@ -112,9 +155,7 @@ function Contar({
               {quitados.length > 0 && (
                 <p className="flex items-start gap-3">
                   <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0" />
-                  <span>
-                    Antes de enviarla al asistente quitamos {listaQuitados}. Tu texto aquí no cambia.
-                  </span>
+                  <span>Antes de enviarla al asistente quitamos {listaQuitados}. Tu texto aquí no cambia.</span>
                 </p>
               )}
               {revision.nombresPosibles.length > 0 && (
@@ -129,17 +170,26 @@ function Contar({
 
           {!ia && (
             <p className="text-base text-text-muted">
-              Después de guardarla, eliges de una lista las palabras que describen tu experiencia.
+              Después de guardarla, puedes escribir con tus palabras las capacidades que quieres destacar.
             </p>
           )}
 
           <Button type="submit" ancho="completo" disabled={guardando}>
-            {guardando ? (ia ? "Leyendo tu historia…" : "Guardando…") : ia ? "Guardar y ver mis etiquetas" : "Guardar mi historia"}
+            {guardando
+              ? ia
+                ? "Leyendo tu historia…"
+                : "Guardando…"
+              : ia
+                ? "Guardar y ver mis etiquetas"
+                : "Guardar mi historia"}
           </Button>
         </form>
       )}
 
-      <Link href="/inicio" className="inline-flex min-h-tap items-center self-start text-base font-bold underline underline-offset-4">
+      <Link
+        href="/inicio"
+        className="inline-flex min-h-tap items-center self-start text-base font-bold underline underline-offset-4"
+      >
         Hacerlo más tarde
       </Link>
     </Pantalla>
@@ -154,10 +204,9 @@ const MENSAJE_MANUAL = {
 
 type Libre = { capa: Capa; texto: string };
 
-function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: EntradaTaxonomia[] }) {
+function Confirmar({ estado }: { estado: EstadoHuella }) {
   const propuestas = estado.etiquetas ?? [];
   const [seleccionadas, setSeleccionadas] = useState<string[]>(propuestas.map((e) => e.id));
-  const [agregadas, setAgregadas] = useState<string[]>([]);
   const [libres, setLibres] = useState<Libre[]>([]);
   const [resultado, confirmar, confirmando] = useActionState<{ error?: string }, FormData>(confirmarHuella, {});
   const manual = estado.modo === "manual";
@@ -165,11 +214,9 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
   const alternar = (lista: string[], set: (v: string[]) => void, id: string) =>
     set(lista.includes(id) ? lista.filter((x) => x !== id) : [...lista, id]);
 
-  const yaPropuestas = new Set(propuestas.map((e) => `${e.capa}:${e.etiqueta.toLowerCase()}`));
-
   return (
     <Pantalla
-      titulo={manual ? "Elige tus etiquetas" : "Esto entendimos de tu historia"}
+      titulo={manual ? "Escribe lo que sabes hacer" : "Esto entendimos de tu historia"}
       intro={
         manual
           ? MENSAJE_MANUAL[estado.motivoManual ?? "apagada"]
@@ -181,25 +228,17 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
         {seleccionadas.map((id) => (
           <input key={id} type="hidden" name="seleccionada" value={id} />
         ))}
-        {agregadas.map((id) => (
-          <input key={id} type="hidden" name="agregada" value={id} />
-        ))}
         {libres.map((l) => (
           <input key={`${l.capa}:${l.texto}`} type="hidden" name="libre" value={`${l.capa}|${l.texto}`} />
         ))}
 
         {ORDEN_CAPAS.map((capa) => {
           const deCapa = propuestas.filter((e) => e.capa === capa);
-          const opciones = taxonomia.filter((t) => t.capa === capa && !yaPropuestas.has(`${capa}:${t.etiqueta.toLowerCase()}`));
           const propias = libres.filter((l) => l.capa === capa);
           return (
-            <section key={capa} aria-labelledby={`capa-${capa}`} className="flex flex-col gap-3">
-              <div>
-                <h2 id={`capa-${capa}`} className="text-lg">
-                  {nombreCapa[capa]}
-                </h2>
-                <p className="text-base text-text-muted">{ayudaCapa[capa]}</p>
-              </div>
+            <details key={capa} open={deCapa.length > 0 || capa === "oficio"} className="flex flex-col gap-3">
+              <summary className="min-h-tap cursor-pointer text-lg font-bold">{nombreCapa[capa]}</summary>
+              <p className="text-base text-text-muted">{ayudaCapa[capa]}</p>
               {deCapa.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {deCapa.map((e) => (
@@ -212,23 +251,6 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
                     />
                   ))}
                 </div>
-              )}
-              {opciones.length > 0 && (
-                <details open={manual && capa !== "normas"} className="group">
-                  <summary className="inline-flex min-h-tap items-center font-bold underline underline-offset-4">
-                    {manual ? "Opciones" : "Agregar otra"}
-                  </summary>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {opciones.map((t) => (
-                      <ChipAlternable
-                        key={t.id}
-                        texto={t.etiqueta}
-                        activo={agregadas.includes(t.id)}
-                        onAlternar={() => alternar(agregadas, setAgregadas, t.id)}
-                      />
-                    ))}
-                  </div>
-                </details>
               )}
               {propias.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -246,10 +268,14 @@ function Confirmar({ estado, taxonomia }: { estado: EstadoHuella; taxonomia: Ent
               <EscribirOtra
                 capa={capa}
                 onAgregar={(texto) =>
-                  setLibres((x) => (x.some((y) => y.capa === capa && y.texto.toLowerCase() === texto.toLowerCase()) ? x : [...x, { capa, texto }]))
+                  setLibres((x) =>
+                    x.some((y) => y.capa === capa && y.texto.toLowerCase() === texto.toLowerCase())
+                      ? x
+                      : [...x, { capa, texto }],
+                  )
                 }
               />
-            </section>
+            </details>
           );
         })}
 

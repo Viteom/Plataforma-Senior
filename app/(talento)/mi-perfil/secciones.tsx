@@ -34,18 +34,39 @@ export function Seccion({ titulo, children }: { titulo: string; children: React.
 }
 
 function Mensaje({ estado }: { estado: Estado }) {
-  if (estado.error) return <p role="alert" className="font-bold text-danger">{estado.error}</p>;
-  if (estado.aviso) return <p role="status" className="font-bold text-success">{estado.aviso}</p>;
+  if (estado.error)
+    return (
+      <p role="alert" className="font-bold text-danger">
+        {estado.error}
+      </p>
+    );
+  if (estado.aviso)
+    return (
+      <p role="status" className="font-bold text-success">
+        {estado.aviso}
+      </p>
+    );
   return null;
 }
 
 // ── Datos ───────────────────────────────────────────────────────────────────
 
-type Datos = { nombre: string; ubicacion: string; oficio: string; resumen: string | null };
+type Datos = {
+  zona_local?: string | null;
+  nombre: string;
+  ubicacion: string;
+  oficio: string;
+  resumen: string | null;
+};
 
 export function SeccionDatos({ datos }: { datos: Datos }) {
   const [editando, setEditando] = useState(false);
-  const { estado, enviar: guardar, pendiente: guardando, alEnviar } = useAccion<Estado>(async (p, d) => {
+  const {
+    estado,
+    enviar: guardar,
+    pendiente: guardando,
+    alEnviar,
+  } = useAccion<Estado>(async (p, d) => {
     const r = await actualizarDatos(p, d);
     if (!r.error) setEditando(false);
     return r;
@@ -56,7 +77,8 @@ export function SeccionDatos({ datos }: { datos: Datos }) {
       <Seccion titulo="Mis datos">
         <dl className="grid gap-3 sm:grid-cols-2">
           <Dato termino="Nombre" valor={datos.nombre} />
-          <Dato termino="Ciudad o vereda" valor={datos.ubicacion} />
+          <Dato termino="Ciudad o municipio" valor={datos.ubicacion} />
+          <Dato termino="Barrio, corregimiento o vereda" valor={datos.zona_local ?? "Sin registrar"} />
           <Dato termino="Oficio" valor={datos.oficio} />
           <Dato termino="Resumen" valor={datos.resumen ?? "Sin resumen"} />
         </dl>
@@ -78,16 +100,35 @@ export function SeccionDatos({ datos }: { datos: Datos }) {
         <Campo id="ubicacion" etiqueta="Ciudad o vereda">
           {(p) => <Input {...p} name="ubicacion" defaultValue={datos.ubicacion} />}
         </Campo>
+        <Campo id="zona-local" etiqueta="Barrio, corregimiento o vereda (opcional)">
+          {(p) => <Input {...p} name="zona_local" defaultValue={datos.zona_local ?? ""} maxLength={100} />}
+        </Campo>
         <Campo id="oficio" etiqueta="Oficio">
           {(p) => <Input {...p} name="oficio" defaultValue={datos.oficio} />}
         </Campo>
-        <Campo id="resumen" etiqueta="Resumen (opcional)" ayuda="Dos o tres frases sobre lo que sabes hacer. No escribas tu edad.">
-          {(p) => <Textarea {...p} name="resumen" defaultValue={datos.resumen ?? ""} rows={3} className={`${p.className} min-h-28`} />}
+        <Campo
+          id="resumen"
+          etiqueta="Resumen (opcional)"
+          ayuda="Dos o tres frases sobre lo que sabes hacer. No escribas tu edad."
+        >
+          {(p) => (
+            <Textarea
+              {...p}
+              name="resumen"
+              defaultValue={datos.resumen ?? ""}
+              rows={3}
+              className={`${p.className} min-h-28`}
+            />
+          )}
         </Campo>
         <Mensaje estado={estado} />
         <div className="flex flex-wrap gap-3">
-          <Button type="submit" disabled={guardando}>{guardando ? "Guardando…" : "Guardar"}</Button>
-          <Button type="button" variant="enlace" size="normal" onClick={() => setEditando(false)}>Cancelar</Button>
+          <Button type="submit" disabled={guardando}>
+            {guardando ? "Guardando…" : "Guardar"}
+          </Button>
+          <Button type="button" variant="enlace" size="normal" onClick={() => setEditando(false)}>
+            Cancelar
+          </Button>
         </div>
       </form>
     </Seccion>
@@ -115,6 +156,7 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
 
   return (
     <Seccion titulo="Mi foto">
+      <p>Sube tu foto sin filtros. No cambiamos tu rostro ni su color.</p>
       <p className="text-text-muted">
         {reservado
           ? "Las empresas la ven solo cuando aceptas conocerlas."
@@ -124,7 +166,11 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
         {fotoUrl ? (
           // Enlace firmado de Storage que vence en minutos: no pasa por el optimizador de imágenes.
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={fotoUrl} alt="Tu foto de perfil" className="size-32 rounded-full border-2 border-border-subtle object-cover" />
+          <img
+            src={fotoUrl}
+            alt="Tu foto de perfil"
+            className="size-32 rounded-full border-2 border-border-subtle object-cover"
+          />
         ) : (
           <div className="flex size-32 items-center justify-center rounded-full border-2 border-dashed border-border bg-surface">
             <Camera aria-hidden className="size-10 text-text-muted" />
@@ -151,7 +197,11 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
       {!cambiando && <Mensaje estado={estado} />}
       {cambiando && (
         <form action={enviar} onSubmit={alEnviar} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
-          <Campo id="foto" etiqueta="Foto (JPG o PNG, hasta 5 MB)" ayuda="Puedes tomarla con el celular en este momento.">
+          <Campo
+            id="foto"
+            etiqueta="Foto (JPG o PNG, hasta 5 MB)"
+            ayuda="Puedes tomarla con el celular en este momento."
+          >
             {(p) => (
               <input
                 {...p}
@@ -164,8 +214,12 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
           </Campo>
           <Mensaje estado={estado} />
           <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={pendiente}>{pendiente ? "Subiendo…" : "Guardar foto"}</Button>
-            <Button type="button" variant="enlace" size="normal" onClick={() => setCambiando(false)}>Cancelar</Button>
+            <Button type="submit" disabled={pendiente}>
+              {pendiente ? "Subiendo…" : "Guardar foto"}
+            </Button>
+            <Button type="button" variant="enlace" size="normal" onClick={() => setCambiando(false)}>
+              Cancelar
+            </Button>
           </div>
         </form>
       )}
@@ -179,7 +233,11 @@ export function Visibilidad({ visibilidad }: { visibilidad: "reservado" | "visib
   const reservado = visibilidad === "reservado";
   return (
     <div className="flex items-start gap-3">
-      {reservado ? <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" /> : <Eye aria-hidden className="mt-0.5 size-6 shrink-0" />}
+      {reservado ? (
+        <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />
+      ) : (
+        <Eye aria-hidden className="mt-0.5 size-6 shrink-0" />
+      )}
       <p>
         <span className="font-bold">{reservado ? "Reservado." : "Visible."}</span>{" "}
         {reservado
@@ -192,7 +250,13 @@ export function Visibilidad({ visibilidad }: { visibilidad: "reservado" | "visib
 
 // ── Formas de trabajar ──────────────────────────────────────────────────────
 
-type Oferta = { tipo: FormaContratar; horas_semana: number | null; modalidad: string | null; tarifa_esperada: number | null; quiere_orientacion: boolean };
+type Oferta = {
+  tipo: FormaContratar;
+  horas_semana: number | null;
+  modalidad: string | null;
+  tarifa_esperada: number | null;
+  quiere_orientacion: boolean;
+};
 
 export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: GuiaTarifa[] }) {
   const [editando, setEditando] = useState(false);
@@ -201,7 +265,12 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
     Object.fromEntries(ofertas.map((o) => [o.tipo, o.tarifa_esperada ? String(o.tarifa_esperada) : ""])),
   );
   const [orientacion, setOrientacion] = useState(ofertas.some((o) => o.quiere_orientacion));
-  const { estado, enviar: guardar, pendiente: guardando, alEnviar } = useAccion<Estado>(async (p, d) => {
+  const {
+    estado,
+    enviar: guardar,
+    pendiente: guardando,
+    alEnviar,
+  } = useAccion<Estado>(async (p, d) => {
     const r = await actualizarFormas(p, d);
     if (!r.error) setEditando(false);
     return r;
@@ -214,9 +283,14 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
         {ofertas.length ? (
           <ul className="flex flex-col gap-2">
             {ofertas.map((o) => (
-              <li key={o.tipo} className="flex flex-wrap items-baseline justify-between gap-2 rounded-md bg-surface px-4 py-3">
+              <li
+                key={o.tipo}
+                className="flex flex-wrap items-baseline justify-between gap-2 rounded-md bg-surface px-4 py-3"
+              >
                 <span className="font-bold">{etiquetaForma(o.tipo)}</span>
-                <span className="text-base text-text-muted">{o.tarifa_esperada ? pesos(o.tarifa_esperada) : "Sin tarifa"}</span>
+                <span className="text-base text-text-muted">
+                  {o.tarifa_esperada ? pesos(o.tarifa_esperada) : "Sin tarifa"}
+                </span>
               </li>
             ))}
           </ul>
@@ -273,22 +347,39 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
         <input type="hidden" name="orientacion" value={orientacion ? "si" : "no"} />
         <Campo id="horas-editar" etiqueta="¿Cuántas horas a la semana? (opcional)">
           {(p) => (
-            <Input {...p} name="horas" defaultValue={primera?.horas_semana ?? ""} inputMode="numeric" maxLength={2} className={`${p.className} max-w-40`} />
+            <Input
+              {...p}
+              name="horas"
+              defaultValue={primera?.horas_semana ?? ""}
+              inputMode="numeric"
+              maxLength={2}
+              className={`${p.className} max-w-40`}
+            />
           )}
         </Campo>
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-2 text-lg font-bold">¿Dónde?</legend>
           {modalidades.map(({ valor, etiqueta }) => (
             <label key={valor} className="flex min-h-tap items-center gap-3 text-lg">
-              <input type="radio" name="modalidad" value={valor} defaultChecked={(primera?.modalidad ?? "presencial") === valor} className="size-6 accent-[var(--color-primary)]" />
+              <input
+                type="radio"
+                name="modalidad"
+                value={valor}
+                defaultChecked={(primera?.modalidad ?? "presencial") === valor}
+                className="size-6 accent-[var(--color-primary)]"
+              />
               {etiqueta}
             </label>
           ))}
         </fieldset>
         <Mensaje estado={estado} />
         <div className="flex flex-wrap gap-3">
-          <Button type="submit" disabled={guardando}>{guardando ? "Guardando…" : "Guardar"}</Button>
-          <Button type="button" variant="enlace" size="normal" onClick={() => setEditando(false)}>Cancelar</Button>
+          <Button type="submit" disabled={guardando}>
+            {guardando ? "Guardando…" : "Guardar"}
+          </Button>
+          <Button type="button" variant="enlace" size="normal" onClick={() => setEditando(false)}>
+            Cancelar
+          </Button>
         </div>
       </form>
     </Seccion>
@@ -314,12 +405,22 @@ const ESTADO_EVIDENCIA = {
 
 export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
   const [agregando, setAgregando] = useState<null | "referencia" | "archivo">(null);
-  const { estado: estadoRef, enviar: guardarRef, pendiente: guardandoRef, alEnviar: alEnviarRef } = useAccion<Estado>(async (p, d) => {
+  const {
+    estado: estadoRef,
+    enviar: guardarRef,
+    pendiente: guardandoRef,
+    alEnviar: alEnviarRef,
+  } = useAccion<Estado>(async (p, d) => {
     const r = await agregarReferencia(p, d);
     if (!r.error) setAgregando(null);
     return r;
   }, {});
-  const { estado: estadoArch, enviar: guardarArch, pendiente: guardandoArch, alEnviar: alEnviarArch } = useAccion<Estado>(async (p, d) => {
+  const {
+    estado: estadoArch,
+    enviar: guardarArch,
+    pendiente: guardandoArch,
+    alEnviar: alEnviarArch,
+  } = useAccion<Estado>(async (p, d) => {
     const r = await subirArchivo(p, d);
     if (!r.error) setAgregando(null);
     return r;
@@ -328,8 +429,8 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
   return (
     <Seccion titulo="Lo que respalda mi experiencia">
       <p className="text-text-muted">
-        Una persona que conozca tu trabajo, o una foto o documento. El equipo lo revisa antes de que una empresa lo vea, y
-        tú decides si lo muestras.
+        Una persona que conozca tu trabajo, o una foto o documento. El equipo lo revisa antes de que una empresa lo vea,
+        y tú decides si lo muestras.
       </p>
 
       {evidencias.length > 0 && (
@@ -337,7 +438,11 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
           {evidencias.map((e) => (
             <li key={e.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4">
               <div className="flex items-start gap-3">
-                {e.tipo === "referencia" ? <Phone aria-hidden className="mt-0.5 size-6 shrink-0" /> : <FileText aria-hidden className="mt-0.5 size-6 shrink-0" />}
+                {e.tipo === "referencia" ? (
+                  <Phone aria-hidden className="mt-0.5 size-6 shrink-0" />
+                ) : (
+                  <FileText aria-hidden className="mt-0.5 size-6 shrink-0" />
+                )}
                 <div className="flex-1">
                   <p className="font-bold">{e.tipo === "referencia" ? e.referencia_nombre : e.descripcion}</p>
                   {e.tipo === "referencia" && <p className="text-text-muted">{e.descripcion}</p>}
@@ -386,7 +491,9 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
       {agregando === "referencia" && (
         <form action={guardarRef} onSubmit={alEnviarRef} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
           <h3 className="text-lg">Una persona que conozca tu trabajo</h3>
-          <p className="text-base text-text-muted">Solo el equipo ve su nombre y su teléfono. Nunca se los damos a una empresa.</p>
+          <p className="text-base text-text-muted">
+            Solo el equipo ve su nombre y su teléfono. Nunca se los damos a una empresa.
+          </p>
           <Campo id="ref-nombre" etiqueta="Nombre">
             {(p) => <Input {...p} name="nombre" />}
           </Campo>
@@ -398,8 +505,12 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
           </Campo>
           <Mensaje estado={estadoRef} />
           <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={guardandoRef}>{guardandoRef ? "Guardando…" : "Guardar referencia"}</Button>
-            <Button type="button" variant="enlace" size="normal" onClick={() => setAgregando(null)}>Cancelar</Button>
+            <Button type="submit" disabled={guardandoRef}>
+              {guardandoRef ? "Guardando…" : "Guardar referencia"}
+            </Button>
+            <Button type="button" variant="enlace" size="normal" onClick={() => setAgregando(null)}>
+              Cancelar
+            </Button>
           </div>
         </form>
       )}
@@ -408,7 +519,8 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
         <form action={guardarArch} onSubmit={alEnviarArch} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
           <h3 className="text-lg">Una foto o un documento</h3>
           <p className="text-base text-text-muted">
-            Por ejemplo, un certificado o una foto de tu trabajo. Que no se vean fechas de nacimiento ni documentos de identidad.
+            Por ejemplo, un certificado o una foto de tu trabajo. Que no se vean fechas de nacimiento ni documentos de
+            identidad.
           </p>
           <Campo id="archivo" etiqueta="Archivo (foto o PDF, hasta 10 MB)">
             {(p) => (
@@ -426,8 +538,12 @@ export function SeccionEvidencias({ evidencias }: { evidencias: Evidencia[] }) {
           </Campo>
           <Mensaje estado={estadoArch} />
           <div className="flex flex-wrap gap-3">
-            <Button type="submit" disabled={guardandoArch}>{guardandoArch ? "Subiendo…" : "Subir"}</Button>
-            <Button type="button" variant="enlace" size="normal" onClick={() => setAgregando(null)}>Cancelar</Button>
+            <Button type="submit" disabled={guardandoArch}>
+              {guardandoArch ? "Subiendo…" : "Subir"}
+            </Button>
+            <Button type="button" variant="enlace" size="normal" onClick={() => setAgregando(null)}>
+              Cancelar
+            </Button>
           </div>
         </form>
       )}
@@ -471,13 +587,17 @@ export function SeccionMisDatos() {
           </Button>
         ) : (
           <form action={borrar} className="flex flex-col gap-4 rounded-lg border-2 border-danger p-5">
-            <p className="font-bold">¿Seguro? Se borran tu perfil, tus historias, tu huella y tus evidencias. No se puede deshacer.</p>
+            <p className="font-bold">
+              ¿Seguro? Se borran tu perfil, tus historias, tu huella y tus evidencias. No se puede deshacer.
+            </p>
             <Mensaje estado={estado} />
             <div className="flex flex-wrap gap-3">
               <Button type="submit" className="bg-danger hover:bg-danger" disabled={borrando}>
                 {borrando ? "Borrando…" : "Sí, borrar todo"}
               </Button>
-              <Button type="button" variant="secundario" onClick={() => setConfirmando(false)}>No, volver</Button>
+              <Button type="button" variant="secundario" onClick={() => setConfirmando(false)}>
+                No, volver
+              </Button>
             </div>
           </form>
         )}

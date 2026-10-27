@@ -2,6 +2,7 @@ import { ArrowRight, BookOpen, Handshake } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AvisoBienestar } from "@/components/bienestar/aviso";
 import { Pantalla } from "@/components/layout/pantalla";
 import { Button } from "@/components/ui/button";
 import { Tarjeta } from "@/components/ui/tarjeta";
@@ -14,6 +15,7 @@ export default async function Inicio() {
 
   return (
     <Pantalla titulo="Hola">
+      <AvisoBienestar />
       {nuevas > 0 ? (
         <section aria-labelledby="siguiente" className="flex flex-col gap-4 rounded-lg bg-surface p-5">
           <p className="text-base font-bold text-text-muted">Tu siguiente paso</p>
@@ -44,10 +46,7 @@ export default async function Inicio() {
         </h2>
         <Tarjeta>
           <Handshake aria-hidden className="size-8" />
-          <p>
-            Cuando una empresa necesite a alguien como tú, te lo contamos aquí y tú decides si
-            te interesa.
-          </p>
+          <p>Cuando una empresa necesite a alguien como tú, te lo contamos aquí y tú decides si te interesa.</p>
           <EnlaceFlecha href="/oportunidades">Ver oportunidades</EnlaceFlecha>
         </Tarjeta>
       </section>

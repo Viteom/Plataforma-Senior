@@ -45,7 +45,9 @@ beforeEach(async () => {
     [u.otroTalento],
   );
   otroPerfil = p2.id as string;
-  await filas(db, "insert into talent_offers (talent_id, tipo, tarifa_esperada) values ($1, 'conversacion', 150000)", [perfil]);
+  await filas(db, "insert into talent_offers (talent_id, tipo, tarifa_esperada) values ($1, 'conversacion', 150000)", [
+    perfil,
+  ]);
   empresa = await crearEmpresa(u.empresa, "Alimentos SAS", true);
   empresaSinVerificar = await crearEmpresa(u.empresaSinVerificar, "Sin Verificar SAS", false);
 });
@@ -72,22 +74,36 @@ describe("regla 9: solo empresas verificadas llegan al talento", () => {
   it("ni siquiera el equipo puede enviar una conexión de una empresa sin verificar", async () => {
     await expect(
       como(db, u.curador, (tx) =>
-        filas(tx, "insert into connections (company_id, talent_id, origen, estado) values ($1, $2, 'exploracion', 'enviada_talento')", [empresaSinVerificar, perfil]),
+        filas(
+          tx,
+          "insert into connections (company_id, talent_id, origen, estado) values ($1, $2, 'exploracion', 'enviada_talento')",
+          [empresaSinVerificar, perfil],
+        ),
       ),
     ).rejects.toThrow(/empresa sin verificar/);
     // Tampoco por actualización directa con la llave de servicio o la consola.
-    const [c] = await filas(db, "insert into connections (company_id, talent_id, origen, estado) values ($1, $2, 'exploracion', 'elegida') returning id", [empresaSinVerificar, perfil]);
-    await expect(filas(db, "update connections set estado = 'enviada_talento' where id = $1", [c.id])).rejects.toThrow(/empresa sin verificar/);
+    const [c] = await filas(
+      db,
+      "insert into connections (company_id, talent_id, origen, estado) values ($1, $2, 'exploracion', 'elegida') returning id",
+      [empresaSinVerificar, perfil],
+    );
+    await expect(filas(db, "update connections set estado = 'enviada_talento' where id = $1", [c.id])).rejects.toThrow(
+      /empresa sin verificar/,
+    );
   });
 
   it("una empresa pausada por reportes tampoco llega", async () => {
     await filas(db, "update companies set estado = 'pausada' where id = $1", [empresa]);
-    await expect(como(db, u.empresa, (tx) => filas(tx, "select pedir_conexion($1)", [perfil]))).rejects.toThrow(/pausada/);
+    await expect(como(db, u.empresa, (tx) => filas(tx, "select pedir_conexion($1)", [perfil]))).rejects.toThrow(
+      /pausada/,
+    );
   });
 
   it("la empresa no se verifica ni se reactiva a sí misma", async () => {
     await expect(
-      como(db, u.empresaSinVerificar, (tx) => filas(tx, "update companies set verificada_en = now() where id = $1", [empresaSinVerificar])),
+      como(db, u.empresaSinVerificar, (tx) =>
+        filas(tx, "update companies set verificada_en = now() where id = $1", [empresaSinVerificar]),
+      ),
     ).rejects.toThrow(/solo el equipo/);
     await filas(db, "update companies set estado = 'pausada' where id = $1", [empresa]);
     await expect(
@@ -100,20 +116,40 @@ describe("flujo desde Explorar", () => {
   it("pedir → aviso en cola → la persona ve la empresa verificada → me interesa → abierta y el equipo los contacta", async () => {
     const [{ id }] = await comoReal(u.empresa, () => filas(db, "select pedir_conexion($1) as id", [perfil]));
 
-    const [aviso] = await filas(db, "select canal, plantilla, estado from notifications where connection_id = $1", [id]);
-    expect(aviso).toMatchObject({ canal: "sms", plantilla: "oportunidad_nueva", estado: "pendiente" });
+    const [aviso] = await filas(db, "select canal, plantilla, estado from notifications where connection_id = $1", [
+      id,
+    ]);
+    expect(aviso).toMatchObject({
+      canal: "sms",
+      plantilla: "oportunidad_nueva",
+      estado: "pendiente",
+    });
 
-    const oportunidades = await como(db, u.talento, (tx) => filas(tx, "select empresa, empresa_verificada, estado from talent_opportunities_view"));
-    expect(oportunidades).toEqual([{ empresa: "Alimentos SAS", empresa_verificada: true, estado: "enviada_talento" }]);
+    const oportunidades = await como(db, u.talento, (tx) =>
+      filas(tx, "select empresa, empresa_verificada, estado from talent_opportunities_view"),
+    );
+    expect(oportunidades).toEqual([
+      {
+        empresa: "Alimentos SAS",
+        empresa_verificada: true,
+        estado: "enviada_talento",
+      },
+    ]);
 
     // Antes de la doble aceptación la empresa no ve el nombre.
-    const [antes] = await como(db, u.empresa, (tx) => filas(tx, "select nombre, identidad_visible from company_talent_view where id = $1", [perfil]));
+    const [antes] = await como(db, u.empresa, (tx) =>
+      filas(tx, "select nombre, identidad_visible from company_talent_view where id = $1", [perfil]),
+    );
     expect(antes).toMatchObject({ nombre: null, identidad_visible: false });
 
-    const [{ estado }] = await comoReal(u.talento, () => filas(db, "select actuar_conexion($1, 'me_interesa') as estado", [id]));
+    const [{ estado }] = await comoReal(u.talento, () =>
+      filas(db, "select actuar_conexion($1, 'me_interesa') as estado", [id]),
+    );
     expect(estado).toBe("abierta");
 
-    const [despues] = await como(db, u.empresa, (tx) => filas(tx, "select nombre from company_talent_view where id = $1", [perfil]));
+    const [despues] = await como(db, u.empresa, (tx) =>
+      filas(tx, "select nombre from company_talent_view where id = $1", [perfil]),
+    );
     expect(despues.nombre).toBe("Ana Reservada");
     const [ayuda] = await filas(db, "select canal from help_requests where canal = 'conexion_abierta'");
     expect(ayuda).toBeTruthy();
@@ -128,13 +164,29 @@ describe("flujo desde Explorar", () => {
 
   it("no se pide dos veces el mismo perfil mientras la conexión siga viva", async () => {
     await comoReal(u.empresa, () => filas(db, "select pedir_conexion($1)", [perfil]));
-    await expect(comoReal(u.empresa, () => filas(db, "select pedir_conexion($1)", [perfil]))).rejects.toThrow(/una_conexion_viva/);
+    await expect(comoReal(u.empresa, () => filas(db, "select pedir_conexion($1)", [perfil]))).rejects.toThrow(
+      /una_conexion_viva/,
+    );
   });
 });
 
 describe("flujo por problema (curaduría)", () => {
   async function prepararNecesidad() {
-    const [n] = await filas(db, "insert into needs (company_id, problema) values ($1, 'Abrir una segunda planta y cumplir INVIMA') returning id", [empresa]);
+    const [n] = await filas(
+      db,
+      "insert into needs (company_id, problema) values ($1, 'Abrir una segunda planta y cumplir INVIMA') returning id",
+      [empresa],
+    );
+    // Condiciones revisadas por el equipo antes del envío de este caso de prueba.
+    await db.query(
+      "update needs set jornada_horas=20, remuneracion=500000, remuneracion_unidad='proyecto', condiciones='Trabajo acompañado con pausas acordadas' where id=$1",
+      [n.id],
+    );
+    await db.query("update needs set dignidad_estado='aprobado', dignidad_por=$2, dignidad_en=now() where id=$1", [
+      n.id,
+      u.curador,
+    ]);
+
     const [c] = await filas(
       db,
       `insert into connections (company_id, talent_id, need_id, origen, estado, puntaje, desglose)
@@ -154,16 +206,27 @@ describe("flujo por problema (curaduría)", () => {
   it("curador elige y envía; la persona acepta; recién ahí la empresa ve el puntaje y la razón", async () => {
     const { conexion } = await prepararNecesidad();
     await comoReal(u.curador, () =>
-      filas(db, "update connections set estado = 'elegida', razon_curador = 'Lideró una certificación parecida' where id = $1", [conexion]),
+      filas(
+        db,
+        "update connections set estado = 'elegida', razon_curador = 'Lideró una certificación parecida' where id = $1",
+        [conexion],
+      ),
     );
-    await comoReal(u.curador, () => filas(db, "update connections set estado = 'enviada_talento' where id = $1", [conexion]));
+    await comoReal(u.curador, () =>
+      filas(db, "update connections set estado = 'enviada_talento' where id = $1", [conexion]),
+    );
 
     // Esperando la respuesta de la persona, la empresa todavía no ve nada de esta búsqueda.
     expect(await como(db, u.empresa, (tx) => filas(tx, "select * from company_connections_view"))).toHaveLength(0);
 
     await comoReal(u.talento, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion]));
-    const [vista] = await como(db, u.empresa, (tx) => filas(tx, "select estado, puntaje, razon_curador from company_connections_view"));
-    expect(vista).toMatchObject({ estado: "le_interesa", razon_curador: "Lideró una certificación parecida" });
+    const [vista] = await como(db, u.empresa, (tx) =>
+      filas(tx, "select estado, puntaje, razon_curador from company_connections_view"),
+    );
+    expect(vista).toMatchObject({
+      estado: "le_interesa",
+      razon_curador: "Lideró una certificación parecida",
+    });
     expect(Number(vista.puntaje)).toBe(82);
 
     await comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'quiero_conocer')", [conexion]));
@@ -174,16 +237,24 @@ describe("flujo por problema (curaduría)", () => {
   it("cerrar ya no pasa por actuar_conexion: terminar exige el acuerdo aceptado (ver procesos.test.ts)", async () => {
     const { conexion } = await prepararNecesidad();
     await filas(db, "update connections set estado = 'abierta' where id = $1", [conexion]);
-    await expect(comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'cerrar', 5)", [conexion]))).rejects.toThrow(/no permitida/);
+    await expect(
+      comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'cerrar', 5)", [conexion])),
+    ).rejects.toThrow(/no permitida/);
     expect(await filas(db, "select * from evidence where talent_id = $1", [perfil])).toHaveLength(0);
   });
 
   it("nadie se salta pasos: la persona no abre sola ni la empresa acepta por la persona", async () => {
     const { conexion } = await prepararNecesidad();
-    await expect(comoReal(u.talento, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion]))).rejects.toThrow(/no permitida/);
+    await expect(
+      comoReal(u.talento, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion])),
+    ).rejects.toThrow(/no permitida/);
     await filas(db, "update connections set estado = 'enviada_talento' where id = $1", [conexion]);
-    await expect(comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion]))).rejects.toThrow(/no permitida/);
-    await expect(comoReal(u.otroTalento, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion]))).rejects.toThrow(/no permitida/);
+    await expect(
+      comoReal(u.empresa, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion])),
+    ).rejects.toThrow(/no permitida/);
+    await expect(
+      comoReal(u.otroTalento, () => filas(db, "select actuar_conexion($1, 'me_interesa')", [conexion])),
+    ).rejects.toThrow(/no permitida/);
   });
 
   it("una empresa no ve necesidades de otra", async () => {
@@ -197,7 +268,9 @@ describe("flujo por problema (curaduría)", () => {
 describe("reportes (A2)", () => {
   it("reportar pausa las conexiones con esa empresa; dos reportes confirmados pausan a la empresa", async () => {
     const [{ id }] = await comoReal(u.empresa, () => filas(db, "select pedir_conexion($1) as id", [perfil]));
-    await comoReal(u.talento, () => filas(db, "select reportar_empresa($1, 'Me pidió plata para el examen médico')", [id]));
+    await comoReal(u.talento, () =>
+      filas(db, "select reportar_empresa($1, 'Me pidió plata para el examen médico')", [id]),
+    );
     const [c] = await filas(db, "select estado from connections where id = $1", [id]);
     expect(c.estado).toBe("pausada");
 
@@ -210,13 +283,17 @@ describe("reportes (A2)", () => {
 
   it("nadie reporta conexiones que no son suyas", async () => {
     const [{ id }] = await comoReal(u.empresa, () => filas(db, "select pedir_conexion($1) as id", [perfil]));
-    await expect(comoReal(u.otroTalento, () => filas(db, "select reportar_empresa($1, 'falso')", [id]))).rejects.toThrow(/sin permiso/);
+    await expect(
+      comoReal(u.otroTalento, () => filas(db, "select reportar_empresa($1, 'falso')", [id])),
+    ).rejects.toThrow(/sin permiso/);
   });
 });
 
 describe("vista de perfiles para empresas", () => {
   it("muestra un rango de tarifa, nunca el número exacto", async () => {
-    const [p] = await como(db, u.empresa, (tx) => filas(tx, "select ofertas from company_talent_view where id = $1", [perfil]));
+    const [p] = await como(db, u.empresa, (tx) =>
+      filas(tx, "select ofertas from company_talent_view where id = $1", [perfil]),
+    );
     const [oferta] = p.ofertas as { rango_min: number; rango_max: number }[];
     expect(oferta.rango_min).toBeLessThan(150000);
     expect(oferta.rango_max).toBeGreaterThan(150000);

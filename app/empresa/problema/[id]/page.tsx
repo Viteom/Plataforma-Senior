@@ -48,7 +48,34 @@ export default async function TalentoSugerido({ params }: { params: Promise<{ id
         ))}
       </div>
 
-      {necesidad.estado === "en_curaduria" && (
+      {necesidad.dignidad_estado === "ajustes" && (
+        <p className="flex items-start gap-3 rounded-md bg-accent p-5 text-lg text-on-accent">
+          <Clock aria-hidden className="mt-1 size-6 shrink-0" />
+          <span className="flex flex-col gap-2">
+            <span>
+              Kánna pidió ajustar las condiciones de este reto antes de enviarlo. Te escribimos para acordar la jornada,
+              el pago o el acompañamiento.
+            </span>
+            {necesidad.semaforo_motivos && necesidad.semaforo_motivos.length > 0 && (
+              <span className="flex flex-col gap-1">
+                {necesidad.semaforo_motivos.map((m) => (
+                  <span key={m}>· {m}</span>
+                ))}
+              </span>
+            )}
+          </span>
+        </p>
+      )}
+
+      {necesidad.dignidad_estado === "pendiente" && (
+        <p className="flex items-start gap-3 rounded-md bg-surface p-5 text-lg">
+          <Clock aria-hidden className="mt-1 size-6 shrink-0" />
+          Kánna está revisando las condiciones del reto: jornada, pago, descansos y acompañamiento. Cuando las apruebe,
+          elegimos perfiles.
+        </p>
+      )}
+
+      {necesidad.estado === "en_curaduria" && necesidad.dignidad_estado !== "pendiente" && necesidad.dignidad_estado !== "ajustes" && (
         <p className="flex items-start gap-3 rounded-md bg-surface p-5 text-lg">
           <Clock aria-hidden className="mt-1 size-6 shrink-0" />
           Nuestro equipo está eligiendo hasta 5 perfiles para tu reto. Cuando una persona diga que le interesa, aparece

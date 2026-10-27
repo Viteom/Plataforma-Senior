@@ -44,3 +44,14 @@ Hito 5 (experiencias, ayuda y gestor, en `main`): catálogo y
 cotización de experiencias con saberes, registro asistido del gestor sin señal, chat de ayuda sin
 IA, «Llámeme» atendido por el equipo, Aprende y Emprende. Sin servicios de pago. Ver
 [docs/hito-5.md](docs/hito-5.md).
+
+## Cambios de bienestar y registro
+
+Ver [bienestar y modelo operativo](docs/bienestar-y-modelo-operativo.md). Las migraciones nuevas
+`20261031000001`, `20261031000002` y `20261031000003` deben aplicarse antes de usar el seguimiento y registro
+ampliado. No se aplicaron a la base remota desde esta tarea. Los cobros siguen desactivados.
+
+La primera entrega de confianza añade las migraciones `20261031000004` a `20261031000006`
+(fotos privadas, carga antes de aceptar y casos de bienestar). Aplicar las seis migraciones
+nuevas en orden solo después de revisar el respaldo y los cambios; no fueron aplicadas
+a Supabase remoto desde esta tarea.

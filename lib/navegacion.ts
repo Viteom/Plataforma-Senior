@@ -18,7 +18,12 @@ import {
 } from "lucide-react";
 
 // «corta»: la etiqueta de la barra inferior en celular. Con cinco destinos cabe una palabra.
-export type ItemNav = { href: string; etiqueta: string; icono: LucideIcon; corta?: string };
+export type ItemNav = {
+  href: string;
+  etiqueta: string;
+  icono: LucideIcon;
+  corta?: string;
+};
 
 // Talento: barra inferior, máximo 4 destinos.
 export const navTalento: ItemNav[] = [
@@ -29,26 +34,77 @@ export const navTalento: ItemNav[] = [
 ];
 
 export const navEmpresa: ItemNav[] = [
-  { href: "/empresa/explorar", etiqueta: "Explorar perfiles", icono: Compass, corta: "Explorar" },
-  { href: "/empresa/problema/nuevo", etiqueta: "Contar un reto", icono: Search, corta: "Un reto" },
-  { href: "/empresa/campo", etiqueta: "Talento del campo", icono: Sprout, corta: "Campo" },
-  { href: "/empresa/procesos", etiqueta: "Mis procesos", icono: LayoutList, corta: "Procesos" },
+  {
+    href: "/empresa/explorar",
+    etiqueta: "Explorar perfiles",
+    icono: Compass,
+    corta: "Explorar",
+  },
+  {
+    href: "/empresa/problema/nuevo",
+    etiqueta: "Contar un reto",
+    icono: Search,
+    corta: "Un reto",
+  },
+  {
+    href: "/empresa/campo",
+    etiqueta: "Talento del campo",
+    icono: Sprout,
+    corta: "Campo",
+  },
+  {
+    href: "/empresa/procesos",
+    etiqueta: "Mis procesos",
+    icono: LayoutList,
+    corta: "Procesos",
+  },
 ];
 
 // En celular, la organización usa la misma barra inferior que el talento, con «Mi empresa» al final.
 export const navEmpresaCelular: ItemNav[] = [
   ...navEmpresa,
-  { href: "/empresa/datos", etiqueta: "Mi empresa", icono: Building2, corta: "Empresa" },
+  {
+    href: "/empresa/datos",
+    etiqueta: "Mi empresa",
+    icono: Building2,
+    corta: "Empresa",
+  },
 ];
 
 export const navEquipo: ItemNav[] = [
+  {
+    href: "/equipo/condiciones",
+    etiqueta: "Condiciones de trabajo",
+    icono: ClipboardList,
+  },
+  {
+    href: "/equipo/bienestar",
+    etiqueta: "Bienestar y seguimiento",
+    icono: LifeBuoy,
+  },
   { href: "/equipo", etiqueta: "Curaduría", icono: ClipboardList },
-  { href: "/equipo/empresas", etiqueta: "Empresas y reportes", icono: Building2 },
-  { href: "/equipo/evidencias", etiqueta: "Evidencias y tarifas", icono: BadgeCheck },
+  {
+    href: "/equipo/empresas",
+    etiqueta: "Empresas y reportes",
+    icono: Building2,
+  },
+  {
+    href: "/equipo/evidencias",
+    etiqueta: "Evidencias y tarifas",
+    icono: BadgeCheck,
+  },
   { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
-  { href: "/equipo/experiencias", etiqueta: "Talento del campo", icono: Sprout },
+  {
+    href: "/equipo/experiencias",
+    etiqueta: "Talento del campo",
+    icono: Sprout,
+  },
   { href: "/equipo/ayuda", etiqueta: "Solicitudes de ayuda", icono: Inbox },
-  { href: "/gestor/registrar", etiqueta: "Registro asistido", icono: UserRoundPlus },
+  {
+    href: "/gestor/registrar",
+    etiqueta: "Registro asistido",
+    icono: UserRoundPlus,
+  },
 ];
 
 export const iconoAyuda = LifeBuoy;

@@ -31,6 +31,7 @@ export type DatosProceso = {
   acuerdo_unidad?: string | null;
   acuerdo_inicio?: string | null;
   acuerdo_nota?: string | null;
+  acuerdo_revisado_en?: string | null; // null: Kánna aún no revisa las condiciones (la demo no lo trae)
   cierre_tipo?: string | null;
   cerrada_por?: string | null;
   motivo_cierre?: string | null;
@@ -128,6 +129,14 @@ export function situacion(p: DatosProceso, lado: Lado): Situacion {
         : { etapa: "conversacion", turno: "tuyo", grupo: "turno", titulo: `Conversación confirmada: ${cuando}`, detalle: "Después de conversar, propón cómo trabajar." };
     }
     case "acuerdo":
+      if (p.acuerdo_revisado_en === null)
+        return {
+          etapa: "acuerdo",
+          turno: "equipo",
+          grupo: "proceso",
+          titulo: t ? "Kánna está revisando el acuerdo que te proponen" : "Acuerdo enviado: Kánna revisa las condiciones",
+          detalle: `${textoAcuerdo(p)}. ${t ? "Te avisamos cuando puedas decidir." : "Después, la persona decide."}`,
+        };
       return t
         ? { etapa: "acuerdo", turno: "tuyo", grupo: "turno", titulo: "La organización te propone un acuerdo", detalle: textoAcuerdo(p) }
         : { etapa: "acuerdo", turno: "otro", grupo: "proceso", titulo: "Acuerdo enviado: esperando a la persona", detalle: textoAcuerdo(p) };

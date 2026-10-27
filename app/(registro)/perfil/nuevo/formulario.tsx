@@ -4,6 +4,8 @@ import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 
+import { ImportarHojaVida } from "@/components/perfil/importar-hoja-vida";
+import { CampoUbicacion } from "@/components/ubicacion/campo-ubicacion";
 import { Pantalla } from "@/components/layout/pantalla";
 import { Button } from "@/components/ui/button";
 import { Campo, Input } from "@/components/ui/campo";
@@ -21,6 +23,8 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
   const tituloRef = useRef<HTMLHeadingElement>(null);
   const [paso, setPaso] = useState<1 | 2 | 3>(1);
   const [b, setB] = useState<BorradorPerfil>(borradorVacio);
+  const [historiaCv, setHistoriaCv] = useState("");
+  const [zona, setZona] = useState("");
   const [errores, setErrores] = useState<Errores>({});
   const [estado, guardar, guardando] = useActionState<EstadoPerfil, FormData>(guardarPerfil, {});
 
@@ -53,7 +57,9 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
       // Lleva el foco al primer campo con problema, para no tener que buscarlo.
       setTimeout(() => {
         const primero = document.querySelector<HTMLElement>('[aria-invalid="true"], fieldset [role="alert"]');
-        const objetivo = primero?.matches("[aria-invalid]") ? primero : primero?.closest("fieldset")?.querySelector<HTMLElement>("input");
+        const objetivo = primero?.matches("[aria-invalid]")
+          ? primero
+          : primero?.closest("fieldset")?.querySelector<HTMLElement>("input");
         objetivo?.focus();
       }, 0);
       return;
@@ -81,7 +87,10 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
           </p>
           <div className="grid grid-cols-3 gap-2" aria-hidden>
             {[1, 2, 3].map((n) => (
-              <span key={n} className={n <= paso ? "h-2 rounded-full bg-primary" : "h-2 rounded-full bg-surface-strong"} />
+              <span
+                key={n}
+                className={n <= paso ? "h-2 rounded-full bg-primary" : "h-2 rounded-full bg-surface-strong"}
+              />
             ))}
           </div>
         </div>
@@ -99,16 +108,37 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
           </p>
         )}
 
+        <input type="hidden" name="historia_cv" value={historiaCv} />
+        <input type="hidden" name="zona_local" value={zona} />
         {paso === 1 && (
           <>
+            <ImportarHojaVida
+              onConfirmar={(d) => {
+                setB((x) => ({
+                  ...x,
+                  nombre: d.nombre || x.nombre,
+                  oficio: d.oficio || x.oficio,
+                }));
+                setHistoriaCv(d.historia);
+              }}
+            />
+            {historiaCv && (
+              <p role="status">
+                Importamos tu experiencia. Revisa los datos y completa las condiciones de trabajo; después podrás armar
+                tu huella con ese texto.
+              </p>
+            )}
             <Campo id="nombre" etiqueta="Tu nombre" error={errores.nombre}>
-              {(p) => <Input {...p} value={b.nombre} onChange={(e) => cambiar("nombre", e.target.value)} autoComplete="name" />}
-            </Campo>
-            <Campo id="ubicacion" etiqueta="Ciudad o vereda donde vives" error={errores.ubicacion}>
               {(p) => (
-                <Input {...p} value={b.ubicacion} onChange={(e) => cambiar("ubicacion", e.target.value)} autoComplete="address-level2" />
+                <Input
+                  {...p}
+                  value={b.nombre}
+                  onChange={(e) => cambiar("nombre", e.target.value)}
+                  autoComplete="name"
+                />
               )}
             </Campo>
+            <CampoUbicacion value={b.ubicacion} onChange={(v) => cambiar("ubicacion", v)} onSectorChange={setZona} />
             <Campo
               id="oficio"
               etiqueta="¿A qué te has dedicado?"
@@ -117,7 +147,10 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
             >
               {(p) => <Input {...p} value={b.oficio} onChange={(e) => cambiar("oficio", e.target.value)} />}
             </Campo>
-            <fieldset className="flex flex-col gap-3" aria-describedby={errores.requisito ? "requisito-error" : undefined}>
+            <fieldset
+              className="flex flex-col gap-3"
+              aria-describedby={errores.requisito ? "requisito-error" : undefined}
+            >
               <legend className="mb-3 text-lg font-bold">¿Cuál de estas describe tu caso?</legend>
               {(
                 [
@@ -254,7 +287,10 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 titulo={`Autorizo a ${MARCA.nombre} a usar mis datos para crear mi perfil y conectarme con empresas.`}
                 descripcion="Nunca le mostramos tu edad a una empresa. Puedes descargar o borrar tus datos cuando quieras."
               />
-              <Link href="/privacidad" className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4">
+              <Link
+                href="/privacidad"
+                className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4"
+              >
                 Cómo cuidamos tus datos
               </Link>
               {errores.autorizo && (

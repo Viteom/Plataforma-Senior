@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonSalir } from "@/components/layout/boton-salir";
-import { Pendiente } from "@/components/layout/pendiente";
+import { FotoDemo } from "@/components/perfil/foto-demo";
 import { Button } from "@/components/ui/button";
 import { Etiqueta } from "@/components/ui/etiqueta";
 
@@ -11,12 +11,17 @@ import { Etiqueta } from "@/components/ui/etiqueta";
 export function MiPerfilDemo() {
   return (
     <Pantalla titulo="Mi perfil">
+      <Link
+        href="/bienestar"
+        className="inline-flex min-h-action items-center rounded-md bg-surface p-4 font-bold underline"
+      >
+        Mi ritmo, mis metas y mi bienestar
+      </Link>
       <Seccion titulo="Quién ve mi perfil">
         <div className="flex items-start gap-3">
           <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />
           <p>
-            <span className="font-bold">Reservado.</span> Las empresas ven tu experiencia, pero no
-            tu nombre ni tu foto.
+            <span className="font-bold">Reservado.</span> Las empresas ven tu experiencia, pero no tu nombre ni tu foto.
           </p>
         </div>
         <Button variant="secundario" size="normal" className="self-start">
@@ -24,6 +29,7 @@ export function MiPerfilDemo() {
         </Button>
       </Seccion>
 
+      <FotoDemo />
       <Seccion titulo="Mi huella de experiencia">
         <div className="flex flex-wrap gap-2">
           <Etiqueta texto="Ejemplo confirmado" confirmada />
@@ -60,10 +66,6 @@ export function MiPerfilDemo() {
       </Seccion>
 
       <BotonSalir />
-
-      <Pendiente hito={3}>
-        Editar perfil, formas de trabajar y visibilidad; descargar o borrar los datos.
-      </Pendiente>
     </Pantalla>
   );
 }

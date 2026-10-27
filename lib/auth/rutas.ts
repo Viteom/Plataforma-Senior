@@ -34,13 +34,12 @@ const AREAS: { prefijos: string[]; roles: Rol[] }[] = [
   { prefijos: ["/equipo"], roles: ["curador", "admin"] },
   { prefijos: ["/gestor"], roles: ["gestor", "admin"] },
   {
-    prefijos: ["/inicio", "/oportunidades", "/mi-perfil", "/aprende", "/emprende", "/perfil", "/huella"],
+    prefijos: ["/inicio", "/bienestar", "/oportunidades", "/mi-perfil", "/aprende", "/emprende", "/perfil", "/huella"],
     roles: ["talento", "admin"],
   },
 ];
 
-const coincide = (pathname: string, prefijo: string) =>
-  pathname === prefijo || pathname.startsWith(`${prefijo}/`);
+const coincide = (pathname: string, prefijo: string) => pathname === prefijo || pathname.startsWith(`${prefijo}/`);
 
 export function esPublica(pathname: string) {
   return PUBLICAS.some((p) => (p === "/" ? pathname === "/" : coincide(pathname, p)));

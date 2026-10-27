@@ -20,11 +20,18 @@ beforeAll(async () => {
   u.otroGestor = await crearUsuario(db, "gestor");
   u.admin = await crearUsuario(db, "admin");
 
-  const crear = async (userId: string | null, nombre: string, visibilidad: string, estado: string, por: string | null = null) => {
+  const crear = async (
+    userId: string | null,
+    nombre: string,
+    visibilidad: string,
+    estado: string,
+    por: string | null = null,
+  ) => {
+    const id = crypto.randomUUID();
     const r = await db.query<{ id: string }>(
-      `insert into talent_profiles (user_id, nombre, ubicacion, resumen, visibilidad, foto_path, estado, registrado_por)
-       values ($1, $2, 'Medellín', 'Resumen de ' || $2, $3, 'fotos/' || $2 || '.jpg', $4, $5) returning id`,
-      [userId, nombre, visibilidad, estado, por],
+      `insert into talent_profiles (id, user_id, nombre, ubicacion, resumen, visibilidad, foto_path, estado, registrado_por)
+       values ($6::uuid, $1, $2, 'Medellín', 'Resumen de ' || $2, $3, ($6::uuid)::text || '/foto.jpg', $4, $5) returning id`,
+      [userId, nombre, visibilidad, estado, por, id],
     );
     return r.rows[0].id;
   };
@@ -44,8 +51,13 @@ beforeAll(async () => {
        ($1, 'situaciones', 'Sin confirmar', null, false)`,
     [perfil.reservado],
   );
-  await db.query(`insert into talent_offers (talent_id, tipo, horas_semana, modalidad, tarifa_esperada) values ($1, 'proyecto', 15, 'presencial', 90000)`, [perfil.reservado]);
-  await db.query(`insert into stories (talent_id, texto, origen) values ($1, 'Abrí una planta en 1998', 'escrito')`, [perfil.reservado]);
+  await db.query(
+    `insert into talent_offers (talent_id, tipo, horas_semana, modalidad, tarifa_esperada) values ($1, 'proyecto', 15, 'presencial', 90000)`,
+    [perfil.reservado],
+  );
+  await db.query(`insert into stories (talent_id, texto, origen) values ($1, 'Abrí una planta en 1998', 'escrito')`, [
+    perfil.reservado,
+  ]);
 });
 
 type Fila = Record<string, unknown>;
@@ -83,7 +95,9 @@ describe("una empresa no lee datos de talento", () => {
   });
 
   it("talent_private: sin permiso", async () => {
-    await expect(como(db, u.empresa, (tx) => filas(tx, "select * from talent_private"))).rejects.toThrow(/permission denied/);
+    await expect(como(db, u.empresa, (tx) => filas(tx, "select * from talent_private"))).rejects.toThrow(
+      /permission denied/,
+    );
   });
 
   it("no puede usar la función del equipo para ver la fecha de nacimiento", async () => {
@@ -143,7 +157,9 @@ describe("vista anónima para empresas", () => {
   });
 
   it("sin sesión no hay acceso", async () => {
-    await expect(como(db, null, (tx) => filas(tx, "select * from company_talent_view"))).rejects.toThrow(/permission denied/);
+    await expect(como(db, null, (tx) => filas(tx, "select * from company_talent_view"))).rejects.toThrow(
+      /permission denied/,
+    );
   });
 });
 
@@ -161,7 +177,9 @@ describe("talento y gestor", () => {
   });
 
   it("el talento no lee su propia fecha de nacimiento por la API, pero sí la guarda", async () => {
-    await expect(como(db, u.talento, (tx) => filas(tx, "select * from talent_private"))).rejects.toThrow(/permission denied/);
+    await expect(como(db, u.talento, (tx) => filas(tx, "select * from talent_private"))).rejects.toThrow(
+      /permission denied/,
+    );
     await como(db, u.talento, (tx) =>
       filas(tx, "select guardar_datos_privados($1, '1962-03-14', 'v2', 'pantalla')", [perfil.reservado]),
     );
@@ -206,12 +224,16 @@ describe("talento y gestor", () => {
 
 describe("equipo", () => {
   it("el curador no lee talent_private directamente", async () => {
-    await expect(como(db, u.curador, (tx) => filas(tx, "select * from talent_private"))).rejects.toThrow(/permission denied/);
+    await expect(como(db, u.curador, (tx) => filas(tx, "select * from talent_private"))).rejects.toThrow(
+      /permission denied/,
+    );
   });
 
   it("el curador la lee con motivo y queda registrado", async () => {
     const r = await como(db, u.curador, (tx) =>
-      filas(tx, "select fecha_nacimiento from ver_datos_privados($1, 'Verificar requisito de entrada')", [perfil.reservado]),
+      filas(tx, "select fecha_nacimiento from ver_datos_privados($1, 'Verificar requisito de entrada')", [
+        perfil.reservado,
+      ]),
     );
     expect(r).toHaveLength(1);
     // La transacción de la prueba se deshace; se comprueba el registro dentro de una nueva.
@@ -240,7 +262,9 @@ describe("empresas: solo el equipo verifica (regla 9)", () => {
   it("una empresa no se crea verificada", async () => {
     await expect(
       como(db, u.empresa, (tx) =>
-        filas(tx, "insert into companies (owner_id, nombre, verificada_en) values ($1, 'Trampa SAS', now())", [u.empresa]),
+        filas(tx, "insert into companies (owner_id, nombre, verificada_en) values ($1, 'Trampa SAS', now())", [
+          u.empresa,
+        ]),
       ),
     ).rejects.toThrow(/row-level security/);
   });
@@ -248,16 +272,27 @@ describe("empresas: solo el equipo verifica (regla 9)", () => {
   it("una empresa no se verifica a sí misma después", async () => {
     await expect(
       como(db, u.empresa, async (tx) => {
-        const [c] = await filas(tx, "insert into companies (owner_id, nombre) values ($1, 'Alimentos SAS') returning id", [u.empresa]);
+        const [c] = await filas(
+          tx,
+          "insert into companies (owner_id, nombre) values ($1, 'Alimentos SAS') returning id",
+          [u.empresa],
+        );
         return filas(tx, "update companies set verificada_en = now() where id = $1", [c.id]);
       }),
     ).rejects.toThrow(/solo el equipo verifica/);
   });
 
   it("el curador sí la verifica", async () => {
-    const [c] = await db.query<{ id: string }>("insert into companies (owner_id, nombre) values ($1, 'Verificable SAS') returning id", [u.empresa]).then((r) => r.rows);
+    const [c] = await db
+      .query<{
+        id: string;
+      }>("insert into companies (owner_id, nombre) values ($1, 'Verificable SAS') returning id", [u.empresa])
+      .then((r) => r.rows);
     const r = await como(db, u.curador, (tx) =>
-      tx.query("update companies set verificada_en = now(), verificada_por = $2, verificada_fuente = 'RUES' where id = $1", [c.id, u.curador]),
+      tx.query(
+        "update companies set verificada_en = now(), verificada_por = $2, verificada_fuente = 'RUES' where id = $1",
+        [c.id, u.curador],
+      ),
     );
     expect(r.affectedRows).toBe(1);
   });
@@ -274,7 +309,9 @@ describe("límite de códigos", () => {
     const hash = "a".repeat(64);
     const resultados: boolean[] = [];
     for (let i = 0; i < 6; i++) {
-      const [r] = await db.query<{ ok: boolean }>("select registrar_intento_codigo($1) as ok", [hash]).then((x) => x.rows);
+      const [r] = await db
+        .query<{ ok: boolean }>("select registrar_intento_codigo($1) as ok", [hash])
+        .then((x) => x.rows);
       resultados.push(r.ok);
     }
     expect(resultados).toEqual([true, true, true, true, true, false]);

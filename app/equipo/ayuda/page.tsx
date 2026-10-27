@@ -1,4 +1,5 @@
 import { MessageSquareWarning } from "lucide-react";
+import Link from "next/link";
 import type { Metadata } from "next";
 
 import { Pantalla } from "@/components/layout/pantalla";
@@ -23,7 +24,12 @@ const CANAL: Record<string, string> = {
 };
 
 const fecha = (iso: string) =>
-  new Date(iso).toLocaleString("es-CO", { day: "numeric", month: "long", hour: "numeric", minute: "2-digit" });
+  new Date(iso).toLocaleString("es-CO", {
+    day: "numeric",
+    month: "long",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
 export default async function EquipoAyuda() {
   const { solicitudes, avisos } = await ayudaYAvisos();
@@ -37,14 +43,29 @@ export default async function EquipoAyuda() {
         {solicitudes.length ? (
           <ul className="flex flex-col gap-3">
             {solicitudes.map((s) => (
-              <li key={s.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-5 sm:flex-row sm:items-center sm:justify-between">
+              <li
+                key={s.id}
+                className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
                 <div>
                   <p className="text-base text-text-muted">
                     {CANAL[s.canal] ?? s.canal} · {fecha(s.creado_en)}
                   </p>
                   <p className="text-lg font-bold">{s.motivo}</p>
                 </div>
-                <BotonAccion accion={atenderSolicitud} campos={{ id: s.id }} texto="Marcar atendida" variant="secundario" size="normal" />
+                {s.wellbeing_case_id ? (
+                  <Link href="/equipo/bienestar" className="inline-flex min-h-tap items-center font-bold underline">
+                    Gestionar en la cola privada de bienestar
+                  </Link>
+                ) : (
+                  <BotonAccion
+                    accion={atenderSolicitud}
+                    campos={{ id: s.id }}
+                    texto="Marcar atendida"
+                    variant="secundario"
+                    size="normal"
+                  />
+                )}
               </li>
             ))}
           </ul>
@@ -65,7 +86,10 @@ export default async function EquipoAyuda() {
         {avisos.length ? (
           <ul className="flex flex-col gap-3">
             {avisos.map((a) => (
-              <li key={a.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-5 sm:flex-row sm:items-center sm:justify-between">
+              <li
+                key={a.id}
+                className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-5 sm:flex-row sm:items-center sm:justify-between"
+              >
                 <div>
                   <p className="text-lg font-bold">{a.persona}</p>
                   <p className="text-base text-text-muted">
@@ -73,7 +97,13 @@ export default async function EquipoAyuda() {
                     {a.motivo_omitido && ` · ${a.motivo_omitido}`} · {fecha(a.creado_en)}
                   </p>
                 </div>
-                <BotonAccion accion={avisadoPorLlamada} campos={{ id: a.id }} texto="Ya le avisé por llamada" variant="secundario" size="normal" />
+                <BotonAccion
+                  accion={avisadoPorLlamada}
+                  campos={{ id: a.id }}
+                  texto="Ya le avisé por llamada"
+                  variant="secundario"
+                  size="normal"
+                />
               </li>
             ))}
           </ul>

@@ -1,7 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Campo, Input } from "@/components/ui/campo";
+import { Campo, Input, Textarea } from "@/components/ui/campo";
+import { CampoUbicacion } from "@/components/ubicacion/campo-ubicacion";
 import { useAccion } from "@/components/ui/use-accion";
 
 import { registrarEmpresa, type Estado } from "../acciones";
@@ -31,12 +32,42 @@ export function FormularioEmpresa() {
           </select>
         )}
       </Campo>
-      <Campo id="ciudad" etiqueta="Ciudad">
-        {(p) => <Input {...p} name="ciudad" autoComplete="address-level2" />}
-      </Campo>
+      <CampoUbicacion name="ciudad" />
       <Campo id="contacto" etiqueta="Persona de contacto">
         {(p) => <Input {...p} name="contacto" autoComplete="name" />}
       </Campo>
+
+      <Campo id="cargo-contacto" etiqueta="Cargo de la persona responsable">
+        {(p) => <Input {...p} name="cargo_contacto" maxLength={100} required />}
+      </Campo>
+      <Campo id="correo-contacto" etiqueta="Correo de contacto">
+        {(p) => <Input {...p} name="correo_contacto" type="email" maxLength={254} autoComplete="email" required />}
+      </Campo>
+      <Campo id="telefono-contacto" etiqueta="Teléfono de contacto">
+        {(p) => <Input {...p} name="telefono_contacto" type="tel" maxLength={20} autoComplete="tel" required />}
+      </Campo>
+      <Campo
+        id="descripcion-empresa"
+        etiqueta="¿Qué hace tu organización?"
+        ayuda="Cuéntanos su actividad y cómo acompañará a las personas que trabajen con ella."
+      >
+        {(p) => <Textarea {...p} name="descripcion" minLength={20} maxLength={1000} required />}
+      </Campo>
+      <Campo id="web-empresa" etiqueta="Sitio web (opcional)">
+        {(p) => <Input {...p} name="sitio_web" type="url" placeholder="https://" maxLength={500} />}
+      </Campo>
+      <Campo
+        id="marca-empresa"
+        etiqueta="Enlace al manual de marca (opcional)"
+        ayuda="Un enlace de consulta. No compartas contraseñas ni documentos internos."
+      >
+        {(p) => <Input {...p} name="brandbook_url" type="url" placeholder="https://" maxLength={500} />}
+      </Campo>
+      <label className="flex min-h-tap items-start gap-3">
+        <input type="checkbox" name="compromiso_bienestar" value="si" required className="mt-1 size-6 shrink-0" />
+        Me comprometo a ofrecer trabajo remunerado, trato digno, condiciones claras y acompañamiento. Kánna revisará
+        cada reto antes de enviarlo.
+      </label>
       {estado.error && (
         <p role="alert" className="font-bold text-danger">
           {estado.error}
