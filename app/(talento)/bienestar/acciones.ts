@@ -10,33 +10,22 @@ async function sesion() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/entrar");
-  const { data: perfil } = await supabase
-    .from("talent_profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
+  const { data: perfil } = await supabase.from("talent_profiles").select("id").eq("user_id", user.id).single();
   if (!perfil) redirect("/perfil/nuevo");
   return { supabase, perfil };
 }
-export async function guardarMetas(
-  _p: EstadoBienestar,
-  d: FormData,
-): Promise<EstadoBienestar> {
+export async function guardarMetas(_p: EstadoBienestar, d: FormData): Promise<EstadoBienestar> {
   const crudo = String(d.get("horas") ?? "");
   const horas = Number(crudo);
   const ingresoCrudo = String(d.get("ingreso") ?? "").trim();
   const ingreso = ingresoCrudo ? Number(ingresoCrudo) : null;
   if (!crudo.trim() || !Number.isInteger(horas) || horas < 0 || horas > 48)
     return { error: "Elige entre 0 y 48 horas a la semana." };
-  if (
-    ingreso !== null &&
-    (!Number.isFinite(ingreso) || ingreso < 0 || ingreso > 1000000000)
-  )
+  if (ingreso !== null && (!Number.isFinite(ingreso) || ingreso < 0 || ingreso > 1000000000))
     return { error: "Revisa tu meta de ingreso semanal." };
   if (d.get("consentimiento") !== "si")
     return {
-      error:
-        "Necesitamos tu autorización para guardar estas preferencias privadas.",
+      error: "Necesitamos tu autorización para guardar estas preferencias privadas.",
     };
   if (MODO_DEMO)
     return {
@@ -56,10 +45,7 @@ export async function guardarMetas(
   revalidatePath("/bienestar");
   return { aviso: "Metas guardadas. Puedes cambiarlas cuando quieras." };
 }
-export async function registrarSeguimiento(
-  _p: EstadoBienestar,
-  d: FormData,
-): Promise<EstadoBienestar> {
+export async function registrarSeguimiento(_p: EstadoBienestar, d: FormData): Promise<EstadoBienestar> {
   const energia = String(d.get("energia") ?? "");
   const trato = String(d.get("trato") ?? "");
   const pago = String(d.get("pago") ?? "");
@@ -70,12 +56,10 @@ export async function registrarSeguimiento(
     !["si", "no", "pendiente"].includes(pago)
   )
     return { error: "Responde las tres preguntas." };
-  if (conexion && !/^[0-9a-f-]{36}$/i.test(conexion))
-    return { error: "Elige uno de tus procesos." };
+  if (conexion && !/^[0-9a-f-]{36}$/i.test(conexion)) return { error: "Elige uno de tus procesos." };
   if (MODO_DEMO)
     return {
-      aviso:
-        "Así quedaría tu seguimiento. La demostración no guarda respuestas.",
+      aviso: "Así quedaría tu seguimiento. La demostración no guarda respuestas.",
     };
   const { supabase, perfil } = await sesion();
   const { error } = await supabase.from("wellbeing_checkins").insert({
@@ -88,8 +72,7 @@ export async function registrarSeguimiento(
   });
   if (error)
     return {
-      error:
-        "No pudimos guardar el seguimiento. Primero guarda tus metas y autoriza el uso de estos datos.",
+      error: "No pudimos guardar el seguimiento. Primero guarda tus metas y autoriza el uso de estos datos.",
     };
   revalidatePath("/bienestar");
   return {

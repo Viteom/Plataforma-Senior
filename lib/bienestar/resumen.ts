@@ -7,34 +7,19 @@ export type AcuerdoConHoras = {
   acuerdo_horas_semana?: number | null;
   acuerdo_inicio?: string | null;
 };
-export function acuerdosActuales<T extends AcuerdoConHoras>(
-  procesos: T[],
-  fecha = fechaColombia(),
-): T[] {
+export function acuerdosActuales<T extends AcuerdoConHoras>(procesos: T[], fecha = fechaColombia()): T[] {
   return procesos.filter(
-    (p) =>
-      p.estado === "en_curso" &&
-      (!p.acuerdo_inicio || p.acuerdo_inicio.slice(0, 10) <= fecha),
+    (p) => p.estado === "en_curso" && (!p.acuerdo_inicio || p.acuerdo_inicio.slice(0, 10) <= fecha),
   );
 }
-export function resumenCarga(
-  meta: number,
-  procesos: AcuerdoConHoras[],
-  fecha = fechaColombia(),
-) {
+export function resumenCarga(meta: number, procesos: AcuerdoConHoras[], fecha = fechaColombia()) {
   const activos = acuerdosActuales(procesos, fecha);
-  const horas = activos.reduce(
-    (s, p) => s + Number(p.acuerdo_horas_semana ?? 0),
-    0,
-  );
+  const horas = activos.reduce((s, p) => s + Number(p.acuerdo_horas_semana ?? 0), 0);
   return {
     horas,
     sinHoras: activos.filter((p) => p.acuerdo_horas_semana == null).length,
     futuros: procesos.filter(
-      (p) =>
-        p.estado === "en_curso" &&
-        p.acuerdo_inicio &&
-        p.acuerdo_inicio.slice(0, 10) > fecha,
+      (p) => p.estado === "en_curso" && p.acuerdo_inicio && p.acuerdo_inicio.slice(0, 10) > fecha,
     ).length,
     porcentaje: meta > 0 ? Math.min(100, Math.round((horas / meta) * 100)) : 0,
     mensaje:

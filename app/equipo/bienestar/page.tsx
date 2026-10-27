@@ -5,61 +5,52 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { MODO_DEMO } from "@/lib/demo";
 import { gestionarCaso } from "./acciones";
 export const metadata = { title: "Acompañamiento de bienestar" };
+
+type CasoEquipo = {
+  id: string;
+  prioridad: string;
+  permite_contacto: boolean;
+  estado: string;
+  asignado_a_mi: boolean;
+  revision_sugerida_en: string;
+  nombre: string | null;
+  energia: string;
+  trato_respetuoso: boolean;
+  pago_a_tiempo: boolean | null;
+};
 export default async function Seguimientos() {
   const supabase = MODO_DEMO ? null : await crearClienteServidor();
-  let usuario: string | undefined;
   if (supabase) {
     const { data } = await supabase.rpc("es_equipo");
     if (!data) redirect("/entrar");
-    usuario = (await supabase.auth.getUser()).data.user?.id;
   }
-  const { data, error } = supabase
-    ? await supabase
-        .from("wellbeing_cases")
-        .select(
-          "id,prioridad,permite_contacto,estado,asignado_a,creado_en,revision_sugerida_en,talent_profiles(nombre),wellbeing_checkins(energia,trato_respetuoso,pago_a_tiempo)",
-        )
-        .in("estado", ["abierto", "en_curso"])
-        .order("prioridad", { ascending: false })
-        .order("creado_en")
-        .limit(100)
-    : { data: [], error: null };
+  // La función deja registro de cada lectura; el equipo no tiene acceso directo a las tablas.
+  const { data, error } = supabase ? await supabase.rpc("casos_bienestar_equipo") : { data: [], error: null };
+  const casos = (data ?? []) as CasoEquipo[];
   return (
     <Pantalla
       titulo="Acompañamiento de bienestar"
-      intro="Cola privada del equipo. Revisa las señales, toma el caso y registra el cierre. Ninguna organización recibe las respuestas."
+      intro="Cola privada del equipo. Revisa las señales, toma el caso y registra el cierre. Ninguna organización recibe las respuestas, y cada vez que abres esta cola queda registrado."
     >
       <p>
-        La fecha sugerida es un objetivo interno de revisión de 48 horas, no una
-        promesa de llamada ni un servicio de emergencias.
+        La fecha sugerida es un objetivo interno de revisión de 48 horas, no una promesa de llamada ni un servicio de
+        emergencias.
       </p>
       {error && <p role="alert">No pudimos cargar los casos.</p>}
-      {data?.length ? (
+      {casos.length ? (
         <ul className="flex flex-col gap-4">
-          {data.map((r) => {
-            const respuestas = r.wellbeing_checkins as unknown as {
-              energia: string;
-              trato_respetuoso: boolean;
-              pago_a_tiempo: boolean | null;
-            } | null;
+          {casos.map((r) => {
             return (
-              <li
-                key={r.id}
-                className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4"
-              >
+              <li key={r.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4">
                 <h2 className="text-xl">
-                  {(r.talent_profiles as unknown as { nombre?: string } | null)
-                    ?.nombre ?? "Persona"}{" "}
-                  ·{" "}
-                  {r.prioridad === "preferente"
-                    ? "Revisión preferente"
-                    : "Acompañamiento"}
+                  {r.nombre ?? "Persona"} ·{" "}
+                  {r.prioridad === "preferente" ? "Revisión preferente" : "Acompañamiento"}
                 </h2>
                 <p>
                   Estado:{" "}
                   {r.estado === "abierto"
                     ? "Sin asignar"
-                    : r.asignado_a === usuario
+                    : r.asignado_a_mi
                       ? "Asignado a ti"
                       : "Asignado a otra persona del equipo"}
                   .
@@ -73,16 +64,15 @@ export default async function Seguimientos() {
                 </p>
                 <p>
                   Ritmo:{" "}
-                  {respuestas?.energia === "pausa"
+                  {r.energia === "pausa"
                     ? "Necesita una pausa"
-                    : respuestas?.energia === "ajustar"
+                    : r.energia === "ajustar"
                       ? "Quiere ajustar su carga"
                       : "Se siente bien"}
-                  . Trato respetuoso:{" "}
-                  {respuestas?.trato_respetuoso ? "Sí" : "No"}. Pago a tiempo:{" "}
-                  {respuestas?.pago_a_tiempo === null
+                  . Trato respetuoso: {r.trato_respetuoso ? "Sí" : "No"}. Pago a tiempo:{" "}
+                  {r.pago_a_tiempo === null
                     ? "Todavía no corresponde"
-                    : respuestas?.pago_a_tiempo
+                    : r.pago_a_tiempo
                       ? "Sí"
                       : "No"}
                   .
@@ -99,7 +89,7 @@ export default async function Seguimientos() {
                     texto="Tomar este caso"
                   />
                 )}
-                {r.asignado_a === usuario && r.estado === "en_curso" && (
+                {r.asignado_a_mi && r.estado === "en_curso" && (
                   <BotonAccion
                     accion={gestionarCaso}
                     campos={{ caso: r.id, accion: "cerrar" }}

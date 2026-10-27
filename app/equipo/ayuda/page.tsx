@@ -35,10 +35,7 @@ export default async function EquipoAyuda() {
   const { solicitudes, avisos } = await ayudaYAvisos();
 
   return (
-    <Pantalla
-      titulo="Solicitudes de ayuda"
-      intro="Lo que la plataforma pasó a una persona del equipo."
-    >
+    <Pantalla titulo="Solicitudes de ayuda" intro="Lo que la plataforma pasó a una persona del equipo.">
       <section aria-labelledby="solicitudes" className="flex flex-col gap-4">
         <h2 id="solicitudes" className="text-xl">
           Abiertas ({solicitudes.length})
@@ -57,10 +54,7 @@ export default async function EquipoAyuda() {
                   <p className="text-lg font-bold">{s.motivo}</p>
                 </div>
                 {s.wellbeing_case_id ? (
-                  <Link
-                    href="/equipo/bienestar"
-                    className="inline-flex min-h-tap items-center font-bold underline"
-                  >
+                  <Link href="/equipo/bienestar" className="inline-flex min-h-tap items-center font-bold underline">
                     Gestionar en la cola privada de bienestar
                   </Link>
                 ) : (
@@ -80,22 +74,14 @@ export default async function EquipoAyuda() {
         )}
       </section>
 
-      <section
-        id="avisos"
-        aria-labelledby="titulo-avisos"
-        className="flex scroll-mt-6 flex-col gap-4"
-      >
+      <section id="avisos" aria-labelledby="titulo-avisos" className="flex scroll-mt-6 flex-col gap-4">
         <h2 id="titulo-avisos" className="text-xl">
           Avisos por dar ({avisos.length})
         </h2>
         <p className="flex items-start gap-3 rounded-md bg-surface p-4">
-          <MessageSquareWarning
-            aria-hidden
-            className="mt-0.5 size-6 shrink-0"
-          />
-          El envío automático de SMS está apagado (es de pago). Llama a estas
-          personas para contarles que tienen una oportunidad nueva, sin decir el
-          nombre de la empresa, y anótalo.
+          <MessageSquareWarning aria-hidden className="mt-0.5 size-6 shrink-0" />
+          El envío automático de SMS está apagado (es de pago). Llama a estas personas para contarles que tienen una
+          oportunidad nueva, sin decir el nombre de la empresa, y anótalo.
         </p>
         {avisos.length ? (
           <ul className="flex flex-col gap-3">
@@ -108,8 +94,7 @@ export default async function EquipoAyuda() {
                   <p className="text-lg font-bold">{a.persona}</p>
                   <p className="text-base text-text-muted">
                     {TEXTO_PLANTILLA[a.plantilla] ?? "Aviso"}
-                    {a.motivo_omitido && ` · ${a.motivo_omitido}`} ·{" "}
-                    {fecha(a.creado_en)}
+                    {a.motivo_omitido && ` · ${a.motivo_omitido}`} · {fecha(a.creado_en)}
                   </p>
                 </div>
                 <BotonAccion
@@ -126,9 +111,7 @@ export default async function EquipoAyuda() {
           <p className="text-text-muted">No hay avisos pendientes.</p>
         )}
       </section>
-      {MODO_DEMO && (
-        <p className="text-base text-text-muted">Datos de ejemplo.</p>
-      )}
+      {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo.</p>}
     </Pantalla>
   );
 }

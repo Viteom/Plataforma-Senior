@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Pantalla } from "@/components/layout/pantalla";
-import {
-  FormularioMetas,
-  FormularioSeguimiento,
-} from "@/components/bienestar/formularios";
+import { FormularioMetas, FormularioSeguimiento } from "@/components/bienestar/formularios";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import { crearClienteServidor } from "@/lib/supabase/server";
 import { MODO_DEMO } from "@/lib/demo";
@@ -13,8 +10,9 @@ import { pesos } from "@/lib/formas";
 export const metadata = { title: "Mi ritmo y bienestar" };
 export default async function Bienestar() {
   const procesos = await listarOportunidades();
-  let preferencias: { horas_meta: number; ingreso_meta: number | null } | null =
-    MODO_DEMO ? { horas_meta: 20, ingreso_meta: null } : null;
+  let preferencias: { horas_meta: number; ingreso_meta: number | null } | null = MODO_DEMO
+    ? { horas_meta: 20, ingreso_meta: null }
+    : null;
   let registros: {
     id: string;
     energia: string;
@@ -29,72 +27,41 @@ export default async function Bienestar() {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) redirect("/entrar");
-    const { data: p } = await supabase
-      .from("talent_profiles")
-      .select("id")
-      .eq("user_id", user.id)
-      .single();
+    const { data: p } = await supabase.from("talent_profiles").select("id").eq("user_id", user.id).single();
     if (!p) redirect("/perfil/nuevo");
     const [metas, seguimientos, casos] = await Promise.all([
-      supabase
-        .from("wellbeing_preferences")
-        .select("horas_meta,ingreso_meta")
-        .eq("talent_id", p.id)
-        .maybeSingle(),
+      supabase.from("wellbeing_preferences").select("horas_meta,ingreso_meta").eq("talent_id", p.id).maybeSingle(),
       supabase
         .from("wellbeing_checkins")
         .select("id,energia,creado_en,quiere_contacto")
         .eq("talent_id", p.id)
         .order("creado_en", { ascending: false })
         .limit(12),
-      supabase
-        .from("wellbeing_cases")
-        .select("checkin_id,estado")
-        .eq("talent_id", p.id),
+      supabase.from("wellbeing_cases").select("checkin_id,estado").eq("talent_id", p.id),
     ]);
-    for (const caso of casos.data ?? [])
-      estadosCaso.set(caso.checkin_id, caso.estado);
+    for (const caso of casos.data ?? []) estadosCaso.set(caso.checkin_id, caso.estado);
     preferencias = metas.data;
     registros = seguimientos.data ?? [];
     errorDatos = Boolean(metas.error || seguimientos.error || casos.error);
   }
-  const carga = preferencias
-    ? resumenCarga(preferencias.horas_meta, procesos)
-    : null;
+  const carga = preferencias ? resumenCarga(preferencias.horas_meta, procesos) : null;
   const ingresoSemanal = acuerdosActuales(procesos)
-    .filter(
-      (p) =>
-        p.estado === "en_curso" &&
-        p.acuerdo_unidad === "hora" &&
-        p.acuerdo_horas_semana != null,
-    )
-    .reduce(
-      (s, p) =>
-        s + Number(p.acuerdo_valor ?? 0) * Number(p.acuerdo_horas_semana),
-      0,
-    );
+    .filter((p) => p.estado === "en_curso" && p.acuerdo_unidad === "hora" && p.acuerdo_horas_semana != null)
+    .reduce((s, p) => s + Number(p.acuerdo_valor ?? 0) * Number(p.acuerdo_horas_semana), 0);
   return (
     <Pantalla
       titulo="Mi ritmo y bienestar"
       intro="Tu bienestar va primero. Tú eliges cuánto quieres trabajar y puedes pedir acompañamiento antes, durante y después de un trabajo."
     >
       {errorDatos && (
-        <p role="alert">
-          El seguimiento todavía no está disponible. Puedes contactar al equipo
-          desde Ayuda.
-        </p>
+        <p role="alert">El seguimiento todavía no está disponible. Puedes contactar al equipo desde Ayuda.</p>
       )}
-      {MODO_DEMO && (
-        <p className="rounded-md bg-surface p-4">
-          Ejemplo de demostración. Tus respuestas no se guardan.
-        </p>
-      )}
+      {MODO_DEMO && <p className="rounded-md bg-surface p-4">Ejemplo de demostración. Tus respuestas no se guardan.</p>}
       {carga && (
         <section className="flex flex-col gap-3 rounded-lg bg-surface p-5">
           <h2 className="text-xl">Tu carga semanal acordada</h2>
           <p className="font-bold">
-            {carga.horas} horas pactadas / {preferencias!.horas_meta} horas que
-            elegiste
+            {carga.horas} horas pactadas / {preferencias!.horas_meta} horas que elegiste
           </p>
           <progress
             aria-label="Horas pactadas frente a tu límite personal"
@@ -103,59 +70,41 @@ export default async function Bienestar() {
             className="h-6 w-full accent-primary"
           />
           <p>{carga.mensaje}</p>
-          <p>
-            Son horas semanales pactadas, no un registro de horas trabajadas. No
-            tienes que completar la barra.
-          </p>
+          <p>Son horas semanales pactadas, no un registro de horas trabajadas. No tienes que completar la barra.</p>
           {carga.futuros > 0 && (
             <p>
-              Hay {carga.futuros} acuerdos aceptados con inicio futuro; se
-              mostrarán en la carga actual cuando llegue su fecha.
+              Hay {carga.futuros} acuerdos aceptados con inicio futuro; se mostrarán en la carga actual cuando llegue su
+              fecha.
             </p>
           )}
           {carga.sinHoras > 0 && (
             <p>
-              Hay {carga.sinHoras} acuerdos sin horas semanales registradas. El
-              total no incluye esos trabajos ni los que tengas fuera de Kánna.
+              Hay {carga.sinHoras} acuerdos sin horas semanales registradas. El total no incluye esos trabajos ni los
+              que tengas fuera de Kánna.
             </p>
           )}
           {preferencias!.ingreso_meta != null && (
             <p>
-              Meta semanal: {pesos(preferencias!.ingreso_meta)}. Estimación de
-              acuerdos por hora: {pesos(ingresoSemanal)}. Es una proyección, no
-              un pago recibido; no incluye acuerdos por mes ni por proyecto.
+              Meta semanal: {pesos(preferencias!.ingreso_meta)}. Estimación de acuerdos por hora:{" "}
+              {pesos(ingresoSemanal)}. Es una proyección, no un pago recibido; no incluye acuerdos por mes ni por
+              proyecto.
             </p>
           )}
-          <Link
-            href="/ayuda"
-            className="inline-flex min-h-tap items-center font-bold underline"
-          >
+          <Link href="/ayuda" className="inline-flex min-h-tap items-center font-bold underline">
             Pedir ayuda para ajustar mi carga
           </Link>
         </section>
       )}
       <section className="flex flex-col gap-4">
         <h2 className="text-xl">Mis metas, a mi ritmo</h2>
-        <FormularioMetas
-          horas={preferencias?.horas_meta}
-          ingreso={preferencias?.ingreso_meta}
-        />
+        <FormularioMetas horas={preferencias?.horas_meta} ingreso={preferencias?.ingreso_meta} />
       </section>
       <section className="flex flex-col gap-4">
         <h2 className="text-xl">¿Cómo vas con tu trabajo?</h2>
-        <p>
-          Estas preguntas ayudan a acompañarte. No son una valoración médica ni
-          calculan tu longevidad.
-        </p>
+        <p>Estas preguntas ayudan a acompañarte. No son una valoración médica ni calculan tu longevidad.</p>
         <FormularioSeguimiento
           procesos={procesos.filter((p) =>
-            [
-              "abierta",
-              "conversacion",
-              "acuerdo",
-              "en_curso",
-              "cerrada",
-            ].includes(p.estado),
+            ["abierta", "conversacion", "acuerdo", "en_curso", "cerrada"].includes(p.estado),
           )}
         />
       </section>

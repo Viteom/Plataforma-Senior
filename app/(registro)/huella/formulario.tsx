@@ -11,21 +11,11 @@ import { Pantalla } from "@/components/layout/pantalla";
 import { Button } from "@/components/ui/button";
 import { Campo, Textarea } from "@/components/ui/campo";
 import { Opcion } from "@/components/ui/opcion";
-import {
-  ayudaCapa,
-  MAX_ETIQUETA_LIBRE,
-  nombreCapa,
-  ORDEN_CAPAS,
-  problemaEtiquetaLibre,
-} from "@/lib/capas";
+import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre } from "@/lib/capas";
 import { prepararHistoria } from "@/lib/ia/preparar";
 import type { Capa } from "@/lib/ia/tipos";
 
-import {
-  confirmarHuella,
-  guardarHistoria,
-  type EstadoHuella,
-} from "./acciones";
+import { confirmarHuella, guardarHistoria, type EstadoHuella } from "./acciones";
 
 type Modo = "escribir" | "dictar" | "llamada";
 
@@ -53,10 +43,7 @@ const modos = [
 type Props = { ia: boolean; nombre: string | null; historiaInicial?: string };
 
 export function FormularioHuella({ ia, nombre, historiaInicial }: Props) {
-  const [estado, guardar, guardando] = useActionState<EstadoHuella, FormData>(
-    guardarHistoria,
-    {},
-  );
+  const [estado, guardar, guardando] = useActionState<EstadoHuella, FormData>(guardarHistoria, {});
 
   if (estado.historiaId) return <Confirmar estado={estado} />;
   return (
@@ -91,14 +78,12 @@ function Contar({
 
   // Lo mismo que hará el servidor antes de enviarla al asistente: se lo contamos a la persona.
   const revision = useMemo(
-    () =>
-      ia && historia.length > 20 ? prepararHistoria(historia, nombre) : null,
+    () => (ia && historia.length > 20 ? prepararHistoria(historia, nombre) : null),
     [ia, historia, nombre],
   );
   const quitados = revision
     ? [
-        revision.reemplazos.fechas + revision.reemplazos.tiempos > 0 &&
-          "las fechas y edades",
+        revision.reemplazos.fechas + revision.reemplazos.tiempos > 0 && "las fechas y edades",
         revision.reemplazos.contacto > 0 && "los datos de contacto",
         revision.reemplazos.documentos > 0 && "los números de documento",
         revision.reemplazos.nombre > 0 && "tu nombre",
@@ -120,9 +105,7 @@ function Contar({
         }}
       />
       <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-lg font-bold">
-          ¿Cómo prefieres contarla?
-        </legend>
+        <legend className="mb-3 text-lg font-bold">¿Cómo prefieres contarla?</legend>
         {modos.map(({ valor, titulo, descripcion, icono: Icono }) => (
           <Opcion
             key={valor}
@@ -140,8 +123,7 @@ function Contar({
       {modo === "llamada" ? (
         <div className="flex flex-col gap-6">
           <p className="text-lg">
-            Déjanos tu número y la hora en que te queda bien. Nunca te vamos a
-            pedir códigos, contraseñas ni dinero.
+            Déjanos tu número y la hora en que te queda bien. Nunca te vamos a pedir códigos, contraseñas ni dinero.
           </p>
           <Button asChild ancho="completo">
             <Link href="/ayuda#llameme">Pedir que me llamen</Link>
@@ -149,23 +131,11 @@ function Contar({
         </div>
       ) : (
         <form action={guardar} className="flex flex-col gap-6">
-          <input
-            type="hidden"
-            name="origen"
-            value={modo === "dictar" ? "dictado" : "escrito"}
-          />
-          {modo === "dictar" && (
-            <Dictado
-              onTexto={(t) => setHistoria((h) => (h ? `${h} ${t}` : t))}
-            />
-          )}
+          <input type="hidden" name="origen" value={modo === "dictar" ? "dictado" : "escrito"} />
+          {modo === "dictar" && <Dictado onTexto={(t) => setHistoria((h) => (h ? `${h} ${t}` : t))} />}
           <Campo
             id="historia"
-            etiqueta={
-              modo === "dictar"
-                ? "Lo que dijiste (puedes corregirlo)"
-                : "Tu historia"
-            }
+            etiqueta={modo === "dictar" ? "Lo que dijiste (puedes corregirlo)" : "Tu historia"}
             ayuda="No importa la ortografía. Cuenta detalles: dónde era, con quién, qué hiciste."
             error={estado.error}
           >
@@ -180,38 +150,27 @@ function Contar({
             )}
           </Campo>
 
-          {revision &&
-            (quitados.length > 0 || revision.nombresPosibles.length > 0) && (
-              <div className="flex flex-col gap-3 rounded-md bg-surface p-4">
-                {quitados.length > 0 && (
-                  <p className="flex items-start gap-3">
-                    <ShieldCheck
-                      aria-hidden
-                      className="mt-0.5 size-6 shrink-0"
-                    />
-                    <span>
-                      Antes de enviarla al asistente quitamos {listaQuitados}.
-                      Tu texto aquí no cambia.
-                    </span>
-                  </p>
-                )}
-                {revision.nombresPosibles.length > 0 && (
-                  <p>
-                    ¿Estos son nombres de otras personas?{" "}
-                    <span className="font-bold">
-                      {revision.nombresPosibles.join(", ")}
-                    </span>
-                    . Si quieres, cámbialos por el cargo, por ejemplo «el jefe
-                    de planta».
-                  </p>
-                )}
-              </div>
-            )}
+          {revision && (quitados.length > 0 || revision.nombresPosibles.length > 0) && (
+            <div className="flex flex-col gap-3 rounded-md bg-surface p-4">
+              {quitados.length > 0 && (
+                <p className="flex items-start gap-3">
+                  <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0" />
+                  <span>Antes de enviarla al asistente quitamos {listaQuitados}. Tu texto aquí no cambia.</span>
+                </p>
+              )}
+              {revision.nombresPosibles.length > 0 && (
+                <p>
+                  ¿Estos son nombres de otras personas?{" "}
+                  <span className="font-bold">{revision.nombresPosibles.join(", ")}</span>. Si quieres, cámbialos por el
+                  cargo, por ejemplo «el jefe de planta».
+                </p>
+              )}
+            </div>
+          )}
 
           {!ia && (
             <p className="text-base text-text-muted">
-              Después de guardarla, puedes escribir con tus palabras las
-              capacidades que quieres destacar.
+              Después de guardarla, puedes escribir con tus palabras las capacidades que quieres destacar.
             </p>
           )}
 
@@ -238,26 +197,18 @@ function Contar({
 }
 
 const MENSAJE_MANUAL = {
-  apagada:
-    "Elige solo lo que se parezca a lo tuyo. Si no lo encuentras, escríbelo con tus palabras.",
-  cuota:
-    "Hoy ya usaste el asistente varias veces. Tu historia quedó guardada: elige tus etiquetas o escríbelas.",
-  error:
-    "El asistente no respondió. Tu historia quedó guardada: elige tus etiquetas o escríbelas.",
+  apagada: "Elige solo lo que se parezca a lo tuyo. Si no lo encuentras, escríbelo con tus palabras.",
+  cuota: "Hoy ya usaste el asistente varias veces. Tu historia quedó guardada: elige tus etiquetas o escríbelas.",
+  error: "El asistente no respondió. Tu historia quedó guardada: elige tus etiquetas o escríbelas.",
 };
 
 type Libre = { capa: Capa; texto: string };
 
 function Confirmar({ estado }: { estado: EstadoHuella }) {
   const propuestas = estado.etiquetas ?? [];
-  const [seleccionadas, setSeleccionadas] = useState<string[]>(
-    propuestas.map((e) => e.id),
-  );
+  const [seleccionadas, setSeleccionadas] = useState<string[]>(propuestas.map((e) => e.id));
   const [libres, setLibres] = useState<Libre[]>([]);
-  const [resultado, confirmar, confirmando] = useActionState<
-    { error?: string },
-    FormData
-  >(confirmarHuella, {});
+  const [resultado, confirmar, confirmando] = useActionState<{ error?: string }, FormData>(confirmarHuella, {});
   const manual = estado.modo === "manual";
 
   const alternar = (lista: string[], set: (v: string[]) => void, id: string) =>
@@ -265,9 +216,7 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
 
   return (
     <Pantalla
-      titulo={
-        manual ? "Escribe lo que sabes hacer" : "Esto entendimos de tu historia"
-      }
+      titulo={manual ? "Escribe lo que sabes hacer" : "Esto entendimos de tu historia"}
       intro={
         manual
           ? MENSAJE_MANUAL[estado.motivoManual ?? "apagada"]
@@ -280,26 +229,15 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
           <input key={id} type="hidden" name="seleccionada" value={id} />
         ))}
         {libres.map((l) => (
-          <input
-            key={`${l.capa}:${l.texto}`}
-            type="hidden"
-            name="libre"
-            value={`${l.capa}|${l.texto}`}
-          />
+          <input key={`${l.capa}:${l.texto}`} type="hidden" name="libre" value={`${l.capa}|${l.texto}`} />
         ))}
 
         {ORDEN_CAPAS.map((capa) => {
           const deCapa = propuestas.filter((e) => e.capa === capa);
           const propias = libres.filter((l) => l.capa === capa);
           return (
-            <details
-              key={capa}
-              open={deCapa.length > 0 || capa === "oficio"}
-              className="flex flex-col gap-3"
-            >
-              <summary className="min-h-tap cursor-pointer text-lg font-bold">
-                {nombreCapa[capa]}
-              </summary>
+            <details key={capa} open={deCapa.length > 0 || capa === "oficio"} className="flex flex-col gap-3">
+              <summary className="min-h-tap cursor-pointer text-lg font-bold">{nombreCapa[capa]}</summary>
               <p className="text-base text-text-muted">{ayudaCapa[capa]}</p>
               {deCapa.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -309,9 +247,7 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
                       texto={e.etiqueta}
                       nueva={e.nueva}
                       activo={seleccionadas.includes(e.id)}
-                      onAlternar={() =>
-                        alternar(seleccionadas, setSeleccionadas, e.id)
-                      }
+                      onAlternar={() => alternar(seleccionadas, setSeleccionadas, e.id)}
                     />
                   ))}
                 </div>
@@ -324,13 +260,7 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
                       texto={l.texto}
                       nueva
                       activo
-                      onAlternar={() =>
-                        setLibres((x) =>
-                          x.filter(
-                            (y) => !(y.capa === capa && y.texto === l.texto),
-                          ),
-                        )
-                      }
+                      onAlternar={() => setLibres((x) => x.filter((y) => !(y.capa === capa && y.texto === l.texto)))}
                     />
                   ))}
                 </div>
@@ -339,11 +269,7 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
                 capa={capa}
                 onAgregar={(texto) =>
                   setLibres((x) =>
-                    x.some(
-                      (y) =>
-                        y.capa === capa &&
-                        y.texto.toLowerCase() === texto.toLowerCase(),
-                    )
+                    x.some((y) => y.capa === capa && y.texto.toLowerCase() === texto.toLowerCase())
                       ? x
                       : [...x, { capa, texto }],
                   )
@@ -354,16 +280,13 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
         })}
 
         <p className="text-base text-text-muted">
-          Lo que escribas con tus palabras lo revisa el equipo antes de que lo
-          vea una empresa.
+          Lo que escribas con tus palabras lo revisa el equipo antes de que lo vea una empresa.
         </p>
 
         {estado.dudas && estado.dudas.length > 0 && (
           <div className="flex flex-col gap-2 rounded-md bg-surface p-4">
             <h2 className="text-lg">Para que tu historia quede más clara</h2>
-            <p className="text-text-muted">
-              Si quieres, cuenta esto en otra historia desde Mi perfil:
-            </p>
+            <p className="text-text-muted">Si quieres, cuenta esto en otra historia desde Mi perfil:</p>
             <ul className="list-disc pl-6">
               {estado.dudas.map((d) => (
                 <li key={d}>{d}</li>
@@ -373,8 +296,7 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
         )}
 
         <p className="text-base text-text-muted">
-          Al confirmar, las empresas pueden encontrar tu perfil según lo que
-          elegiste: reservado o visible.
+          Al confirmar, las empresas pueden encontrar tu perfil según lo que elegiste: reservado o visible.
         </p>
 
         {resultado.error && (
@@ -392,13 +314,7 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
 
 // Campo para escribir una etiqueta propia. Vive dentro del formulario principal, así que Enter
 // agrega la etiqueta en vez de enviar todo.
-function EscribirOtra({
-  capa,
-  onAgregar,
-}: {
-  capa: Capa;
-  onAgregar: (texto: string) => void;
-}) {
+function EscribirOtra({ capa, onAgregar }: { capa: Capa; onAgregar: (texto: string) => void }) {
   const [texto, setTexto] = useState("");
   const [error, setError] = useState<string | null>(null);
   const id = `otra-${capa}`;

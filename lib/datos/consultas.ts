@@ -18,14 +18,7 @@ import { rutaFotoValida } from "@/lib/privacidad/foto";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
-import type {
-  ConexionEmpresa,
-  EvidenciaVista,
-  MiEmpresa,
-  NecesidadVista,
-  Oportunidad,
-  PerfilVista,
-} from "./tipos";
+import type { ConexionEmpresa, EvidenciaVista, MiEmpresa, NecesidadVista, Oportunidad, PerfilVista } from "./tipos";
 
 // Lecturas para las pantallas. En modo demostración devuelven los ejemplos de lib/demo.ts con la
 // misma forma; con Supabase leen solo de las vistas pensadas para cada rol.
@@ -65,30 +58,20 @@ export async function obtenerMiEmpresa(): Promise<MiEmpresa | null> {
   };
 }
 
-export async function listarPerfiles(
-  busqueda: string,
-  formas: FormaContratar[],
-): Promise<PerfilVista[]> {
+export async function listarPerfiles(busqueda: string, formas: FormaContratar[]): Promise<PerfilVista[]> {
   let perfiles: PerfilVista[];
   if (MODO_DEMO) {
     perfiles = perfilesEjemplo;
   } else {
     const { supabase } = await cliente();
-    const { data } = await supabase
-      .from("company_talent_view")
-      .select("*")
-      .limit(300);
+    const { data } = await supabase.from("company_talent_view").select("*").limit(300);
     perfiles = (data ?? []) as PerfilVista[];
   }
-  const filtrados = formas.length
-    ? perfiles.filter((p) => p.ofertas.some((o) => formas.includes(o.tipo)))
-    : perfiles;
+  const filtrados = formas.length ? perfiles.filter((p) => p.ofertas.some((o) => formas.includes(o.tipo))) : perfiles;
   return ordenarPorBusqueda(filtrados, busqueda);
 }
 
-export async function obtenerPerfil(
-  id: string,
-): Promise<{
+export async function obtenerPerfil(id: string): Promise<{
   perfil: PerfilVista;
   evidencias: EvidenciaVista[];
   conexion: ConexionEmpresa | null;
@@ -109,40 +92,29 @@ export async function obtenerPerfil(
     return {
       perfil,
       evidencias,
-      conexion:
-        (await conexionesDemo()).find((c) => c.talent_id === id) ?? null,
+      conexion: (await conexionesDemo()).find((c) => c.talent_id === id) ?? null,
     };
   }
   const { supabase } = await cliente();
-  const [{ data: perfil }, { data: evidencias }, { data: conexiones }] =
-    await Promise.all([
-      supabase
-        .from("company_talent_view")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle(),
-      supabase
-        .from("company_evidence_view")
-        .select("id, tipo, descripcion, nota_equipo")
-        .eq("talent_id", id),
-      supabase
-        .from("company_connections_view")
-        .select("*")
-        .eq("talent_id", id)
-        .order("actualizado_en", { ascending: false })
-        .limit(1),
-    ]);
+  const [{ data: perfil }, { data: evidencias }, { data: conexiones }] = await Promise.all([
+    supabase.from("company_talent_view").select("*").eq("id", id).maybeSingle(),
+    supabase.from("company_evidence_view").select("id, tipo, descripcion, nota_equipo").eq("talent_id", id),
+    supabase
+      .from("company_connections_view")
+      .select("*")
+      .eq("talent_id", id)
+      .order("actualizado_en", { ascending: false })
+      .limit(1),
+  ]);
   if (!perfil) return null;
   // El bucket de fotos es privado. La vista ya decidió si esta empresa puede ver la foto (perfil
   // visible o conexión abierta); el enlace firmado lo crea el servidor y vence en 10 minutos.
   const fotoPath = (perfil as PerfilVista).foto_path;
-  const permitida =
-    Boolean(perfil.identidad_visible) && rutaFotoValida(perfil.id, fotoPath);
+  const permitida = Boolean(perfil.identidad_visible) && rutaFotoValida(perfil.id, fotoPath);
   const admin = permitida ? crearClienteAdmin() : null;
   const fotoUrl =
     admin && fotoPath
-      ? ((await admin.storage.from("fotos").createSignedUrl(fotoPath, 600)).data
-          ?.signedUrl ?? null)
+      ? ((await admin.storage.from("fotos").createSignedUrl(fotoPath, 600)).data?.signedUrl ?? null)
       : null;
   return {
     perfil: { ...(perfil as PerfilVista), foto_url: fotoUrl },
@@ -165,28 +137,19 @@ export async function listarConexiones(): Promise<{
   }
   const { supabase } = await cliente();
   const [{ data: conexiones }, { data: necesidades }] = await Promise.all([
-    supabase
-      .from("company_connections_view")
-      .select("*")
-      .order("actualizado_en", { ascending: false }),
+    supabase.from("company_connections_view").select("*").order("actualizado_en", { ascending: false }),
     supabase
       .from("needs")
-      .select(
-        "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en",
-      )
+      .select("id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en")
       .order("creado_en", { ascending: false }),
   ]);
-  const ids = [
-    ...new Set((conexiones ?? []).map((c) => c.talent_id as string)),
-  ];
+  const ids = [...new Set((conexiones ?? []).map((c) => c.talent_id as string))];
   const { data: perfiles } = ids.length
     ? await supabase.from("company_talent_view").select("*").in("id", ids)
     : { data: [] };
   return {
     conexiones: (conexiones ?? []) as ConexionEmpresa[],
-    perfiles: new Map(
-      ((perfiles ?? []) as PerfilVista[]).map((p) => [p.id, p]),
-    ),
+    perfiles: new Map(((perfiles ?? []) as PerfilVista[]).map((p) => [p.id, p])),
     necesidades: ((necesidades ?? []) as NecesidadVista[]).map((n) => ({
       ...n,
       requisitos: [],
@@ -194,9 +157,7 @@ export async function listarConexiones(): Promise<{
   };
 }
 
-export async function obtenerNecesidad(
-  id: string,
-): Promise<{
+export async function obtenerNecesidad(id: string): Promise<{
   necesidad: NecesidadVista;
   conexiones: ConexionEmpresa[];
   perfiles: Map<string, PerfilVista>;
@@ -213,15 +174,12 @@ export async function obtenerNecesidad(
   const { data: necesidad } = await supabase
     .from("needs")
     .select(
-      "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, need_requirements(capa, etiqueta, obligatorio)",
+      "id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, dignidad_estado, need_requirements(capa, etiqueta, obligatorio)",
     )
     .eq("id", id)
     .maybeSingle();
   if (!necesidad) return null;
-  const { data: conexiones } = await supabase
-    .from("company_connections_view")
-    .select("*")
-    .eq("need_id", id);
+  const { data: conexiones } = await supabase.from("company_connections_view").select("*").eq("need_id", id);
   const ids = (conexiones ?? []).map((c) => c.talent_id as string);
   const { data: perfiles } = ids.length
     ? await supabase.from("company_talent_view").select("*").in("id", ids)
@@ -232,20 +190,14 @@ export async function obtenerNecesidad(
   return {
     necesidad: { ...resto, requisitos: need_requirements ?? [] },
     conexiones: (conexiones ?? []) as ConexionEmpresa[],
-    perfiles: new Map(
-      ((perfiles ?? []) as PerfilVista[]).map((p) => [p.id, p]),
-    ),
+    perfiles: new Map(((perfiles ?? []) as PerfilVista[]).map((p) => [p.id, p])),
   };
 }
 
 // ── Talento ─────────────────────────────────────────────────────────────────
 
 export async function listarOportunidades(): Promise<Oportunidad[]> {
-  if (MODO_DEMO)
-    return [
-      vistaTalentoDemo(await leerProcesoDemo()),
-      ...oportunidadesEjemplo.slice(1),
-    ];
+  if (MODO_DEMO) return [vistaTalentoDemo(await leerProcesoDemo()), ...oportunidadesEjemplo.slice(1)];
   const { supabase } = await cliente();
   const { data } = await supabase
     .from("talent_opportunities_view")

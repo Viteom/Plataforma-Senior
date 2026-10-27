@@ -9,7 +9,7 @@ los retratos anteriores. No se fusionó esta rama en `main`.
 
 ## Publicación y base de datos
 
-Las migraciones `20261031000001` a `20261031000006` se incluyen únicamente como archivos para
+Las migraciones `20261031000001` a `20261031000007` se incluyen únicamente como archivos para
 revisión: no se aplicaron en Supabase. Las pruebas de base de datos utilizan PGlite en memoria.
 No se ejecutó ningún despliegue en Vercel. `vercel.json` desactiva los despliegues de Git para
 `bienestar-codex`, de modo que subir esta rama no publique la aplicación automáticamente.
@@ -22,6 +22,18 @@ Los cobros y desembolsos continúan desactivados.
 - `npx next build`: aprobado, incluidas las comprobaciones de tipos.
 - Comprobación de formato del diff: aprobada. Los archivos PDF y DOCX de prueba se conservan
   como binarios mediante `.gitattributes`.
+
+## Correcciones después de la revisión
+
+- Fotos: se descartaron las de Pexels (tamaños mal declarados y personas que no correspondían a los
+  perfiles). La web vuelve a los retratos del brandbook y a las fotos de Sandoná, a color y sin filtro,
+  guardados en `public/web/`.
+- Hoja de vida: en la demostración no se lee ningún archivo; se muestra un ejemplo fijo.
+- Revisión de Kánna: la persona y la organización ven cuándo un acuerdo o un reto espera la revisión,
+  y la organización ve cuándo Kánna pidió ajustes.
+- Bienestar: migración `20261031000007`. El equipo lee los casos solo por `casos_bienestar_equipo()`,
+  que deja registro; borrar un seguimiento ya no borra la solicitud de ayuda.
+- Formato: el código vuelve al ancho de 120 columnas del proyecto.
 
 ## Pendientes de revisión
 

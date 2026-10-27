@@ -19,11 +19,7 @@ export async function AvisoBienestar() {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return null;
-  const { data: perfil } = await supabase
-    .from("talent_profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data: perfil } = await supabase.from("talent_profiles").select("id").eq("user_id", user.id).maybeSingle();
   if (!perfil) return null;
   const { data: meta } = await supabase
     .from("wellbeing_preferences")
@@ -42,28 +38,21 @@ export async function AvisoBienestar() {
       .limit(1)
       .maybeSingle();
     if (carga.horas > meta.horas_meta)
-      mensaje =
-        "Tus acuerdos superan las horas que elegiste. Revisa tu carga y pide un ajuste si lo necesitas.";
+      mensaje = "Tus acuerdos superan las horas que elegiste. Revisa tu carga y pide un ajuste si lo necesitas.";
     else if (ultimo?.energia === "pausa")
-      mensaje =
-        "En tu último seguimiento pediste una pausa. Puedes revisar tu ritmo y pedir acompañamiento.";
+      mensaje = "En tu último seguimiento pediste una pausa. Puedes revisar tu ritmo y pedir acompañamiento.";
     else if (
       procesos.some((p) => ["en_curso", "cerrada"].includes(p.estado)) &&
-      (!ultimo ||
-        Date.now() - new Date(ultimo.creado_en).getTime() > 7 * 86400000)
+      (!ultimo || Date.now() - new Date(ultimo.creado_en).getTime() > 7 * 86400000)
     )
-      mensaje =
-        "¿Cómo vas con tu trabajo? Si quieres, registra tu seguimiento y cuéntanos si necesitas apoyo.";
+      mensaje = "¿Cómo vas con tu trabajo? Si quieres, registra tu seguimiento y cuéntanos si necesitas apoyo.";
     else return null;
   }
   return (
     <aside className="flex flex-col gap-2 rounded-md border-2 border-border-subtle p-4">
       <h2 className="text-lg">Tu bienestar va primero</h2>
       <p>{mensaje}</p>
-      <Link
-        href="/bienestar"
-        className="inline-flex min-h-tap items-center font-bold underline"
-      >
+      <Link href="/bienestar" className="inline-flex min-h-tap items-center font-bold underline">
         Revisar mi ritmo y seguimiento
       </Link>
     </aside>

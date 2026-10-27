@@ -46,12 +46,10 @@ export function leerEmpresa(d: FormData) {
       if (u.protocol !== "https:" || u.username || u.password) throw Error();
     } catch {
       return {
-        error:
-          "Los enlaces de sitio web y manual de marca deben empezar por https:// y no incluir claves.",
+        error: "Los enlaces de sitio web y manual de marca deben empezar por https:// y no incluir claves.",
       };
     }
   }
-  if (!datos.compromiso_bienestar)
-    return { error: "Confirma el compromiso de trato digno y acompañamiento." };
+  if (!datos.compromiso_bienestar) return { error: "Confirma el compromiso de trato digno y acompañamiento." };
   return { datos };
 }

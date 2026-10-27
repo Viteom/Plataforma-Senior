@@ -110,11 +110,7 @@ export const navEquipo: ItemNav[] = [
 export const iconoAyuda = LifeBuoy;
 
 // Un destino está activo si es la ruta exacta o una subruta (salvo la raíz de un área).
-export function estaActivo(
-  pathname: string,
-  href: string,
-  raices: string[] = [],
-) {
+export function estaActivo(pathname: string, href: string, raices: string[] = []) {
   if (raices.includes(href)) return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
 }

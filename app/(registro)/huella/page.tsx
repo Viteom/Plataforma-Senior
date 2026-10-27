@@ -10,11 +10,7 @@ import { FormularioHuella } from "./formulario";
 export const metadata: Metadata = { title: "Tu historia" };
 
 // La disponibilidad de la IA se revisa aquí, en el servidor (docs/ia-desde-moai.md, sección 5).
-export default async function Huella({
-  searchParams,
-}: {
-  searchParams: Promise<{ fuente?: string }>;
-}) {
+export default async function Huella({ searchParams }: { searchParams: Promise<{ fuente?: string }> }) {
   if (MODO_DEMO) return <FormularioHuella ia nombre={null} />;
 
   const supabase = await crearClienteServidor();
@@ -43,11 +39,5 @@ export default async function Huella({
             .maybeSingle()
         ).data?.texto
       : undefined;
-  return (
-    <FormularioHuella
-      ia={iaDisponible()}
-      nombre={perfil.nombre as string}
-      historiaInicial={inicial}
-    />
-  );
+  return <FormularioHuella ia={iaDisponible()} nombre={perfil.nombre as string} historiaInicial={inicial} />;
 }

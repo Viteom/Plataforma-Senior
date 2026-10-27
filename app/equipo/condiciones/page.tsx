@@ -32,19 +32,13 @@ export default async function Condiciones() {
       {data?.length ? (
         <ul className="flex flex-col gap-4">
           {data.map((c) => (
-            <li
-              key={c.id}
-              className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4"
-            >
+            <li key={c.id} className="flex flex-col gap-3 rounded-md border-2 border-border-subtle p-4">
               <h2 className="text-xl">
                 {(c.companies as unknown as { nombre: string })?.nombre} ·{" "}
                 {(c.talent_profiles as unknown as { nombre: string })?.nombre}
               </h2>
               <p>{textoAcuerdo(c)}</p>
-              <p>
-                {c.acuerdo_nota ||
-                  "Sin nota adicional: confirma las tareas y condiciones con ambas partes."}
-              </p>
+              <p>{c.acuerdo_nota || "Sin nota adicional: confirma las tareas y condiciones con ambas partes."}</p>
               <BotonAccion
                 accion={revisarAcuerdoTrabajo}
                 campos={{ conexion: c.id, version: String(c.acuerdo_version) }}

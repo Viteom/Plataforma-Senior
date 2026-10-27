@@ -6,11 +6,9 @@ const h = vi.hoisted(() => ({
     foto_path: "",
     identidad_visible: true,
   },
-  sign: vi
-    .fn()
-    .mockResolvedValue({
-      data: { signedUrl: "https://storage.example/foto-firmada" },
-    }),
+  sign: vi.fn().mockResolvedValue({
+    data: { signedUrl: "https://storage.example/foto-firmada" },
+  }),
   admin: vi.fn(),
 }));
 vi.mock("@/lib/demo", async (original) => ({
@@ -28,12 +26,8 @@ vi.mock("@/lib/supabase/server", () => ({
     auth: { getUser: async () => ({ data: { user: { id: "empresa" } } }) },
     from: (tabla: string) => {
       const chain: Record<string, unknown> = {};
-      for (const k of ["select", "eq", "order", "limit", "maybeSingle"])
-        chain[k] = () => chain;
-      chain.then = (
-        resolve: (r: unknown) => unknown,
-        reject: (e: unknown) => unknown,
-      ) =>
+      for (const k of ["select", "eq", "order", "limit", "maybeSingle"]) chain[k] = () => chain;
+      chain.then = (resolve: (r: unknown) => unknown, reject: (e: unknown) => unknown) =>
         Promise.resolve({
           data: tabla === "company_talent_view" ? h.perfil : [],
         }).then(resolve, reject);
@@ -58,27 +52,17 @@ it.each([
   "../foto.jpg",
   "https://ejemplo.com/foto.jpg",
   "00000000-0000-4000-8000-000000000001/%2e%2e.jpg",
-])(
-  "no usa la llave de servicio para una ruta ajena o inválida: %s",
-  async (ruta) => {
-    h.perfil.foto_path = ruta;
-    expect((await obtenerPerfil(h.perfil.id))?.perfil.foto_url).toBeNull();
-    expect(h.admin).not.toHaveBeenCalled();
-  },
-);
+])("no usa la llave de servicio para una ruta ajena o inválida: %s", async (ruta) => {
+  h.perfil.foto_path = ruta;
+  expect((await obtenerPerfil(h.perfil.id))?.perfil.foto_url).toBeNull();
+  expect(h.admin).not.toHaveBeenCalled();
+});
 it("no firma una foto si no está autorizada la identidad, aunque la ruta sea propia", async () => {
   h.perfil.identidad_visible = false;
   expect((await obtenerPerfil(h.perfil.id))?.perfil.foto_url).toBeNull();
   expect(h.admin).not.toHaveBeenCalled();
 });
 it("rechaza rutas normalizables, subcarpetas, barras invertidas y extensiones activas", () => {
-  for (const f of [
-    "../foto.jpg",
-    "carpeta/foto.jpg",
-    "foto.svg",
-    "foto.jpg?x=1",
-    "foto%2ejpg",
-    "foto\\otra.jpg",
-  ])
+  for (const f of ["../foto.jpg", "carpeta/foto.jpg", "foto.svg", "foto.jpg?x=1", "foto%2ejpg", "foto\\otra.jpg"])
     expect(rutaFotoValida(h.perfil.id, `${h.perfil.id}/${f}`)).toBe(false);
 });

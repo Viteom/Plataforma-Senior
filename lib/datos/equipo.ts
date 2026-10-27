@@ -70,19 +70,10 @@ export async function panelEquipo(): Promise<{
     supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
     supabase.from("companies").select("*", cuenta).is("verificada_en", null),
     supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
-    supabase
-      .from("company_reports")
-      .select("*", cuenta)
-      .eq("estado", "abierto"),
+    supabase.from("company_reports").select("*", cuenta).eq("estado", "abierto"),
     supabase.from("help_requests").select("*", cuenta).eq("estado", "abierta"),
-    supabase
-      .from("notifications")
-      .select("*", cuenta)
-      .in("estado", ["pendiente", "omitido"]),
-    supabase
-      .from("experience_requests")
-      .select("*", cuenta)
-      .eq("estado", "recibida"),
+    supabase.from("notifications").select("*", cuenta).in("estado", ["pendiente", "omitido"]),
+    supabase.from("experience_requests").select("*", cuenta).eq("estado", "recibida"),
     supabase
       .from("footprint_tags")
       .select("*", cuenta)
@@ -95,16 +86,16 @@ export async function panelEquipo(): Promise<{
       .eq("estado", "en_curaduria")
       .order("creado_en"),
   ]);
-  const [
-    necesidades,
-    empresas,
-    evidencias,
-    reportes,
-    ayuda,
-    avisos,
-    cotizaciones,
-    etiquetas,
-  ] = [r1, r2, r3, r4, r5, r6, r7, r8].map((r) => r.count ?? 0);
+  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas] = [
+    r1,
+    r2,
+    r3,
+    r4,
+    r5,
+    r6,
+    r7,
+    r8,
+  ].map((r) => r.count ?? 0);
   return {
     conteos: {
       necesidades,
@@ -119,8 +110,7 @@ export async function panelEquipo(): Promise<{
     cola: (cola ?? []).map((n) => ({
       id: n.id as string,
       problema: n.problema as string,
-      empresa:
-        (n.companies as unknown as { nombre: string } | null)?.nombre ?? "",
+      empresa: (n.companies as unknown as { nombre: string } | null)?.nombre ?? "",
       creado_en: n.creado_en as string,
     })),
   };
@@ -307,8 +297,7 @@ export async function empresasYReportes(): Promise<{
       motivo: r.motivo as string,
       estado: r.estado as string,
       creado_en: r.creado_en as string,
-      empresa:
-        (r.companies as unknown as { nombre: string } | null)?.nombre ?? "",
+      empresa: (r.companies as unknown as { nombre: string } | null)?.nombre ?? "",
     })),
   };
 }
@@ -363,9 +352,7 @@ export async function evidenciasYTarifas(): Promise<{
   const [{ data: evidencias }, { data: guias }] = await Promise.all([
     supabase
       .from("evidence")
-      .select(
-        "id, tipo, descripcion, referencia_nombre, referencia_telefono, archivo_path, talent_profiles(nombre)",
-      )
+      .select("id, tipo, descripcion, referencia_nombre, referencia_telefono, archivo_path, talent_profiles(nombre)")
       .eq("estado", "pendiente")
       .in("tipo", ["referencia", "archivo"])
       .order("creado_en")
@@ -376,9 +363,7 @@ export async function evidenciasYTarifas(): Promise<{
     (evidencias ?? []).map(async (e) => {
       let enlace: string | null = null;
       if (e.archivo_path) {
-        const { data } = await supabase.storage
-          .from("evidencias")
-          .createSignedUrl(e.archivo_path as string, 600);
+        const { data } = await supabase.storage.from("evidencias").createSignedUrl(e.archivo_path as string, 600);
         enlace = data?.signedUrl ?? null;
       }
       return {
@@ -388,17 +373,13 @@ export async function evidenciasYTarifas(): Promise<{
         referencia_nombre: e.referencia_nombre as string | null,
         referencia_telefono: e.referencia_telefono as string | null,
         enlace,
-        persona:
-          (e.talent_profiles as unknown as { nombre: string } | null)?.nombre ??
-          "",
+        persona: (e.talent_profiles as unknown as { nombre: string } | null)?.nombre ?? "",
       };
     }),
   );
   return {
     evidencias: conEnlace,
-    guias: Object.fromEntries(
-      (guias ?? []).map((g) => [g.tipo as string, g as GuiaEditable]),
-    ),
+    guias: Object.fromEntries((guias ?? []).map((g) => [g.tipo as string, g as GuiaEditable])),
   };
 }
 
@@ -429,8 +410,7 @@ export async function ayudaYAvisos(): Promise<{
         {
           id: "00000000-0000-4000-9200-000000000001",
           canal: "conexion_abierta",
-          motivo:
-            "Conexión abierta: poner en contacto a la empresa con la persona.",
+          motivo: "Conexión abierta: poner en contacto a la empresa con la persona.",
           estado: "abierta",
           creado_en: "2026-10-21T14:00:00Z",
         },
@@ -464,9 +444,7 @@ export async function ayudaYAvisos(): Promise<{
       .limit(100),
     supabase
       .from("notifications")
-      .select(
-        "id, estado, plantilla, motivo_omitido, creado_en, talent_profiles(nombre)",
-      )
+      .select("id, estado, plantilla, motivo_omitido, creado_en, talent_profiles(nombre)")
       .in("estado", ["pendiente", "omitido"])
       .order("creado_en")
       .limit(100),
@@ -479,9 +457,7 @@ export async function ayudaYAvisos(): Promise<{
       plantilla: a.plantilla as string,
       motivo_omitido: a.motivo_omitido as string | null,
       creado_en: a.creado_en as string,
-      persona:
-        (a.talent_profiles as unknown as { nombre: string } | null)?.nombre ??
-        "",
+      persona: (a.talent_profiles as unknown as { nombre: string } | null)?.nombre ?? "",
     })),
   };
 }
@@ -519,8 +495,6 @@ export async function etiquetasPorRevisar(): Promise<EtiquetaPorRevisar[]> {
     id: t.id as string,
     capa: t.capa as Capa,
     etiqueta: t.etiqueta as string,
-    oficio:
-      (t.talent_profiles as unknown as { oficio: string | null } | null)
-        ?.oficio ?? null,
+    oficio: (t.talent_profiles as unknown as { oficio: string | null } | null)?.oficio ?? null,
   }));
 }

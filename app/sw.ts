@@ -30,8 +30,7 @@ const serwist = new Serwist({
           "/huella",
           "/entrar",
           "/inicio",
-        ].some((p) => url.pathname === p || url.pathname.startsWith(`${p}/`)) ||
-        url.hostname.endsWith(".supabase.co"),
+        ].some((p) => url.pathname === p || url.pathname.startsWith(`${p}/`)) || url.hostname.endsWith(".supabase.co"),
       handler: new NetworkOnly(),
     },
     ...defaultCache,

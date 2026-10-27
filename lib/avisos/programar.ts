@@ -79,9 +79,7 @@ export function decidirEnvios(
       continue;
     }
     // Varios avisos: un solo SMS que los agrupa. Si alguno es una oportunidad nueva, se dice eso.
-    const nueva = avisos.some(
-      (a) => (a.plantilla ?? "oportunidad_nueva") === "oportunidad_nueva",
-    );
+    const nueva = avisos.some((a) => (a.plantilla ?? "oportunidad_nueva") === "oportunidad_nueva");
     decision.enviar.push({
       userId,
       ids,
@@ -92,11 +90,10 @@ export function decidirEnvios(
 }
 
 // Oportunidades sin respuesta después de 3 días: alguien del equipo llama (brief).
-export function necesitanSeguimiento<
-  T extends { enviadaEn: Date; conSeguimiento: boolean },
->(conexiones: T[], ahora: Date): T[] {
+export function necesitanSeguimiento<T extends { enviadaEn: Date; conSeguimiento: boolean }>(
+  conexiones: T[],
+  ahora: Date,
+): T[] {
   const limite = ahora.getTime() - DIAS_SEGUIMIENTO * 24 * 3600_000;
-  return conexiones.filter(
-    (c) => !c.conSeguimiento && c.enviadaEn.getTime() <= limite,
-  );
+  return conexiones.filter((c) => !c.conSeguimiento && c.enviadaEn.getTime() <= limite);
 }

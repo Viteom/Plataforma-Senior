@@ -12,11 +12,7 @@ import { Mosaico } from "@/components/web/mosaico";
 import { Pasos } from "@/components/web/pasos";
 import { Preguntas } from "@/components/web/preguntas";
 import { Promesas } from "@/components/web/promesas";
-import {
-  PASOS_TALENTO,
-  PREGUNTAS_TALENTO,
-  RETRATOS,
-} from "@/lib/web/contenido";
+import { PASOS_TALENTO, PREGUNTAS_TALENTO, RETRATOS } from "@/lib/web/contenido";
 
 // Portada. El mensaje principal es provisional (sale del brandbook): el concepto se explora después.
 export default function Portada() {
@@ -26,9 +22,7 @@ export default function Portada() {
         titulo={
           <>
             <span className="block">Tu experiencia</span>
-            <span className="block font-editorial font-normal tracking-normal text-primary italic">
-              abre posibilidades
-            </span>
+            <span className="block font-editorial font-normal tracking-normal text-primary italic">abre posibilidades</span>
           </>
         }
         texto="Kánna conecta a personas con trayectoria con organizaciones que buscan talento para sus retos. Oficios y profesiones, al mismo nivel."
@@ -37,11 +31,7 @@ export default function Portada() {
             <Button asChild className="active:scale-[0.97]">
               <Link href="/entrar">Crear mi perfil</Link>
             </Button>
-            <Button
-              asChild
-              variant="secundario"
-              className="active:scale-[0.97]"
-            >
+            <Button asChild variant="secundario" className="active:scale-[0.97]">
               <Link href="/organizaciones">Busco talento</Link>
             </Button>
           </>
@@ -62,40 +52,15 @@ export default function Portada() {
       <BandaOficios />
       <Mosaico
         id="campo"
-        imagen="https://images.pexels.com/photos/4210854/pexels-photo-4210854.jpeg?auto=compress&cs=tinysrgb&w=1400"
-        imagenCelular="https://images.pexels.com/photos/4210860/pexels-photo-4210860.jpeg?auto=compress&cs=tinysrgb&w=900"
-        descripcion="Grabado de una artesana de Sandoná, Nariño, tejiendo paja toquilla."
+        imagen="/web/campo-sandona.webp"
+        imagenCelular="/web/campo-tejido.webp"
+        descripcion="Fotografía de una artesana de Sandoná, Nariño, tejiendo paja toquilla."
         celdas={[
-          {
-            tipo: "titulo",
-            texto: "Talento del campo",
-            color: "bg-text text-bg",
-          },
-          {
-            tipo: "dato",
-            texto: "Talleres para equipos con sabedoras y sabedores",
-            corto: "Talleres para equipos",
-            color: "bg-bg text-text",
-          },
-          {
-            tipo: "dato",
-            texto: "Oficios por encargo: tejidos, muebles, restauración",
-            corto: "Oficios por encargo",
-            color: "bg-bg text-text",
-          },
-          {
-            tipo: "dato",
-            texto: "Vasees los arma con personas que no usan tecnología",
-            corto: "Hecho con Vasees",
-            color: "bg-bg text-text",
-          },
-          {
-            tipo: "accion",
-            texto: "Conocer Talento del campo",
-            corto: "Conocerlo",
-            href: "/campo",
-            color: "bg-primary text-on-primary",
-          },
+          { tipo: "titulo", texto: "Talento del campo", color: "bg-text text-bg" },
+          { tipo: "dato", texto: "Talleres para equipos con sabedoras y sabedores", corto: "Talleres para equipos", color: "bg-bg text-text" },
+          { tipo: "dato", texto: "Oficios por encargo: tejidos, muebles, restauración", corto: "Oficios por encargo", color: "bg-bg text-text" },
+          { tipo: "dato", texto: "Vasees los arma con personas que no usan tecnología", corto: "Hecho con Vasees", color: "bg-bg text-text" },
+          { tipo: "accion", texto: "Conocer Talento del campo", corto: "Conocerlo", href: "/campo", color: "bg-primary text-on-primary" },
         ]}
         posiciones={[0, 8, 13, 18, 5]}
         posicionesCelular={[0, 5, 9, 13, 15]}
@@ -106,10 +71,7 @@ export default function Portada() {
         titulo="Cuéntanos qué sabes hacer"
         texto="Tu trayectoria es solo el comienzo. No necesitas resumir toda tu vida en tu último cargo."
         accion={{ href: "/entrar", texto: "Crear mi perfil" }}
-        secundaria={{
-          href: "/organizaciones",
-          texto: "¿Buscas talento? Explora perfiles",
-        }}
+        secundaria={{ href: "/organizaciones", texto: "¿Buscas talento? Explora perfiles" }}
         retrato={RETRATOS.azul}
       />
     </>

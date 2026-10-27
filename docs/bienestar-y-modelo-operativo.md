@@ -15,8 +15,9 @@ mensaje accesibles, y la meta de ingreso. La proyección económica solo suma ac
 con horas conocidas: no mezcla pagos mensuales o totales de proyectos con ingreso semanal.
 No son pagos cobrados. El seguimiento queda disponible también después de cerrar el proceso.
 
-Las respuestas no llegan a empresas ni al matching. RLS permite leerlas a la persona y al equipo
-curador/admin; la autorización de metas queda registrada. Pedir contacto crea una solicitud de
+Las respuestas no llegan a empresas ni al matching. RLS solo deja leerlas a la persona. El equipo
+curador/admin las ve por `casos_bienestar_equipo()`, que registra quién abrió la cola y quién tomó o
+cerró cada caso (`wellbeing_access_log`, solo lo lee administración). La autorización de metas queda registrada. Pedir contacto crea una solicitud de
 ayuda en la misma transacción. El historial y las metas se eliminan con el perfil y se incluyen
 en su descarga de datos. Las páginas privadas no se guardan en la caché de la PWA.
 
@@ -97,7 +98,8 @@ La huella ya no despliega el catálogo completo de etiquetas: se revisan sugeren
 escrita/dictada o se escriben capacidades propias por grupos desplegables. Las nuevas etiquetas
 siguen pasando por el equipo antes de llegar a empresas.
 
-PDF, DOC y DOCX se leen localmente en un proceso limitado en tiempo y memoria. Se valida el tipo
+En la demostración no se lee ningún archivo: se muestra una hoja de vida de ejemplo, porque sin
+cuenta ni tope diario cualquiera podría poner al servidor a abrir documentos. PDF, DOC y DOCX se leen localmente en un proceso limitado en tiempo y memoria. Se valida el tipo
 real, se extrae texto plano y la persona revisa nombre, oficio y experiencia. No hay OCR: un PDF
 escaneado requiere versión con texto o escritura/dictado. No se conserva el archivo original ni
 se envía a la IA; la experiencia confirmada usa la preparación de privacidad antes de cualquier
@@ -114,20 +116,12 @@ La organización registra NIT, sector, tamaño, ubicación, responsable, cargo, 
 actividad, enlace web y enlace al manual de marca. La verificación del NIT sigue a cargo del
  equipo y no se obtiene solo por completar el formulario.
 
-## Fotografías de banco
+## Fotografías
 
-Se sustituyen los grabados por referencias de Pexels sin filtros añadidos. Las fotos son
-ilustrativas: no representan perfiles registrados, avales ni contrataciones de esas personas.
-Licencia y condiciones: https://www.pexels.com/license/.
-
-Fuentes: https://www.pexels.com/photo/3783348/, https://www.pexels.com/photo/3768131/,
-https://www.pexels.com/photo/3768114/, https://www.pexels.com/photo/3823493/,
-https://www.pexels.com/photo/3768138/, https://www.pexels.com/photo/4210854/,
-https://www.pexels.com/photo/4210860/.
-
-El entorno no pudo descargar ni inspeccionar las fotos: images.pexels.com respondió 403 del proxy.
-La entrega usa enlaces externos directos, que deben comprobarse visualmente antes de publicar.
-No se afirma que todas las fotografías muestren las actividades o territorios de los ejemplos.
+Se quitó el filtro de grabado: la web usa los mismos retratos del brandbook y las fotos de Sandoná
+(Wikimedia Commons, CC BY-SA 4.0) a color, sin filtros, guardadas en `public/web/` con el tamaño y el
+encuadre de los grabados. No se cargan fotos desde otros sitios. Las fotos de Pexels de la primera
+entrega se descartaron: no correspondían a los perfiles de ejemplo y sus tamaños estaban mal declarados.
 
 ## Primera entrega de confianza y bienestar
 
@@ -151,6 +145,8 @@ Migraciones adicionales `20261031000004`, `20261031000005` y `20261031000006`:
   al equipo. Sin permiso no se crea una solicitud de contacto.
 - El equipo puede tomar el caso, ver que está asignado y marcar la revisión finalizada; la persona
   ve el estado en su historial. Solo quien tomó el caso puede cerrarlo desde la interfaz.
+- Si la persona borra un seguimiento, se borran sus respuestas y el caso, pero la solicitud de ayuda
+  que pidió sigue en la cola (migración `20261031000007`).
 - Se propone una fecha interna de revisión a 48 horas, configurable mediante una migración futura.
   No es una promesa de atención al usuario ni un servicio de emergencias. Antes del piloto deben
   definirse responsables reales, cobertura, reasignación y protocolo de respuesta.

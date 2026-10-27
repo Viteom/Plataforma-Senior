@@ -2,16 +2,11 @@
 import { revalidatePath } from "next/cache";
 import { MODO_DEMO } from "@/lib/demo";
 import { crearClienteServidor } from "@/lib/supabase/server";
-export async function gestionarCaso(
-  _p: { error?: string; aviso?: string },
-  datos: FormData,
-) {
+export async function gestionarCaso(_p: { error?: string; aviso?: string }, datos: FormData) {
   const caso = String(datos.get("caso") ?? "");
   const accion = String(datos.get("accion") ?? "");
   if (
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      caso,
-    ) ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(caso) ||
     !["tomar", "cerrar"].includes(accion)
   )
     return { error: "Caso no válido." };
@@ -23,8 +18,7 @@ export async function gestionarCaso(
   });
   if (error)
     return {
-      error:
-        "No pudimos guardar. El caso puede haber cambiado o estar asignado a otra persona.",
+      error: "No pudimos guardar. El caso puede haber cambiado o estar asignado a otra persona.",
     };
   revalidatePath("/equipo/bienestar");
   revalidatePath("/bienestar");

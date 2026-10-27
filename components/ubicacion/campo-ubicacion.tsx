@@ -25,8 +25,7 @@ export function CampoUbicacion({
     setInterno(texto);
     onChange?.(texto);
   };
-  const lugares =
-    catalogo.find((d) => d.departamento === departamento)?.municipios ?? [];
+  const lugares = catalogo.find((d) => d.departamento === departamento)?.municipios ?? [];
   return (
     <div className="flex flex-col gap-3">
       <Campo id={`${id}-departamento`} etiqueta="Departamento (para buscar)">

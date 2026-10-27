@@ -22,14 +22,8 @@ it.each(["pdf", "docx"])(
 );
 it("rechaza contenido que no corresponde al formato declarado", async () => {
   await expect(
-    ejecutar(
-      process.execPath,
-      [
-        "scripts/leer-hoja-vida.mjs",
-        "tests/fixtures/hoja-vida-ejemplo.docx",
-        "pdf",
-      ],
-      { timeout: 15000 },
-    ),
+    ejecutar(process.execPath, ["scripts/leer-hoja-vida.mjs", "tests/fixtures/hoja-vida-ejemplo.docx", "pdf"], {
+      timeout: 15000,
+    }),
   ).rejects.toThrow();
 });

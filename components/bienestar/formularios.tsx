@@ -1,18 +1,9 @@
 "use client";
 import { useActionState } from "react";
-import {
-  guardarMetas,
-  registrarSeguimiento,
-} from "@/app/(talento)/bienestar/acciones";
+import { guardarMetas, registrarSeguimiento } from "@/app/(talento)/bienestar/acciones";
 import { Campo, Input } from "@/components/ui/campo";
 import { Button } from "@/components/ui/button";
-export function FormularioMetas({
-  horas,
-  ingreso,
-}: {
-  horas?: number;
-  ingreso?: number | null;
-}) {
+export function FormularioMetas({ horas, ingreso }: { horas?: number; ingreso?: number | null }) {
   const [r, action, pending] = useActionState(guardarMetas, {});
   return (
     <form action={action} className="flex flex-col gap-4">
@@ -21,44 +12,17 @@ export function FormularioMetas({
         etiqueta="Tu límite personal de horas a la semana"
         ayuda="Cuenta todos tus trabajos. Cero significa que quieres hacer una pausa."
       >
-        {(p) => (
-          <Input
-            {...p}
-            name="horas"
-            type="number"
-            min={0}
-            max={48}
-            defaultValue={horas}
-            required
-          />
-        )}
+        {(p) => <Input {...p} name="horas" type="number" min={0} max={48} defaultValue={horas} required />}
       </Campo>
-      <Campo
-        id="ingreso-meta"
-        etiqueta="Meta de ingreso semanal en pesos (opcional)"
-      >
+      <Campo id="ingreso-meta" etiqueta="Meta de ingreso semanal en pesos (opcional)">
         {(p) => (
-          <Input
-            {...p}
-            name="ingreso"
-            type="number"
-            min={0}
-            max={1000000000}
-            defaultValue={ingreso ?? undefined}
-          />
+          <Input {...p} name="ingreso" type="number" min={0} max={1000000000} defaultValue={ingreso ?? undefined} />
         )}
       </Campo>
       <label className="flex min-h-tap items-center gap-3">
-        <input
-          name="consentimiento"
-          value="si"
-          type="checkbox"
-          required
-          className="size-6"
-        />
-        Autorizo guardar mis metas y seguimientos para revisión privada del
-        equipo. Solo podrán contactarme por un seguimiento si marco el permiso
-        correspondiente. Las organizaciones no reciben mis respuestas.
+        <input name="consentimiento" value="si" type="checkbox" required className="size-6" />
+        Autorizo guardar mis metas y seguimientos para revisión privada del equipo. Solo podrán contactarme por un
+        seguimiento si marco el permiso correspondiente. Las organizaciones no reciben mis respuestas.
       </label>
       {r.error && <p role="alert">{r.error}</p>}
       {r.aviso && <p role="status">{r.aviso}</p>}
@@ -66,11 +30,7 @@ export function FormularioMetas({
     </form>
   );
 }
-export function FormularioSeguimiento({
-  procesos,
-}: {
-  procesos: { id: string; empresa: string }[];
-}) {
+export function FormularioSeguimiento({ procesos }: { procesos: { id: string; empresa: string }[] }) {
   const [r, action, pending] = useActionState(registrarSeguimiento, {});
   const clase = "min-h-action rounded-sm border-2 border-border bg-bg px-3";
   return (
@@ -125,9 +85,8 @@ export function FormularioSeguimiento({
       {r.error && <p role="alert">{r.error}</p>}
       {r.aviso && <p role="status">{r.aviso}</p>}
       <p>
-        Si necesitas una pausa o reportas problemas de trato o pago, el equipo
-        revisará tu respuesta de forma privada. Marcar la casilla autoriza que
-        te contacte por este seguimiento.
+        Si necesitas una pausa o reportas problemas de trato o pago, el equipo revisará tu respuesta de forma privada.
+        Marcar la casilla autoriza que te contacte por este seguimiento.
       </p>
       <Button disabled={pending}>Guardar seguimiento</Button>
     </form>

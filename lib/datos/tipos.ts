@@ -154,8 +154,7 @@ export type ExperienciaVista = {
   aprobada_por_sabedora_en: string | null;
 };
 
-export type EstadoSolicitud =
-  "recibida" | "cotizada" | "confirmada" | "realizada" | "reporte_enviado";
+export type EstadoSolicitud = "recibida" | "cotizada" | "confirmada" | "realizada" | "reporte_enviado";
 
 export type SolicitudExperiencia = {
   id: string;

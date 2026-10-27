@@ -7,12 +7,7 @@ import { MODO_DEMO } from "@/lib/demo";
 import { esForma } from "@/lib/formas";
 import type { Capa } from "@/lib/ia/tipos";
 import { aCandidato, COLUMNAS_CANDIDATOS } from "@/lib/matching/cargar";
-import {
-  PESOS_BRIEF,
-  proponer,
-  type Necesidad,
-  type Pesos,
-} from "@/lib/matching/puntaje";
+import { PESOS_BRIEF, proponer, type Necesidad, type Pesos } from "@/lib/matching/puntaje";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 // Acciones del equipo (curador y admin). RLS les permite escribir estas tablas; la regla 9 la
@@ -39,10 +34,7 @@ async function equipo() {
 
 // ── Curaduría ───────────────────────────────────────────────────────────────
 
-export async function calcularPropuestos(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function calcularPropuestos(_p: Estado, datos: FormData): Promise<Estado> {
   const need = String(datos.get("need") ?? "");
   if (!UUID.test(need)) return { error: "Búsqueda no válida." };
   if (MODO_DEMO) return DEMO;
@@ -77,39 +69,20 @@ export async function calcularPropuestos(
     presupuesto: n.presupuesto,
   };
 
-  const [{ data: filas }, { data: pesosFilas }, { data: yaConectados }] =
-    await Promise.all([
-      supabase
-        .from("talent_profiles")
-        .select(COLUMNAS_CANDIDATOS)
-        .eq("estado", "publicado")
-        .limit(2000),
-      supabase.from("matching_weights").select("componente, peso"),
-      supabase
-        .from("connections")
-        .select("talent_id")
-        .eq("need_id", need)
-        .neq("estado", "propuesta"),
-    ]);
-  const excluir = new Set(
-    (yaConectados ?? []).map((c) => c.talent_id as string),
-  );
+  const [{ data: filas }, { data: pesosFilas }, { data: yaConectados }] = await Promise.all([
+    supabase.from("talent_profiles").select(COLUMNAS_CANDIDATOS).eq("estado", "publicado").limit(2000),
+    supabase.from("matching_weights").select("componente, peso"),
+    supabase.from("connections").select("talent_id").eq("need_id", need).neq("estado", "propuesta"),
+  ]);
+  const excluir = new Set((yaConectados ?? []).map((c) => c.talent_id as string));
   const pesos: Pesos = {
     ...PESOS_BRIEF,
-    ...Object.fromEntries(
-      (pesosFilas ?? []).map((p) => [p.componente, Number(p.peso)]),
-    ),
+    ...Object.fromEntries((pesosFilas ?? []).map((p) => [p.componente, Number(p.peso)])),
   };
-  const candidatos = (filas ?? [])
-    .map((f) => aCandidato(f as never))
-    .filter((c) => !excluir.has(c.id));
+  const candidatos = (filas ?? []).map((f) => aCandidato(f as never)).filter((c) => !excluir.has(c.id));
   const resultados = proponer(candidatos, necesidad, pesos);
 
-  await supabase
-    .from("connections")
-    .delete()
-    .eq("need_id", need)
-    .eq("estado", "propuesta");
+  await supabase.from("connections").delete().eq("need_id", need).eq("estado", "propuesta");
   if (resultados.length) {
     const { error } = await supabase.from("connections").insert(
       resultados.map((r) => ({
@@ -130,16 +103,11 @@ export async function calcularPropuestos(
   }
   revalidatePath(`/equipo/problema/${need}`);
   return {
-    aviso: resultados.length
-      ? `Listo: ${resultados.length} propuestos.`
-      : "Nadie cumple la forma de contratar pedida.",
+    aviso: resultados.length ? `Listo: ${resultados.length} propuestos.` : "Nadie cumple la forma de contratar pedida.",
   };
 }
 
-export async function enviarElegidos(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function enviarElegidos(_p: Estado, datos: FormData): Promise<Estado> {
   const need = String(datos.get("need") ?? "");
   const elegidos = datos
     .getAll("elegido")
@@ -148,9 +116,7 @@ export async function enviarElegidos(
   if (!UUID.test(need)) return { error: "Búsqueda no válida." };
   if (!elegidos.length) return { error: "Elige al menos una persona." };
   if (elegidos.length > 5) return { error: "Máximo 5 personas por búsqueda." };
-  const razones = Object.fromEntries(
-    elegidos.map((id) => [id, texto(datos.get(`razon-${id}`), 200)]),
-  );
+  const razones = Object.fromEntries(elegidos.map((id) => [id, texto(datos.get(`razon-${id}`), 200)]));
   if (Object.values(razones).some((r) => r.length < 5))
     return { error: "Escribe una línea de por qué para cada persona elegida." };
   if (MODO_DEMO) return DEMO;
@@ -163,10 +129,7 @@ export async function enviarElegidos(
       .eq("id", id)
       .eq("estado", "propuesta");
     if (e1) return { error: "No pudimos guardar la elección." };
-    const { error: e2 } = await supabase
-      .from("connections")
-      .update({ estado: "enviada_talento" })
-      .eq("id", id);
+    const { error: e2 } = await supabase.from("connections").update({ estado: "enviada_talento" }).eq("id", id);
     if (e2) {
       return {
         error: /sin verificar|pausada/.test(e2.message)
@@ -175,11 +138,7 @@ export async function enviarElegidos(
       };
     }
   }
-  await supabase
-    .from("connections")
-    .delete()
-    .eq("need_id", need)
-    .eq("estado", "propuesta");
+  await supabase.from("connections").delete().eq("need_id", need).eq("estado", "propuesta");
   await supabase.from("needs").update({ estado: "enviada" }).eq("id", need);
   revalidatePath(`/equipo/problema/${need}`);
   revalidatePath("/equipo");
@@ -190,17 +149,13 @@ export async function enviarElegidos(
 
 // ── Empresas y reportes ─────────────────────────────────────────────────────
 
-export async function verificarEmpresa(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function verificarEmpresa(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   const fuente = texto(datos.get("fuente"), 200);
   if (!UUID.test(id)) return { error: "Empresa no válida." };
   if (fuente.length < 3)
     return {
-      error:
-        "Anota dónde lo verificaste, por ejemplo «RUES, matrícula activa».",
+      error: "Anota dónde lo verificaste, por ejemplo «RUES, matrícula activa».",
     };
   if (MODO_DEMO) return DEMO;
   const { supabase, user } = await equipo();
@@ -217,13 +172,9 @@ export async function verificarEmpresa(
   return { aviso: "Empresa verificada." };
 }
 
-export async function resolverReporte(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function resolverReporte(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
-  const decision =
-    datos.get("decision") === "confirmado" ? "confirmado" : "descartado";
+  const decision = datos.get("decision") === "confirmado" ? "confirmado" : "descartado";
   if (!UUID.test(id)) return { error: "Reporte no válido." };
   if (MODO_DEMO) return DEMO;
   const { supabase, user } = await equipo();
@@ -234,22 +185,15 @@ export async function resolverReporte(
   if (error) return { error: "No pudimos guardar." };
   revalidatePath("/equipo/empresas");
   return {
-    aviso:
-      decision === "confirmado"
-        ? "Confirmado. Con dos confirmados la empresa queda en pausa."
-        : "Descartado.",
+    aviso: decision === "confirmado" ? "Confirmado. Con dos confirmados la empresa queda en pausa." : "Descartado.",
   };
 }
 
 // ── Evidencias y guía de tarifas ────────────────────────────────────────────
 
-export async function revisarEvidencia(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function revisarEvidencia(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
-  const decision =
-    datos.get("decision") === "verificada" ? "verificada" : "rechazada";
+  const decision = datos.get("decision") === "verificada" ? "verificada" : "rechazada";
   const nota = texto(datos.get("nota"), 200);
   if (!UUID.test(id)) return { error: "Evidencia no válida." };
   if (decision === "verificada" && nota.length < 5)
@@ -259,8 +203,7 @@ export async function revisarEvidencia(
   // La nota la ven empresas: no puede revelar la edad (regla 1).
   if (/\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b/i.test(nota)) {
     return {
-      error:
-        "La nota no puede mencionar edad, años ni fechas: la ven las empresas.",
+      error: "La nota no puede mencionar edad, años ni fechas: la ven las empresas.",
     };
   }
   if (MODO_DEMO) return DEMO;
@@ -276,29 +219,18 @@ export async function revisarEvidencia(
   if (error) return { error: "No pudimos guardar." };
   revalidatePath("/equipo/evidencias");
   return {
-    aviso:
-      decision === "verificada"
-        ? "Verificada."
-        : "Marcada como no verificable.",
+    aviso: decision === "verificada" ? "Verificada." : "Marcada como no verificable.",
   };
 }
 
-export async function guardarGuia(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function guardarGuia(_p: Estado, datos: FormData): Promise<Estado> {
   const tipo = String(datos.get("tipo") ?? "");
   const unidad = String(datos.get("unidad") ?? "");
-  const minimo = Number(
-    String(datos.get("minimo") ?? "").replace(/[^\d]/g, ""),
-  );
-  const maximo = Number(
-    String(datos.get("maximo") ?? "").replace(/[^\d]/g, ""),
-  );
+  const minimo = Number(String(datos.get("minimo") ?? "").replace(/[^\d]/g, ""));
+  const maximo = Number(String(datos.get("maximo") ?? "").replace(/[^\d]/g, ""));
   const fuente = texto(datos.get("fuente"), 200);
   if (!esForma(tipo)) return { error: "Forma de contratar no válida." };
-  if (!["hora", "conversacion", "mes", "proyecto", "persona"].includes(unidad))
-    return { error: "Unidad no válida." };
+  if (!["hora", "conversacion", "mes", "proyecto", "persona"].includes(unidad)) return { error: "Unidad no válida." };
   if (!(minimo > 0) || !(maximo >= minimo))
     return {
       error: "El mínimo debe ser mayor que cero y no mayor que el máximo.",
@@ -324,10 +256,7 @@ export async function guardarGuia(
 
 // ── Ayuda y avisos ──────────────────────────────────────────────────────────
 
-export async function atenderSolicitud(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function atenderSolicitud(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   if (!UUID.test(id)) return { error: "Solicitud no válida." };
   if (MODO_DEMO) return DEMO;
@@ -340,18 +269,14 @@ export async function atenderSolicitud(
     .select("id");
   if (error || !data?.length)
     return {
-      error:
-        "No pudimos guardar. Los casos de bienestar se gestionan desde su cola privada.",
+      error: "No pudimos guardar. Los casos de bienestar se gestionan desde su cola privada.",
     };
   revalidatePath("/equipo/ayuda");
   return { aviso: "Atendida." };
 }
 
 // Mientras no haya SMS (es de pago), el equipo avisa por llamada y lo deja anotado.
-export async function avisadoPorLlamada(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function avisadoPorLlamada(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   if (!UUID.test(id)) return { error: "Aviso no válido." };
   if (MODO_DEMO) return DEMO;
@@ -391,10 +316,7 @@ const aSlug = (s: string) =>
     .replace(/^-|-$/g, "")
     .slice(0, 80);
 
-export async function guardarExperiencia(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function guardarExperiencia(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   const tipo = datos.get("tipo") === "oficio" ? "oficio" : "experiencia";
   const nombre = texto(datos.get("nombre"), 120);
@@ -404,8 +326,7 @@ export async function guardarExperiencia(
     .map(String)
     .filter((f) => f === "territorio" || f === "sede");
   if (nombre.length < 3) return { error: "Escribe el nombre de la oferta." };
-  if (proposito.length < 20)
-    return { error: "Cuenta el propósito en al menos una frase." };
+  if (proposito.length < 20) return { error: "Cuenta el propósito en al menos una frase." };
   if (!formatos.length) return { error: "Elige al menos un formato." };
 
   // "Título: descripción" por línea.
@@ -415,8 +336,7 @@ export async function guardarExperiencia(
   });
   const grupoMin = numero(datos.get("grupo_min"));
   const grupoMax = numero(datos.get("grupo_max"));
-  if (grupoMin && grupoMax && grupoMax < grupoMin)
-    return { error: "El máximo no puede ser menor que el mínimo." };
+  if (grupoMin && grupoMax && grupoMax < grupoMin) return { error: "El máximo no puede ser menor que el mínimo." };
   const porcentaje = numero(datos.get("porcentaje_sabedora"));
   if (porcentaje !== null && (porcentaje < 0 || porcentaje > 100))
     return { error: "El porcentaje para quien lo hace va de 0 a 100." };
@@ -443,8 +363,7 @@ export async function guardarExperiencia(
     porcentaje_sabedora: porcentaje,
     testimonio: texto(datos.get("testimonio"), 1000) || null,
     // Se guarda la fecha de la aprobación: sin ella la base no deja publicar.
-    aprobada_por_sabedora_en:
-      datos.get("aprobada") === "si" ? new Date().toISOString() : null,
+    aprobada_por_sabedora_en: datos.get("aprobada") === "si" ? new Date().toISOString() : null,
   };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
@@ -459,8 +378,7 @@ export async function guardarExperiencia(
     const aprobada = campos.aprobada_por_sabedora_en
       ? (actual?.aprobada_por_sabedora_en ?? campos.aprobada_por_sabedora_en)
       : null;
-    const estado =
-      !aprobada && actual?.estado === "publicada" ? "borrador" : actual?.estado;
+    const estado = !aprobada && actual?.estado === "publicada" ? "borrador" : actual?.estado;
     const { error } = await supabase
       .from("experiences")
       .update({ ...campos, aprobada_por_sabedora_en: aprobada, estado })
@@ -478,23 +396,15 @@ export async function guardarExperiencia(
   return { aviso: "Guardada." };
 }
 
-export async function cambiarEstadoExperiencia(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function cambiarEstadoExperiencia(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
-  const estado = ["borrador", "publicada", "pausada"].includes(
-    String(datos.get("estado")),
-  )
+  const estado = ["borrador", "publicada", "pausada"].includes(String(datos.get("estado")))
     ? String(datos.get("estado"))
     : null;
   if (!UUID.test(id) || !estado) return { error: "Datos no válidos." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
-  const { error } = await supabase
-    .from("experiences")
-    .update({ estado })
-    .eq("id", id);
+  const { error } = await supabase.from("experiences").update({ estado }).eq("id", id);
   if (error) {
     return {
       error: /check/.test(error.message)
@@ -505,8 +415,7 @@ export async function cambiarEstadoExperiencia(
   revalidatePath("/equipo/experiencias");
   revalidatePath("/empresa/campo");
   return {
-    aviso:
-      estado === "publicada" ? "Publicada: ya la ven las empresas." : "Listo.",
+    aviso: estado === "publicada" ? "Publicada: ya la ven las empresas." : "Listo.",
   };
 }
 
@@ -516,28 +425,17 @@ const SIGUIENTE_SOLICITUD: Record<string, string> = {
   confirmada: "realizada",
 };
 
-export async function avanzarSolicitud(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function avanzarSolicitud(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   const actual = String(datos.get("actual") ?? "");
   const siguiente = SIGUIENTE_SOLICITUD[actual];
   if (!UUID.test(id) || !siguiente) return { error: "Datos no válidos." };
   const valor = numero(datos.get("valor"));
-  if (siguiente === "cotizada" && !(valor && valor > 0))
-    return { error: "Escribe el valor de la cotización." };
+  if (siguiente === "cotizada" && !(valor && valor > 0)) return { error: "Escribe el valor de la cotización." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
-  const cambios =
-    siguiente === "cotizada"
-      ? { estado: siguiente, valor_cotizado: valor }
-      : { estado: siguiente };
-  const { error } = await supabase
-    .from("experience_requests")
-    .update(cambios)
-    .eq("id", id)
-    .eq("estado", actual);
+  const cambios = siguiente === "cotizada" ? { estado: siguiente, valor_cotizado: valor } : { estado: siguiente };
+  const { error } = await supabase.from("experience_requests").update(cambios).eq("id", id).eq("estado", actual);
   if (error) return { error: "No pudimos actualizar la solicitud." };
   revalidatePath("/equipo/experiencias");
   return {
@@ -545,10 +443,7 @@ export async function avanzarSolicitud(
   };
 }
 
-export async function registrarImpacto(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function registrarImpacto(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   const personas = numero(datos.get("personas"));
   const horas = numero(datos.get("horas"));
@@ -566,10 +461,7 @@ export async function registrarImpacto(
     notas: texto(datos.get("notas"), 1000) || null,
   });
   if (error) return { error: "No pudimos guardar el impacto." };
-  await supabase
-    .from("experience_requests")
-    .update({ estado: "reporte_enviado" })
-    .eq("id", id);
+  await supabase.from("experience_requests").update({ estado: "reporte_enviado" }).eq("id", id);
   revalidatePath("/equipo/experiencias");
   return {
     aviso: "Impacto registrado. La empresa ya ve su reporte en Mis procesos.",
@@ -580,39 +472,24 @@ export async function registrarImpacto(
 
 // Aprobar deja que las empresas la vean. «Sumar a la lista» además la vuelve opción para todas
 // las personas y la conecta con la taxonomía (así cuenta en el puntaje).
-export async function revisarEtiqueta(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function revisarEtiqueta(_p: Estado, datos: FormData): Promise<Estado> {
   const id = String(datos.get("id") ?? "");
   const decision = String(datos.get("decision") ?? "");
-  if (!UUID.test(id) || !["aprobar", "sumar", "quitar"].includes(decision))
-    return { error: "Etiqueta no válida." };
+  if (!UUID.test(id) || !["aprobar", "sumar", "quitar"].includes(decision)) return { error: "Etiqueta no válida." };
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
 
   if (decision === "quitar") {
-    const { error } = await supabase
-      .from("footprint_tags")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("footprint_tags").delete().eq("id", id);
     if (error) return { error: "No pudimos quitarla." };
     revalidatePath("/equipo/etiquetas");
     return { aviso: "Quitada del perfil." };
   }
 
-  const { data: etiqueta } = await supabase
-    .from("footprint_tags")
-    .select("capa, etiqueta")
-    .eq("id", id)
-    .maybeSingle();
+  const { data: etiqueta } = await supabase.from("footprint_tags").select("capa, etiqueta").eq("id", id).maybeSingle();
   if (!etiqueta) return { error: "Esa etiqueta ya no existe." };
   // Lo que ven las empresas no puede revelar la edad (regla 1).
-  if (
-    /\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b|\d{5,}|@/i.test(
-      etiqueta.etiqueta as string,
-    )
-  ) {
+  if (/\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b|\d{5,}|@/i.test(etiqueta.etiqueta as string)) {
     return { error: "Tiene edad, fechas o datos de contacto. Quítala." };
   }
 
@@ -651,10 +528,7 @@ export async function revisarEtiqueta(
   };
 }
 
-export async function revisarCondicionesReto(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function revisarCondicionesReto(_p: Estado, datos: FormData): Promise<Estado> {
   const reto = String(datos.get("reto") ?? "");
   if (!UUID.test(reto)) return { error: "Reto no válido." };
   if (MODO_DEMO) return DEMO;
@@ -666,17 +540,13 @@ export async function revisarCondicionesReto(
   });
   if (error)
     return {
-      error:
-        "No pudimos autorizarlo. Completa las condiciones y revisa el acceso del equipo.",
+      error: "No pudimos autorizarlo. Completa las condiciones y revisa el acceso del equipo.",
     };
   revalidatePath(`/equipo/problema/${reto}`);
   return { aviso: "Revisión guardada." };
 }
 
-export async function completarCondicionesReto(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function completarCondicionesReto(_p: Estado, datos: FormData): Promise<Estado> {
   const reto = String(datos.get("reto") ?? "");
   const jornada_horas = Number(datos.get("jornada_horas"));
   const remuneracion = Number(datos.get("remuneracion"));
@@ -705,17 +575,13 @@ export async function completarCondicionesReto(
     .select("id");
   if (error || !data?.length)
     return {
-      error:
-        "No pudimos guardar. Revisa tu acceso y vuelve a cargar el reto por si cambió.",
+      error: "No pudimos guardar. Revisa tu acceso y vuelve a cargar el reto por si cambió.",
     };
   revalidatePath(`/equipo/problema/${reto}`);
   return { aviso: "Condiciones guardadas. Revísalas antes de autorizarlas." };
 }
 
-export async function revisarAcuerdoTrabajo(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function revisarAcuerdoTrabajo(_p: Estado, datos: FormData): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Proceso no válido." };
   if (MODO_DEMO) return DEMO;
@@ -726,8 +592,7 @@ export async function revisarAcuerdoTrabajo(
   });
   if (error)
     return {
-      error:
-        "El acuerdo cambió o no tienes permiso. Vuelve a revisar sus condiciones.",
+      error: "El acuerdo cambió o no tienes permiso. Vuelve a revisar sus condiciones.",
     };
   revalidatePath("/equipo/condiciones");
   return {

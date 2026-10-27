@@ -4,34 +4,22 @@ import { redirect } from "next/navigation";
 
 import { MODO_DEMO } from "@/lib/demo";
 import { experienciaHojaVida } from "@/lib/perfil/hoja-vida";
-import {
-  leerBorrador,
-  validarPerfil,
-  VERSION_AUTORIZACION,
-  type Errores,
-} from "@/lib/perfil/validar";
+import { leerBorrador, validarPerfil, VERSION_AUTORIZACION, type Errores } from "@/lib/perfil/validar";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type EstadoPerfil = { errores?: Errores; paso?: 1 | 2 | 3 };
 
 // Guarda el perfil en 3 pasos: talent_profiles, talent_offers y, por función, el requisito de
 // entrada y la autorización de datos en talent_private (nunca en el perfil: es dato de edad).
-export async function guardarPerfil(
-  _previo: EstadoPerfil,
-  datos: FormData,
-): Promise<EstadoPerfil> {
+export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Promise<EstadoPerfil> {
   const resultado = validarPerfil(leerBorrador(datos.get("borrador")));
-  if (!resultado.ok)
-    return { errores: resultado.errores, paso: resultado.paso };
+  if (!resultado.ok) return { errores: resultado.errores, paso: resultado.paso };
   const cv = String(datos.get("historia_cv") ?? "");
-  const experienciaCv = cv
-    ? experienciaHojaVida(cv, resultado.perfil.nombre)
-    : "";
+  const experienciaCv = cv ? experienciaHojaVida(cv, resultado.perfil.nombre) : "";
   if (cv && (cv.length > 6000 || experienciaCv.length < 40))
     return {
       errores: {
-        general:
-          "Revisa la experiencia importada: usa entre 40 y 6.000 letras.",
+        general: "Revisa la experiencia importada: usa entre 40 y 6.000 letras.",
       },
       paso: 1,
     };
@@ -61,18 +49,9 @@ export async function guardarPerfil(
         .trim()
         .slice(0, 100) || null,
   };
-  const { data: existente } = await supabase
-    .from("talent_profiles")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data: existente } = await supabase.from("talent_profiles").select("id").eq("user_id", user.id).maybeSingle();
   const { data: perfil, error } = existente
-    ? await supabase
-        .from("talent_profiles")
-        .update(campos)
-        .eq("id", existente.id)
-        .select("id")
-        .single()
+    ? await supabase.from("talent_profiles").update(campos).eq("id", existente.id).select("id").single()
     : await supabase
         .from("talent_profiles")
         .insert({ ...campos, user_id: user.id })

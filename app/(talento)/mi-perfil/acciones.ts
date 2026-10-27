@@ -14,12 +14,7 @@ export type Estado = { error?: string; aviso?: string };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const ERROR = "No pudimos guardar el cambio. Intenta de nuevo o pide ayuda.";
-const TIPOS_ARCHIVO = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "application/pdf",
-];
+const TIPOS_ARCHIVO = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
 const MAX_ARCHIVO = 10 * 1024 * 1024;
 
 async function sesion() {
@@ -43,10 +38,7 @@ const texto = (v: FormDataEntryValue | null, max: number) =>
     .trim()
     .slice(0, max);
 
-export async function actualizarDatos(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function actualizarDatos(_p: Estado, datos: FormData): Promise<Estado> {
   const nombre = texto(datos.get("nombre"), 80);
   const ubicacion = texto(datos.get("ubicacion"), 80);
   const oficio = texto(datos.get("oficio"), 120);
@@ -71,13 +63,9 @@ export async function actualizarDatos(
 }
 
 export async function cambiarVisibilidad(datos: FormData) {
-  const visibilidad =
-    datos.get("visibilidad") === "visible" ? "visible" : "reservado";
+  const visibilidad = datos.get("visibilidad") === "visible" ? "visible" : "reservado";
   const { supabase, perfil } = await sesion();
-  await supabase
-    .from("talent_profiles")
-    .update({ visibilidad })
-    .eq("id", perfil.id);
+  await supabase.from("talent_profiles").update({ visibilidad }).eq("id", perfil.id);
   revalidatePath("/mi-perfil");
 }
 
@@ -90,23 +78,15 @@ export async function cambiarEstado(datos: FormData) {
   revalidatePath("/mi-perfil");
 }
 
-export async function actualizarFormas(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
-  const formas = datos
-    .getAll("formas")
-    .map(String)
-    .filter(esForma) as FormaContratar[];
+export async function actualizarFormas(_p: Estado, datos: FormData): Promise<Estado> {
+  const formas = datos.getAll("formas").map(String).filter(esForma) as FormaContratar[];
   if (!formas.length) return { error: "Elige al menos una forma de trabajar." };
   const horasCrudas = String(datos.get("horas") ?? "").trim();
   const horas = horasCrudas ? Number(horasCrudas) : null;
   if (horas !== null && (!Number.isInteger(horas) || horas < 1 || horas > 48)) {
     return { error: "Escribe un número de horas entre 1 y 48." };
   }
-  const modalidad = ["presencial", "remoto", "mixto"].includes(
-    String(datos.get("modalidad")),
-  )
+  const modalidad = ["presencial", "remoto", "mixto"].includes(String(datos.get("modalidad")))
     ? String(datos.get("modalidad"))
     : "presencial";
   const orientacion = datos.get("orientacion") === "si";
@@ -115,9 +95,7 @@ export async function actualizarFormas(
   await supabase.from("talent_offers").delete().eq("talent_id", perfil.id);
   const { error } = await supabase.from("talent_offers").insert(
     formas.map((tipo) => {
-      const tarifa = Number(
-        String(datos.get(`tarifa-${tipo}`) ?? "").replace(/[^\d]/g, ""),
-      );
+      const tarifa = Number(String(datos.get(`tarifa-${tipo}`) ?? "").replace(/[^\d]/g, ""));
       return {
         talent_id: perfil.id,
         tipo,
@@ -148,20 +126,15 @@ export async function quitarEtiqueta(datos: FormData) {
   revalidatePath("/mi-perfil");
 }
 
-export async function agregarReferencia(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function agregarReferencia(_p: Estado, datos: FormData): Promise<Estado> {
   const nombre = texto(datos.get("nombre"), 80);
   const descripcion = texto(datos.get("descripcion"), 120);
   const telefono = normalizarCelular(String(datos.get("telefono") ?? ""));
   if (nombre.length < 2) return { error: "Escribe el nombre de la persona." };
-  if (!telefono)
-    return { error: "Escribe un celular de 10 números, empezando por 3." };
+  if (!telefono) return { error: "Escribe un celular de 10 números, empezando por 3." };
   if (descripcion.length < 2)
     return {
-      error:
-        "Cuéntanos de dónde te conoce, por ejemplo «fue mi jefe en la planta».",
+      error: "Cuéntanos de dónde te conoce, por ejemplo «fue mi jefe en la planta».",
     };
 
   const { supabase, perfil } = await sesion();
@@ -175,21 +148,15 @@ export async function agregarReferencia(
   if (error) return { error: ERROR };
   revalidatePath("/mi-perfil");
   return {
-    aviso:
-      "Listo. Alguien del equipo llamará a esa persona antes de mostrarla.",
+    aviso: "Listo. Alguien del equipo llamará a esa persona antes de mostrarla.",
   };
 }
 
-export async function subirArchivo(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function subirArchivo(_p: Estado, datos: FormData): Promise<Estado> {
   const archivo = datos.get("archivo");
   const descripcion = texto(datos.get("descripcion"), 120);
-  if (!(archivo instanceof File) || archivo.size === 0)
-    return { error: "Elige una foto o un documento." };
-  if (!TIPOS_ARCHIVO.includes(archivo.type))
-    return { error: "Solo fotos (JPG, PNG) o documentos PDF." };
+  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elige una foto o un documento." };
+  if (!TIPOS_ARCHIVO.includes(archivo.type)) return { error: "Solo fotos (JPG, PNG) o documentos PDF." };
   if (archivo.size > MAX_ARCHIVO)
     return {
       error: "El archivo pesa más de 10 MB. Intenta con una foto más liviana.",
@@ -234,19 +201,12 @@ const MAX_FOTO = 5 * 1024 * 1024;
 
 export async function subirFoto(_p: Estado, datos: FormData): Promise<Estado> {
   const archivo = datos.get("foto");
-  if (!(archivo instanceof File) || archivo.size === 0)
-    return { error: "Elige una foto." };
-  if (!TIPOS_FOTO.includes(archivo.type))
-    return { error: "Solo fotos JPG, PNG o WebP." };
-  if (archivo.size > MAX_FOTO)
-    return { error: "La foto pesa más de 5 MB. Intenta con una más liviana." };
+  if (!(archivo instanceof File) || archivo.size === 0) return { error: "Elige una foto." };
+  if (!TIPOS_FOTO.includes(archivo.type)) return { error: "Solo fotos JPG, PNG o WebP." };
+  if (archivo.size > MAX_FOTO) return { error: "La foto pesa más de 5 MB. Intenta con una más liviana." };
 
   const { supabase, perfil } = await sesion();
-  const { data: actual } = await supabase
-    .from("talent_profiles")
-    .select("foto_path")
-    .eq("id", perfil.id)
-    .single();
+  const { data: actual } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
   const extension = {
     "image/jpeg": "jpg",
     "image/png": "png",
@@ -259,33 +219,21 @@ export async function subirFoto(_p: Estado, datos: FormData): Promise<Estado> {
     .upload(ruta, archivo, { contentType: archivo.type });
   if (errorSubida) return { error: ERROR };
 
-  const { error } = await supabase
-    .from("talent_profiles")
-    .update({ foto_path: ruta })
-    .eq("id", perfil.id);
+  const { error } = await supabase.from("talent_profiles").update({ foto_path: ruta }).eq("id", perfil.id);
   if (error) {
     await supabase.storage.from("fotos").remove([ruta]);
     return { error: ERROR };
   }
-  if (actual?.foto_path)
-    await supabase.storage.from("fotos").remove([actual.foto_path as string]);
+  if (actual?.foto_path) await supabase.storage.from("fotos").remove([actual.foto_path as string]);
   revalidatePath("/mi-perfil");
   return { aviso: "Foto guardada." };
 }
 
 export async function quitarFoto() {
   const { supabase, perfil } = await sesion();
-  const { data: actual } = await supabase
-    .from("talent_profiles")
-    .select("foto_path")
-    .eq("id", perfil.id)
-    .single();
-  await supabase
-    .from("talent_profiles")
-    .update({ foto_path: null })
-    .eq("id", perfil.id);
-  if (actual?.foto_path)
-    await supabase.storage.from("fotos").remove([actual.foto_path as string]);
+  const { data: actual } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
+  await supabase.from("talent_profiles").update({ foto_path: null }).eq("id", perfil.id);
+  if (actual?.foto_path) await supabase.storage.from("fotos").remove([actual.foto_path as string]);
   revalidatePath("/mi-perfil");
 }
 
@@ -293,16 +241,8 @@ export async function borrarEvidencia(datos: FormData) {
   const id = String(datos.get("id") ?? "");
   if (!UUID.test(id)) return;
   const { supabase } = await sesion();
-  const { data } = await supabase
-    .from("evidence")
-    .delete()
-    .eq("id", id)
-    .select("archivo_path")
-    .maybeSingle();
-  if (data?.archivo_path)
-    await supabase.storage
-      .from("evidencias")
-      .remove([data.archivo_path as string]);
+  const { data } = await supabase.from("evidence").delete().eq("id", id).select("archivo_path").maybeSingle();
+  if (data?.archivo_path) await supabase.storage.from("evidencias").remove([data.archivo_path as string]);
   revalidatePath("/mi-perfil");
 }
 
@@ -321,54 +261,27 @@ export async function cambiarAutorizacion(datos: FormData) {
 // parte que solo lee el equipo; el archivo explica cómo pedirlas.
 export async function descargarDatos(): Promise<string> {
   const { supabase, user, perfil } = await sesion();
-  const [
-    perfilCompleto,
-    ofertas,
-    historias,
-    huella,
-    evidencias,
-    ayudas,
-    metas,
-    seguimientos,
-  ] = await Promise.all([
+  const [perfilCompleto, ofertas, historias, huella, evidencias, ayudas, metas, seguimientos] = await Promise.all([
     supabase
       .from("talent_profiles")
-      .select(
-        "nombre, ubicacion, oficio, resumen, visibilidad, estado, created_at, zona_local",
-      )
+      .select("nombre, ubicacion, oficio, resumen, visibilidad, estado, created_at, zona_local")
       .eq("id", perfil.id)
       .single(),
-    supabase
-      .from("talent_offers")
-      .select("tipo, horas_semana, modalidad, tarifa_esperada")
-      .eq("talent_id", perfil.id),
-    supabase
-      .from("stories")
-      .select("texto, origen, created_at")
-      .eq("talent_id", perfil.id),
-    supabase
-      .from("footprint_tags")
-      .select("capa, etiqueta, confirmada")
-      .eq("talent_id", perfil.id),
+    supabase.from("talent_offers").select("tipo, horas_semana, modalidad, tarifa_esperada").eq("talent_id", perfil.id),
+    supabase.from("stories").select("texto, origen, created_at").eq("talent_id", perfil.id),
+    supabase.from("footprint_tags").select("capa, etiqueta, confirmada").eq("talent_id", perfil.id),
     supabase
       .from("evidence")
-      .select(
-        "tipo, descripcion, referencia_nombre, referencia_telefono, estado, creado_en",
-      )
+      .select("tipo, descripcion, referencia_nombre, referencia_telefono, estado, creado_en")
       .eq("talent_id", perfil.id),
-    supabase
-      .from("help_requests")
-      .select("canal, motivo, estado, creado_en")
-      .eq("user_id", user.id),
+    supabase.from("help_requests").select("canal, motivo, estado, creado_en").eq("user_id", user.id),
     supabase
       .from("wellbeing_preferences")
       .select("horas_meta, ingreso_meta, consentimiento_en")
       .eq("talent_id", perfil.id),
     supabase
       .from("wellbeing_checkins")
-      .select(
-        "connection_id, energia, trato_respetuoso, pago_a_tiempo, quiere_contacto, creado_en",
-      )
+      .select("connection_id, energia, trato_respetuoso, pago_a_tiempo, quiere_contacto, creado_en")
       .eq("talent_id", perfil.id),
   ]);
   return JSON.stringify(
@@ -401,19 +314,11 @@ export async function borrarCuenta(): Promise<Estado> {
     .not("archivo_path", "is", null);
   const rutas = (archivos ?? []).map((a) => a.archivo_path as string);
   if (rutas.length) await supabase.storage.from("evidencias").remove(rutas);
-  const { data: conFoto } = await supabase
-    .from("talent_profiles")
-    .select("foto_path")
-    .eq("id", perfil.id)
-    .single();
-  if (conFoto?.foto_path)
-    await supabase.storage.from("fotos").remove([conFoto.foto_path as string]);
+  const { data: conFoto } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
+  if (conFoto?.foto_path) await supabase.storage.from("fotos").remove([conFoto.foto_path as string]);
 
   // Borra el perfil y, en cascada, ofertas, historias, huella, evidencias y datos privados.
-  const { error } = await supabase
-    .from("talent_profiles")
-    .delete()
-    .eq("id", perfil.id);
+  const { error } = await supabase.from("talent_profiles").delete().eq("id", perfil.id);
   if (error) return { error: ERROR };
 
   // El usuario de Auth solo se borra con la llave de servicio. Sin ella, el equipo lo termina.

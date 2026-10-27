@@ -8,13 +8,7 @@ import { esProcesoDemo } from "@/lib/demo-proceso";
 import { avanzarProcesoDemo } from "@/lib/demo-proceso-cookie";
 import { leerEmpresa } from "@/lib/empresa/validar";
 import { esForma } from "@/lib/formas";
-import {
-  leerAcuerdo,
-  leerAgenda,
-  leerEvaluacion,
-  leerMotivo,
-  mensajeProceso,
-} from "@/lib/procesos-formularios";
+import { leerAcuerdo, leerAgenda, leerEvaluacion, leerMotivo, mensajeProceso } from "@/lib/procesos-formularios";
 import { CAPAS_LIBRES, componerReto, problemaRequisitoLibre } from "@/lib/reto";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
@@ -27,23 +21,13 @@ const DEMO = { aviso: "En la demostración no se guarda nada." };
 
 // En la demostración avanza de verdad un solo proceso (Alimentos del Oriente), guardado en este
 // navegador. Los demás ejemplos solo se muestran.
-async function pasoDemo(
-  conexion: string,
-  accion: string,
-  extra: object,
-  aviso: string,
-): Promise<Estado> {
+async function pasoDemo(conexion: string, accion: string, extra: object, aviso: string): Promise<Estado> {
   if (!esProcesoDemo(conexion)) {
     return {
-      aviso:
-        "En la demostración avanza el proceso con Alimentos del Oriente. Este es solo de ejemplo.",
+      aviso: "En la demostración avanza el proceso con Alimentos del Oriente. Este es solo de ejemplo.",
     };
   }
-  const r = await avanzarProcesoDemo(
-    "empresa",
-    accion,
-    extra as Record<string, unknown>,
-  );
+  const r = await avanzarProcesoDemo("empresa", accion, extra as Record<string, unknown>);
   if ("error" in r) return { error: r.error };
   revalidatePath("/", "layout");
   return { aviso };
@@ -70,36 +54,26 @@ function mensaje(error: { message?: string } | null): string {
   if (/sin verificar|pausada/.test(m))
     return "Tu empresa todavía no está verificada o está en pausa. Te escribimos cuando quede lista.";
   if (/registrada/.test(m)) return "Primero registra los datos de tu empresa.";
-  if (/una_conexion_viva|duplicate/.test(m))
-    return "Ya pediste conocer este perfil. Lo verás en Mis procesos.";
+  if (/una_conexion_viva|duplicate/.test(m)) return "Ya pediste conocer este perfil. Lo verás en Mis procesos.";
   if (/no disponible/.test(m)) return "Este perfil ya no está disponible.";
   return "No pudimos guardar. Intenta de nuevo o pide ayuda.";
 }
 
-export async function registrarEmpresa(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function registrarEmpresa(_p: Estado, datos: FormData): Promise<Estado> {
   const resultado = leerEmpresa(datos);
   if ("error" in resultado) return { error: resultado.error };
   if (MODO_DEMO) return DEMO;
 
   const { supabase, user } = await sesion();
-  const { error } = await supabase
-    .from("companies")
-    .insert({ owner_id: user.id, ...resultado.datos });
+  const { error } = await supabase.from("companies").insert({ owner_id: user.id, ...resultado.datos });
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa", "layout");
   return {
-    aviso:
-      "Listo. Nuestro equipo verifica el NIT en el RUES; mientras tanto puedes explorar perfiles.",
+    aviso: "Listo. Nuestro equipo verifica el NIT en el RUES; mientras tanto puedes explorar perfiles.",
   };
 }
 
-export async function pedirConexion(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function pedirConexion(_p: Estado, datos: FormData): Promise<Estado> {
   const talento = String(datos.get("talento") ?? "");
   if (!UUID.test(talento)) return { error: "Perfil no válido." };
   if (MODO_DEMO) return DEMO;
@@ -108,15 +82,11 @@ export async function pedirConexion(
   if (error) return { error: mensaje(error) };
   revalidatePath(`/empresa/perfil/${talento}`);
   return {
-    aviso:
-      "Listo. Le contamos a la persona; si le interesa, abrimos la conversación.",
+    aviso: "Listo. Le contamos a la persona; si le interesa, abrimos la conversación.",
   };
 }
 
-export async function quieroConocer(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function quieroConocer(_p: Estado, datos: FormData): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Conexión no válida." };
   if (MODO_DEMO)
@@ -134,19 +104,13 @@ export async function quieroConocer(
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa", "layout");
   return {
-    aviso:
-      "Listo. Nuestro equipo los pone en contacto en las próximas 24 horas hábiles.",
+    aviso: "Listo. Nuestro equipo los pone en contacto en las próximas 24 horas hábiles.",
   };
 }
 
 // ── Pasos del proceso después de abrir la conexión ──────────────────────────
 
-async function paso(
-  datos: FormData,
-  accion: string,
-  extra: object,
-  aviso: string,
-): Promise<Estado> {
+async function paso(datos: FormData, accion: string, extra: object, aviso: string): Promise<Estado> {
   const conexion = String(datos.get("conexion") ?? "");
   if (!UUID.test(conexion)) return { error: "Conexión no válida." };
   if (MODO_DEMO) return pasoDemo(conexion, accion, extra, aviso);
@@ -161,24 +125,13 @@ async function paso(
   return { aviso };
 }
 
-export async function agendarConversacion(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function agendarConversacion(_p: Estado, datos: FormData): Promise<Estado> {
   const agenda = leerAgenda(datos);
   if ("error" in agenda) return agenda;
-  return paso(
-    datos,
-    "agendar",
-    agenda.datos,
-    "Listo. Le avisamos a la persona para que confirme la fecha.",
-  );
+  return paso(datos, "agendar", agenda.datos, "Listo. Le avisamos a la persona para que confirme la fecha.");
 }
 
-export async function proponerAcuerdo(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function proponerAcuerdo(_p: Estado, datos: FormData): Promise<Estado> {
   const acuerdo = leerAcuerdo(datos);
   if ("error" in acuerdo) return acuerdo;
   return paso(
@@ -189,24 +142,13 @@ export async function proponerAcuerdo(
   );
 }
 
-export async function noSeguirEmpresa(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function noSeguirEmpresa(_p: Estado, datos: FormData): Promise<Estado> {
   const motivo = leerMotivo(datos, "empresa");
   if ("error" in motivo) return motivo;
-  return paso(
-    datos,
-    "no_seguir",
-    { motivo: motivo.datos },
-    "Listo. Le avisamos a la persona con cuidado.",
-  );
+  return paso(datos, "no_seguir", { motivo: motivo.datos }, "Listo. Le avisamos a la persona con cuidado.");
 }
 
-export async function terminarProceso(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function terminarProceso(_p: Estado, datos: FormData): Promise<Estado> {
   const evaluacion = leerEvaluacion(datos);
   if ("error" in evaluacion) return evaluacion;
   return paso(
@@ -217,10 +159,7 @@ export async function terminarProceso(
   );
 }
 
-export async function calificarProceso(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function calificarProceso(_p: Estado, datos: FormData): Promise<Estado> {
   const evaluacion = leerEvaluacion(datos);
   if ("error" in evaluacion) return evaluacion;
   return paso(
@@ -240,37 +179,21 @@ function leerLibres(datos: FormData, campo: string) {
       const [capa, ...resto] = v.split("|");
       return { capa, etiqueta: texto(resto.join("|"), 60) };
     })
-    .filter(
-      (l) =>
-        (CAPAS_LIBRES as string[]).includes(l.capa) &&
-        !problemaRequisitoLibre(l.etiqueta),
-    )
+    .filter((l) => (CAPAS_LIBRES as string[]).includes(l.capa) && !problemaRequisitoLibre(l.etiqueta))
     .slice(0, 10);
 }
 
 // Contar un reto. Los requisitos se eligen de la taxonomía (sin IA: la IA está apagada) o se
 // escriben a mano. Lo que intentaron y el plazo van en el mismo texto del reto.
-export async function crearNecesidad(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estado> {
   const reto = texto(datos.get("problema"), 2000);
-  const problema = componerReto(
-    reto,
-    texto(datos.get("intentado"), 800),
-    String(datos.get("plazo") ?? ""),
-  );
+  const problema = componerReto(reto, texto(datos.get("intentado"), 800), String(datos.get("plazo") ?? ""));
   const formatos = datos.getAll("formatos").map(String).filter(esForma);
-  const modalidad = ["presencial", "remoto", "mixto"].includes(
-    String(datos.get("modalidad")),
-  )
+  const modalidad = ["presencial", "remoto", "mixto"].includes(String(datos.get("modalidad")))
     ? String(datos.get("modalidad"))
     : null;
   const ubicacion = texto(datos.get("ubicacion"), 80) || null;
-  const presupuestoCrudo = String(datos.get("presupuesto") ?? "").replace(
-    /[^\d]/g,
-    "",
-  );
+  const presupuestoCrudo = String(datos.get("presupuesto") ?? "").replace(/[^\d]/g, "");
   const presupuesto = presupuestoCrudo ? Number(presupuestoCrudo) : null;
   const obligatorios = datos
     .getAll("obligatorio")
@@ -291,10 +214,8 @@ export async function crearNecesidad(
     })),
   ];
 
-  if (reto.length < 20)
-    return { error: "Cuéntanos el reto con un poco más de detalle." };
-  if (!formatos.length)
-    return { error: "Elige al menos una forma de contratar." };
+  if (reto.length < 20) return { error: "Cuéntanos el reto con un poco más de detalle." };
+  if (!formatos.length) return { error: "Elige al menos una forma de contratar." };
   if (!obligatorios.length && !deseables.length && !libres.length) {
     return {
       error: "Elige o escribe al menos una cosa que deba saber la persona.",
@@ -316,8 +237,7 @@ export async function crearNecesidad(
     condiciones.length > 1500
   )
     return {
-      error:
-        "Completa jornada, remuneración y condiciones para que Kánna revise el reto.",
+      error: "Completa jornada, remuneración y condiciones para que Kánna revise el reto.",
     };
   if (MODO_DEMO) redirect(`/empresa/problema/${necesidadEjemplo.id}`);
 
@@ -360,17 +280,15 @@ export async function crearNecesidad(
     if (errorReq) return { error: mensaje(errorReq) };
   }
   if (libres.length) {
-    const { error: errorLibres } = await supabase
-      .from("need_requirements")
-      .insert(
-        libres.map((l) => ({
-          need_id: necesidad.id,
-          capa: l.capa,
-          etiqueta: l.etiqueta,
-          taxonomy_id: null,
-          obligatorio: l.obligatorio,
-        })),
-      );
+    const { error: errorLibres } = await supabase.from("need_requirements").insert(
+      libres.map((l) => ({
+        need_id: necesidad.id,
+        capa: l.capa,
+        etiqueta: l.etiqueta,
+        taxonomy_id: null,
+        obligatorio: l.obligatorio,
+      })),
+    );
     if (errorLibres) return { error: mensaje(errorLibres) };
   }
   redirect(`/empresa/problema/${necesidad.id}`);
@@ -378,10 +296,7 @@ export async function crearNecesidad(
 
 // Solicitud de cotización de una experiencia. En v1 no hay pagos en línea: el equipo cotiza y
 // confirma por fuera, y lo registra en su panel.
-export async function pedirCotizacion(
-  _p: Estado,
-  datos: FormData,
-): Promise<Estado> {
+export async function pedirCotizacion(_p: Estado, datos: FormData): Promise<Estado> {
   const experiencia = String(datos.get("experiencia") ?? "");
   const formato = datos.get("formato") === "territorio" ? "territorio" : "sede";
   const personas = Number(datos.get("personas"));
@@ -410,7 +325,6 @@ export async function pedirCotizacion(
   if (error) return { error: mensaje(error) };
   revalidatePath("/empresa/procesos");
   return {
-    aviso:
-      "Listo. Te enviamos la cotización en los próximos días hábiles. La verás en Mis procesos.",
+    aviso: "Listo. Te enviamos la cotización en los próximos días hábiles. La verás en Mis procesos.",
   };
 }

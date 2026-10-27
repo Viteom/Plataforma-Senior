@@ -29,9 +29,7 @@ export default async function MiEmpresa() {
   const detalle = MODO_DEMO
     ? null
     : (
-        await (
-          await crearClienteServidor()
-        )
+        await (await crearClienteServidor())
           .from("companies")
           .select(
             "sector, ciudad, contacto, cargo_contacto, correo_contacto, telefono_contacto, descripcion, sitio_web, brandbook_url",
@@ -43,8 +41,7 @@ export default async function MiEmpresa() {
     empresa.estado === "pausada"
       ? {
           icono: PauseCircle,
-          texto:
-            "En pausa mientras revisamos un reporte. Escríbenos desde Ayuda.",
+          texto: "En pausa mientras revisamos un reporte. Escríbenos desde Ayuda.",
         }
       : empresa.verificada
         ? {
@@ -53,17 +50,13 @@ export default async function MiEmpresa() {
           }
         : {
             icono: Clock,
-            texto:
-              "En verificación. Revisamos el NIT en el RUES; te escribimos cuando quede lista.",
+            texto: "En verificación. Revisamos el NIT en el RUES; te escribimos cuando quede lista.",
           };
   const Icono = estado.icono;
 
   return (
     <div className="max-w-2xl">
-      <Pantalla
-        titulo={empresa.nombre}
-        intro={empresa.nit ? `NIT ${empresa.nit}` : undefined}
-      >
+      <Pantalla titulo={empresa.nombre} intro={empresa.nit ? `NIT ${empresa.nit}` : undefined}>
         <p className="flex items-start gap-3 rounded-md bg-surface p-4 text-lg">
           <Icono aria-hidden className="mt-0.5 size-6 shrink-0" />
           {estado.texto}
@@ -96,10 +89,7 @@ export default async function MiEmpresa() {
               ))}
           </dl>
         )}
-        <p>
-          Para corregir datos de una organización verificada, contacta al equipo
-          desde Ayuda.
-        </p>
+        <p>Para corregir datos de una organización verificada, contacta al equipo desde Ayuda.</p>
       </Pantalla>
     </div>
   );

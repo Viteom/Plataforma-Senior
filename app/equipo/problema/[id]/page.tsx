@@ -9,11 +9,7 @@ import { necesidadParaCurar } from "@/lib/datos/equipo";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, pesos } from "@/lib/formas";
 
-import {
-  calcularPropuestos,
-  revisarCondicionesReto,
-  completarCondicionesReto,
-} from "../../acciones";
+import { calcularPropuestos, revisarCondicionesReto, completarCondicionesReto } from "../../acciones";
 import { ElegirPropuestos } from "./elegir";
 
 export const metadata: Metadata = { title: "Curar búsqueda" };
@@ -29,11 +25,7 @@ const ESTADO_PERSONA: Record<string, string> = {
   pausada: "En pausa",
 };
 
-export default async function CurarProblema({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function CurarProblema({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const datos = await necesidadParaCurar(id);
@@ -57,21 +49,12 @@ export default async function CurarProblema({
       intro={`«${necesidad.problema}»`}
     >
       {!empresa.verificada && (
-        <p
-          role="status"
-          className="flex items-start gap-3 rounded-md border-2 border-danger p-4"
-        >
-          <AlertTriangle
-            aria-hidden
-            className="mt-0.5 size-6 shrink-0 text-danger"
-          />
+        <p role="status" className="flex items-start gap-3 rounded-md border-2 border-danger p-4">
+          <AlertTriangle aria-hidden className="mt-0.5 size-6 shrink-0 text-danger" />
           <span>
-            <span className="font-bold">Empresa sin verificar.</span> Puedes
-            preparar la lista, pero no se envía a nadie hasta verificarla en{" "}
-            <Link
-              href="/equipo/empresas"
-              className="font-bold underline underline-offset-4"
-            >
+            <span className="font-bold">Empresa sin verificar.</span> Puedes preparar la lista, pero no se envía a nadie
+            hasta verificarla en{" "}
+            <Link href="/equipo/empresas" className="font-bold underline underline-offset-4">
               Empresas
             </Link>
             .
@@ -83,18 +66,15 @@ export default async function CurarProblema({
         <h2 className="text-xl">Revisión de trabajo digno</h2>
         <p>Estado: {necesidad.dignidad_estado ?? "pendiente"}</p>
         <p>
-          Jornada: {necesidad.jornada_horas ?? "por completar"} horas/semana.
-          Remuneración: {necesidad.remuneracion ?? "por completar"} ·{" "}
-          {necesidad.remuneracion_unidad ?? "por completar"}.
+          Jornada: {necesidad.jornada_horas ?? "por completar"} horas/semana. Remuneración:{" "}
+          {necesidad.remuneracion ?? "por completar"} · {necesidad.remuneracion_unidad ?? "por completar"}.
         </p>
         <p>
-          {necesidad.condiciones ??
-            "La organización debe completar tareas, descansos, exigencias y acompañamiento."}
+          {necesidad.condiciones ?? "La organización debe completar tareas, descansos, exigencias y acompañamiento."}
         </p>
         <p>
-          Confirma remuneración justa, descansos, seguridad, ajustes acordables
-          y una persona responsable. La edad o un diagnóstico no determinan la
-          posibilidad de trabajar.
+          Confirma remuneración justa, descansos, seguridad, ajustes acordables y una persona responsable. La edad o un
+          diagnóstico no determinan la posibilidad de trabajar.
         </p>
         <details>
           <summary className="min-h-tap cursor-pointer font-bold">
@@ -180,34 +160,23 @@ export default async function CurarProblema({
       <dl className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
         <div>
           <dt className="text-base text-text-muted">Forma de contratar</dt>
-          <dd className="font-bold">
-            {necesidad.formatos.map(etiquetaForma).join(", ") || "Cualquiera"}
-          </dd>
+          <dd className="font-bold">{necesidad.formatos.map(etiquetaForma).join(", ") || "Cualquiera"}</dd>
         </div>
         <div>
           <dt className="text-base text-text-muted">Dónde</dt>
           <dd className="font-bold">
-            {[necesidad.modalidad, necesidad.ubicacion]
-              .filter(Boolean)
-              .join(" · ") || "Sin indicar"}
+            {[necesidad.modalidad, necesidad.ubicacion].filter(Boolean).join(" · ") || "Sin indicar"}
           </dd>
         </div>
         <div>
           <dt className="text-base text-text-muted">Presupuesto</dt>
-          <dd className="font-bold">
-            {necesidad.presupuesto
-              ? pesos(necesidad.presupuesto)
-              : "Sin indicar"}
-          </dd>
+          <dd className="font-bold">{necesidad.presupuesto ? pesos(necesidad.presupuesto) : "Sin indicar"}</dd>
         </div>
         <div>
           <dt className="text-base text-text-muted">Requisitos</dt>
           <dd className="font-bold">
-            {necesidad.requisitos
-              .map(
-                (r) => `${r.etiqueta}${r.obligatorio ? " (obligatorio)" : ""}`,
-              )
-              .join(", ") || "Ninguno"}
+            {necesidad.requisitos.map((r) => `${r.etiqueta}${r.obligatorio ? " (obligatorio)" : ""}`).join(", ") ||
+              "Ninguno"}
           </dd>
         </div>
       </dl>
@@ -228,9 +197,7 @@ export default async function CurarProblema({
           {enCola.length > 0 ? (
             <ElegirPropuestos need={necesidad.id} propuestas={enCola} />
           ) : (
-            <p className="text-text-muted">
-              Calcula el puntaje para ver los 10 mejores perfiles publicados.
-            </p>
+            <p className="text-text-muted">Calcula el puntaje para ver los 10 mejores perfiles publicados.</p>
           )}
         </section>
       )}
@@ -242,10 +209,7 @@ export default async function CurarProblema({
           </h2>
           <ul className="flex flex-col gap-2">
             {enviadas.map((p) => (
-              <li
-                key={p.id}
-                className="flex flex-wrap justify-between gap-2 rounded-md bg-surface px-4 py-3"
-              >
+              <li key={p.id} className="flex flex-wrap justify-between gap-2 rounded-md bg-surface px-4 py-3">
                 <span className="font-bold">{p.nombre}</span>
                 <span>{ESTADO_PERSONA[p.estado] ?? p.estado}</span>
               </li>
@@ -255,8 +219,7 @@ export default async function CurarProblema({
       )}
       {MODO_DEMO && (
         <p className="text-base text-text-muted">
-          Datos de ejemplo: el puntaje se calcula de verdad con los perfiles de
-          ejemplo.
+          Datos de ejemplo: el puntaje se calcula de verdad con los perfiles de ejemplo.
         </p>
       )}
     </Pantalla>

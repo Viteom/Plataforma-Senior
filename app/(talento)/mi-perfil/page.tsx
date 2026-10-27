@@ -37,24 +37,15 @@ export default async function MiPerfil() {
 
   const { data: perfil } = await supabase
     .from("talent_profiles")
-    .select(
-      "id, nombre, ubicacion, oficio, resumen, visibilidad, estado, foto_path, zona_local",
-    )
+    .select("id, nombre, ubicacion, oficio, resumen, visibilidad, estado, foto_path, zona_local")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!perfil) redirect("/perfil/nuevo");
 
-  const [
-    { data: ofertas },
-    { data: etiquetas },
-    { data: evidencias },
-    { data: guias },
-  ] = await Promise.all([
+  const [{ data: ofertas }, { data: etiquetas }, { data: evidencias }, { data: guias }] = await Promise.all([
     supabase
       .from("talent_offers")
-      .select(
-        "tipo, horas_semana, modalidad, tarifa_esperada, quiere_orientacion",
-      )
+      .select("tipo, horas_semana, modalidad, tarifa_esperada, quiere_orientacion")
       .eq("talent_id", perfil.id),
     supabase
       .from("footprint_tags")
@@ -64,9 +55,7 @@ export default async function MiPerfil() {
       .order("etiqueta"),
     supabase
       .from("evidence")
-      .select(
-        "id, tipo, descripcion, referencia_nombre, estado, autorizada_empresas",
-      )
+      .select("id, tipo, descripcion, referencia_nombre, estado, autorizada_empresas")
       .eq("talent_id", perfil.id)
       .order("creado_en"),
     supabase.from("rate_guides").select("tipo, unidad, minimo, maximo"),
@@ -75,11 +64,7 @@ export default async function MiPerfil() {
   const reservado = perfil.visibilidad === "reservado";
   // Enlace firmado por 10 minutos: el bucket es privado y solo la persona y el equipo lo leen.
   const fotoUrl = perfil.foto_path
-    ? ((
-        await supabase.storage
-          .from("fotos")
-          .createSignedUrl(perfil.foto_path, 600)
-      ).data?.signedUrl ?? null)
+    ? ((await supabase.storage.from("fotos").createSignedUrl(perfil.foto_path, 600)).data?.signedUrl ?? null)
     : null;
   const buscaron = (await listarOportunidades()).filter(
     (o) => o.estado !== "enviada_talento" && o.estado !== "descarta",
@@ -96,23 +81,15 @@ export default async function MiPerfil() {
       <Seccion titulo="Quién ve mi perfil">
         <Visibilidad visibilidad={perfil.visibilidad} />
         <form action={cambiarVisibilidad}>
-          <input
-            type="hidden"
-            name="visibilidad"
-            value={reservado ? "visible" : "reservado"}
-          />
+          <input type="hidden" name="visibilidad" value={reservado ? "visible" : "reservado"} />
           <Button type="submit" variant="secundario" size="normal">
             {reservado ? "Cambiar a visible" : "Cambiar a reservado"}
           </Button>
         </form>
         {perfil.estado === "borrador" ? (
           <p className="rounded-md bg-surface p-4">
-            Las empresas todavía no ven tu perfil: falta confirmar tu huella de
-            experiencia.{" "}
-            <Link
-              href="/huella"
-              className="font-bold underline underline-offset-4"
-            >
+            Las empresas todavía no ven tu perfil: falta confirmar tu huella de experiencia.{" "}
+            <Link href="/huella" className="font-bold underline underline-offset-4">
               Contar mi historia
             </Link>
           </p>
@@ -123,25 +100,10 @@ export default async function MiPerfil() {
                 ? "Tu perfil está en pausa: ninguna empresa lo ve."
                 : "Tu perfil está disponible para las empresas."}
             </p>
-            <input
-              type="hidden"
-              name="estado"
-              value={perfil.estado === "pausado" ? "publicado" : "pausado"}
-            />
-            <Button
-              type="submit"
-              variant="suave"
-              size="normal"
-              className="self-start"
-            >
-              {perfil.estado === "pausado" ? (
-                <Play aria-hidden />
-              ) : (
-                <Pause aria-hidden />
-              )}
-              {perfil.estado === "pausado"
-                ? "Volver a mostrar mi perfil"
-                : "Pausar mi perfil"}
+            <input type="hidden" name="estado" value={perfil.estado === "pausado" ? "publicado" : "pausado"} />
+            <Button type="submit" variant="suave" size="normal" className="self-start">
+              {perfil.estado === "pausado" ? <Play aria-hidden /> : <Pause aria-hidden />}
+              {perfil.estado === "pausado" ? "Volver a mostrar mi perfil" : "Pausar mi perfil"}
             </Button>
           </form>
         )}
@@ -176,9 +138,7 @@ export default async function MiPerfil() {
                       >
                         <span className="font-bold">{e.etiqueta}</span>
                         {!e.taxonomy_id && !e.aprobada_en && (
-                          <span className="text-sm text-text-muted">
-                            (la revisa el equipo)
-                          </span>
+                          <span className="text-sm text-text-muted">(la revisa el equipo)</span>
                         )}
                         <input type="hidden" name="id" value={e.id} />
                         <button
@@ -196,9 +156,7 @@ export default async function MiPerfil() {
             );
           })
         ) : (
-          <p className="text-text-muted">
-            Todavía no tienes etiquetas confirmadas.
-          </p>
+          <p className="text-text-muted">Todavía no tienes etiquetas confirmadas.</p>
         )}
         <Link
           href="/huella"
@@ -209,10 +167,7 @@ export default async function MiPerfil() {
         </Link>
       </Seccion>
 
-      <SeccionFormas
-        ofertas={ofertas ?? []}
-        guias={(guias ?? []) as GuiaTarifa[]}
-      />
+      <SeccionFormas ofertas={ofertas ?? []} guias={(guias ?? []) as GuiaTarifa[]} />
 
       <SeccionEvidencias evidencias={evidencias ?? []} />
 
@@ -220,18 +175,13 @@ export default async function MiPerfil() {
         {buscaron.length ? (
           <ul className="flex flex-col gap-2">
             {buscaron.map((o) => (
-              <li
-                key={o.id}
-                className="rounded-md bg-surface px-4 py-3 font-bold"
-              >
+              <li key={o.id} className="rounded-md bg-surface px-4 py-3 font-bold">
                 {o.empresa}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-text-muted">
-            Todavía ninguna. Aquí verás las empresas que quisieron conocerte.
-          </p>
+          <p className="text-text-muted">Todavía ninguna. Aquí verás las empresas que quisieron conocerte.</p>
         )}
       </Seccion>
 

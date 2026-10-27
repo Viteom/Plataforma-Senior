@@ -21,8 +21,7 @@ export function MiPerfilDemo() {
         <div className="flex items-start gap-3">
           <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />
           <p>
-            <span className="font-bold">Reservado.</span> Las empresas ven tu
-            experiencia, pero no tu nombre ni tu foto.
+            <span className="font-bold">Reservado.</span> Las empresas ven tu experiencia, pero no tu nombre ni tu foto.
           </p>
         </div>
         <Button variant="secundario" size="normal" className="self-start">
@@ -46,9 +45,7 @@ export function MiPerfilDemo() {
       </Seccion>
 
       <Seccion titulo="Cómo me pueden contratar">
-        <p className="text-text-muted">
-          Aún no has elegido formas de trabajar.
-        </p>
+        <p className="text-text-muted">Aún no has elegido formas de trabajar.</p>
       </Seccion>
 
       <Seccion titulo="Empresas que me buscaron">
@@ -73,13 +70,7 @@ export function MiPerfilDemo() {
   );
 }
 
-function Seccion({
-  titulo,
-  children,
-}: {
-  titulo: string;
-  children: React.ReactNode;
-}) {
+function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-3 border-b-2 border-border-subtle pb-6">
       <h2 className="text-xl">{titulo}</h2>

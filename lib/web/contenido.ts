@@ -1,6 +1,6 @@
 // Textos de la web informativa. Tuteo (brandbook), nada de edades ni de promesas de contratación.
 // Los perfiles son ejemplos de redacción sobre fotos de referencia: no describen a esas personas y
-// las fotografías de banco son ilustrativas y no identifican a talento de Kánna.
+// ninguna foto se publica en producción sin la autorización firmada de quien aparece.
 
 export const MENU_WEB = [
   { href: "/talento", etiqueta: "Talento" },
@@ -12,75 +12,20 @@ export const MENU_WEB = [
 export type Retrato = { src: string; ancho: number; alto: number; alt: string };
 
 export const RETRATOS = {
-  libro: {
-    src: "https://images.pexels.com/photos/3783348/pexels-photo-3783348.jpeg?auto=compress&cs=tinysrgb&w=900",
-    ancho: 900,
-    alto: 1350,
-    alt: "Fotografía de banco ilustrativa de una persona",
-  },
-  sombrero: {
-    src: "https://images.pexels.com/photos/3768131/pexels-photo-3768131.jpeg?auto=compress&cs=tinysrgb&w=900",
-    ancho: 900,
-    alto: 599,
-    alt: "Fotografía de banco ilustrativa de una persona",
-  },
-  azul: {
-    src: "https://images.pexels.com/photos/3768114/pexels-photo-3768114.jpeg?auto=compress&cs=tinysrgb&w=900",
-    ancho: 900,
-    alto: 599,
-    alt: "Fotografía de banco ilustrativa de una persona",
-  },
-  rojo: {
-    src: "https://images.pexels.com/photos/3823493/pexels-photo-3823493.jpeg?auto=compress&cs=tinysrgb&w=900",
-    ancho: 900,
-    alto: 897,
-    alt: "Fotografía de banco ilustrativa de una persona",
-  },
-  cocina: {
-    src: "https://images.pexels.com/photos/3768138/pexels-photo-3768138.jpeg?auto=compress&cs=tinysrgb&w=900",
-    ancho: 900,
-    alto: 1350,
-    alt: "Fotografía de banco ilustrativa de una persona",
-  },
+  libro: { src: "/web/retrato-libro.webp", ancho: 900, alto: 1350, alt: "Fotografía de un hombre de pie en su biblioteca, con un libro en la mano" },
+  sombrero: { src: "/web/retrato-sombrero.webp", ancho: 900, alto: 599, alt: "Fotografía de un hombre con sombrero que sonríe" },
+  azul: { src: "/web/retrato-azul.webp", ancho: 900, alto: 599, alt: "Fotografía de una mujer que sonríe mirando a un lado" },
+  rojo: { src: "/web/retrato-rojo.webp", ancho: 900, alto: 897, alt: "Fotografía de una mujer de cabello claro que mira de frente" },
+  cocina: { src: "/web/retrato-cocina.webp", ancho: 900, alto: 1350, alt: "Fotografía de un cocinero con delantal que prepara empanadas" },
 } satisfies Record<string, Retrato>;
 
 // Perfiles de ejemplo para la galería de oficios: oficio, capacidades y forma de trabajar.
 export const PERFILES_MUESTRA = [
-  {
-    retrato: RETRATOS.cocina,
-    oficio: "Cocina de producción",
-    capacidades: ["Producción por lotes", "Formación de aprendices"],
-    lugar: "Medellín",
-    forma: "Por proyecto",
-  },
-  {
-    retrato: RETRATOS.rojo,
-    oficio: "Contabilidad y finanzas",
-    capacidades: ["Salida de crisis de caja", "NIIF para pymes"],
-    lugar: "Bogotá",
-    forma: "Conversación de una hora",
-  },
-  {
-    retrato: RETRATOS.libro,
-    oficio: "Docencia y bibliotecas",
-    capacidades: ["Promoción de lectura", "Formación de docentes"],
-    lugar: "Manizales",
-    forma: "Mentoría",
-  },
-  {
-    retrato: RETRATOS.azul,
-    oficio: "Enfermería",
-    capacidades: ["Cuidado en casa", "Formación de cuidadores"],
-    lugar: "Cali",
-    forma: "Por horas",
-  },
-  {
-    retrato: RETRATOS.sombrero,
-    oficio: "Ebanistería",
-    capacidades: ["Organización de taller", "Restauración de muebles"],
-    lugar: "Pasto",
-    forma: "Por proyecto",
-  },
+  { retrato: RETRATOS.cocina, oficio: "Cocina de producción", capacidades: ["Producción por lotes", "Formación de aprendices"], lugar: "Medellín", forma: "Por proyecto" },
+  { retrato: RETRATOS.rojo, oficio: "Contabilidad y finanzas", capacidades: ["Salida de crisis de caja", "NIIF para pymes"], lugar: "Bogotá", forma: "Conversación de una hora" },
+  { retrato: RETRATOS.libro, oficio: "Docencia y bibliotecas", capacidades: ["Promoción de lectura", "Formación de docentes"], lugar: "Manizales", forma: "Mentoría" },
+  { retrato: RETRATOS.azul, oficio: "Enfermería", capacidades: ["Cuidado en casa", "Formación de cuidadores"], lugar: "Cali", forma: "Por horas" },
+  { retrato: RETRATOS.sombrero, oficio: "Ebanistería", capacidades: ["Organización de taller", "Restauración de muebles"], lugar: "Pasto", forma: "Por proyecto" },
 ];
 
 export const OFICIOS = [
@@ -105,8 +50,7 @@ export type Paso = { titulo: string; texto: string };
 export const PASOS_TALENTO: Paso[] = [
   {
     titulo: "Entra con un código",
-    texto:
-      "Te llega un código de 6 números por mensaje de texto o por correo. No necesitas contraseña.",
+    texto: "Te llega un código de 6 números por mensaje de texto o por correo. No necesitas contraseña.",
   },
   {
     titulo: "Cuenta lo que sabes",
@@ -128,8 +72,7 @@ export const PASOS_TALENTO: Paso[] = [
 export const PASOS_ORGANIZACION: Paso[] = [
   {
     titulo: "Verifica tu organización",
-    texto:
-      "Entras con un código y nos das el NIT. Lo revisamos antes de que puedas invitar a alguien a conversar.",
+    texto: "Entras con un código y nos das el NIT. Lo revisamos antes de que puedas invitar a alguien a conversar.",
   },
   {
     titulo: "Cuenta tu reto",
@@ -228,30 +171,23 @@ export const PREGUNTAS_ORGANIZACION: Pregunta[] = [
 
 // Promesas de confianza, en el orden en que preocupan.
 export const PROMESAS = [
-  {
-    titulo: "Nadie te va a pedir dinero.",
-    texto:
-      "Ni Kánna ni una organización. Si alguien lo hace, no pagues y avísanos.",
-  },
-  {
-    titulo: "Solo organizaciones verificadas.",
-    texto: "Revisamos el NIT antes de que puedan invitarte a conversar.",
-  },
-  {
-    titulo: "La edad nunca se muestra.",
-    texto: "Ni tu fecha de nacimiento ni tu foto entran en la búsqueda.",
-  },
-  {
-    titulo: "Siempre hay una persona.",
-    texto: "Si algo no te queda claro, te llamamos.",
-  },
+  { titulo: "Nadie te va a pedir dinero.", texto: "Ni Kánna ni una organización. Si alguien lo hace, no pagues y avísanos." },
+  { titulo: "Solo organizaciones verificadas.", texto: "Revisamos el NIT antes de que puedan invitarte a conversar." },
+  { titulo: "La edad nunca se muestra.", texto: "Ni tu fecha de nacimiento ni tu foto entran en la búsqueda." },
+  { titulo: "Siempre hay una persona.", texto: "Si algo no te queda claro, te llamamos." },
 ];
 
 export const CREDITOS = [
   {
-    obra: "Fotografías de referencia de Pexels",
-    autor: "Ver autor en la ficha de cada fotografía",
-    licencia: "Licencia Pexels",
-    url: "https://www.pexels.com/license/",
+    obra: "Sandoná, tierra de artesanas",
+    autor: "JoaquinStevenMeneses",
+    licencia: "CC BY-SA 4.0",
+    url: "https://commons.wikimedia.org/wiki/File:Sandon%C3%A1,_tierra_de_artesanas.jpg",
+  },
+  {
+    obra: "En el campo también se teje",
+    autor: "JoaquinStevenMeneses",
+    licencia: "CC BY-SA 4.0",
+    url: "https://commons.wikimedia.org/wiki/File:En_el_campo_tambi%C3%A9n_se_teje.jpg",
   },
 ];
