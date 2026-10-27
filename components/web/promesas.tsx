@@ -8,7 +8,7 @@ import { MARCO, retraso } from "./marco";
 // Capítulo oscuro de confianza: lo que preocupa, dicho en grande y sin letra pequeña.
 export function Promesas({ enlace = true }: { enlace?: boolean }) {
   return (
-    <section aria-labelledby="confianza" className="bg-text py-24 text-bg lg:py-36">
+    <section aria-labelledby="confianza" className="bg-deep py-24 text-on-deep lg:py-36">
       <div className={MARCO}>
         <h2 id="confianza" data-aparecer className="titular-marca max-w-[16ch] text-afiche">
           Hecho para que confíes

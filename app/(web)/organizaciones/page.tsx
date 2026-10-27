@@ -103,7 +103,7 @@ export default function PaginaOrganizaciones() {
         id="campo"
         imagen="/web/campo-sandona.webp"
         imagenCelular="/web/campo-tejido.webp"
-        descripcion="Grabado de una artesana de Sandoná, Nariño, tejiendo paja toquilla."
+        descripcion="Fotografía de una artesana de Sandoná, Nariño, tejiendo paja toquilla."
         celdas={[
           { tipo: "titulo", texto: "Talento del campo", color: "bg-text text-bg" },
           {

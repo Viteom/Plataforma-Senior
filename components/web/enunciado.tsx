@@ -6,15 +6,15 @@ import { RETRATOS } from "@/lib/web/contenido";
 import { retraso } from "./marco";
 import { Retrato } from "./retrato";
 
-// Tablero de enunciados: un cuadro oscuro con la frase, uno claro con una sola palabra que se sale
-// del cuadro, uno con retrato y, debajo, el texto largo que lo explica.
+// Tablero de enunciados: un cuadro oscuro con la frase, uno claro con una sola palabra, uno con
+// retrato y, debajo, el texto largo que lo explica.
 export function Enunciado() {
   return (
     <section aria-labelledby="lo-que-sabes" className="bg-bg px-4 md:px-8">
       <div className="mx-auto grid max-w-web grid-cols-2 gap-1.5 lg:grid-cols-12 lg:grid-rows-[38svh_38svh] lg:gap-2">
         <div
           data-aparecer
-          className="col-span-2 flex min-h-[34svh] items-end rounded-lg bg-text p-5 text-bg lg:col-span-8 lg:row-span-2 lg:min-h-0 lg:p-8"
+          className="col-span-2 flex min-h-[34svh] items-end rounded-lg bg-primary p-5 text-on-primary lg:col-span-8 lg:row-span-2 lg:min-h-0 lg:p-8"
         >
           <h2 id="lo-que-sabes" className="titular-marca text-afiche lg:text-gigante">
             Lo que sabes importa
@@ -26,7 +26,7 @@ export function Enunciado() {
           aria-hidden
           className="flex aspect-square items-end overflow-hidden rounded-lg bg-surface p-4 lg:col-span-4 lg:aspect-auto lg:p-6"
         >
-          <span className="titular-marca text-titular whitespace-nowrap lg:text-afiche">Capacidades</span>
+          <span className="titular-marca text-xl whitespace-nowrap sm:text-titular">Capacidades</span>
         </div>
         <div data-aparecer style={retraso(2)} className="aspect-square overflow-hidden rounded-lg lg:col-span-4 lg:aspect-auto">
           <Retrato retrato={RETRATOS.rojo} className="h-full border-0" tamanos="(min-width: 64rem) 30vw, 48vw" />

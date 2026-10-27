@@ -22,25 +22,25 @@ export const metadata: Metadata = {
 
 const ENTRAR = MODO_DEMO ? "/empresa/campo" : "/entrar?para=empresa";
 
-const GRABADO_CAMPO = {
+const FOTO_CAMPO = {
   src: "/web/campo-sandona.webp",
   ancho: 1440,
   alto: 960,
-  alt: "Grabado de una artesana de Sandoná, Nariño, tejiendo paja toquilla",
+  alt: "Fotografía de una artesana de Sandoná, Nariño, tejiendo paja toquilla",
 };
 
 const TEJIDO_CAMPO = {
   src: "/web/campo-tejido.webp",
   ancho: 800,
   alto: 1600,
-  alt: "Grabado de una artesana tejiendo paja toquilla en su casa, en Sandoná, Nariño",
+  alt: "Fotografía de una artesana tejiendo paja toquilla en su casa, en Sandoná, Nariño",
 };
 
 const DETALLE_CAMPO = {
   src: "/web/detalle-sandona.webp",
   ancho: 560,
   alto: 560,
-  alt: "Grabado de unas manos tejiendo paja toquilla",
+  alt: "Fotografía de unas manos tejiendo paja toquilla",
 };
 
 export default async function PaginaCampo() {
@@ -62,7 +62,7 @@ export default async function PaginaCampo() {
             <Link href={ENTRAR}>Pedir una cotización</Link>
           </Button>
         }
-        retrato={GRABADO_CAMPO}
+        retrato={FOTO_CAMPO}
         forma="bg-deep"
         formatoRetrato="aspect-[3/2] h-[min(24rem,42svh)]"
         nota="Cada ficha la aprueba quien hace el taller o el oficio."

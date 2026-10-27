@@ -90,7 +90,7 @@ export function Mosaico({
   );
 
   return (
-    <section aria-labelledby={id} className="bg-deep px-4 py-4 md:px-8 md:py-8">
+    <section aria-labelledby={id} className="bg-bg px-4 py-4 md:px-8 md:py-8">
       <div data-aparecer style={retraso(0)} className="mx-auto max-w-web">
         {tablero(6, 4, posiciones, imagen, "hidden lg:grid")}
         {tablero(3, 6, posicionesCelular, imagenCelular, "lg:hidden")}
