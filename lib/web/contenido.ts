@@ -1,6 +1,6 @@
 // Textos de la web informativa. Tuteo (brandbook), nada de edades ni de promesas de contratación.
-// Los perfiles son ejemplos de redacción sobre fotos de referencia: no describen a esas personas y
-// ninguna foto se publica en producción sin la autorización firmada de quien aparece.
+// Los perfiles son ejemplos de redacción sobre fotos de banco (Pexels, uso libre): no describen a esas personas y
+// las fotografías son ilustrativas: no identifican a talento de Kánna.
 
 export const MENU_WEB = [
   { href: "/talento", etiqueta: "Talento" },
@@ -12,11 +12,11 @@ export const MENU_WEB = [
 export type Retrato = { src: string; ancho: number; alto: number; alt: string };
 
 export const RETRATOS = {
-  libro: { src: "/web/retrato-libro.webp", ancho: 900, alto: 1350, alt: "Fotografía de un hombre de pie en su biblioteca, con un libro en la mano" },
-  sombrero: { src: "/web/retrato-sombrero.webp", ancho: 900, alto: 599, alt: "Fotografía de un hombre con sombrero que sonríe" },
-  azul: { src: "/web/retrato-azul.webp", ancho: 900, alto: 599, alt: "Fotografía de una mujer que sonríe mirando a un lado" },
-  rojo: { src: "/web/retrato-rojo.webp", ancho: 900, alto: 897, alt: "Fotografía de una mujer de cabello claro que mira de frente" },
-  cocina: { src: "/web/retrato-cocina.webp", ancho: 900, alto: 1350, alt: "Fotografía de un cocinero con delantal que prepara empanadas" },
+  libro: { src: "/web/retrato-libro.webp", ancho: 900, alto: 1350, alt: "Fotografía de un profesor de barba canosa con un portátil en un auditorio" },
+  sombrero: { src: "/web/retrato-sombrero.webp", ancho: 900, alto: 599, alt: "Fotografía de un artesano con gafas que sonríe en su taller" },
+  azul: { src: "/web/retrato-azul.webp", ancho: 900, alto: 599, alt: "Fotografía de una enfermera con uniforme azul que mira de frente" },
+  rojo: { src: "/web/retrato-rojo.webp", ancho: 900, alto: 897, alt: "Fotografía de una ejecutiva de cabello canoso que sonríe en una reunión" },
+  cocina: { src: "/web/retrato-cocina.webp", ancho: 900, alto: 1350, alt: "Fotografía de un chef de barba canosa con una olla en la mano" },
 } satisfies Record<string, Retrato>;
 
 // Perfiles de ejemplo para la galería de oficios: oficio, capacidades y forma de trabajar.
