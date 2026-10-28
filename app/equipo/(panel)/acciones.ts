@@ -141,7 +141,7 @@ export async function enviarElegidos(_p: Estado, datos: FormData): Promise<Estad
   await supabase.from("connections").delete().eq("need_id", need).eq("estado", "propuesta");
   await supabase.from("needs").update({ estado: "enviada" }).eq("id", need);
   revalidatePath(`/equipo/problema/${need}`);
-  revalidatePath("/equipo");
+  revalidatePath("/equipo", "layout");
   return {
     aviso: `Enviado a ${elegidos.length} ${elegidos.length === 1 ? "persona" : "personas"}. Quedaron en la cola de avisos.`,
   };
@@ -610,7 +610,7 @@ export async function revisarMuestra(_p: Estado, datos: FormData): Promise<Estad
   const { error } = await supabase.rpc("revisar_muestra", { reto });
   if (error) return { error: "No pudimos marcarlo. Puede que otra persona ya lo haya revisado." };
   revalidatePath(`/equipo/problema/${reto}`);
-  revalidatePath("/equipo");
+  revalidatePath("/equipo", "layout");
   return { aviso: "Listo: la aprobación automática quedó confirmada." };
 }
 

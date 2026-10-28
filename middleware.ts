@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { decidirRuta, type Rol } from "@/lib/auth/rutas";
+import { actividadVigente, COOKIE_ACTIVIDAD, opcionesCookieActividad } from "@/lib/auth/inactividad";
+import { decidirRuta, ENTRADA_EQUIPO, esPublica, esRolEquipo, type Rol } from "@/lib/auth/rutas";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseConfigurado } from "@/lib/supabase/config";
 
 // Refresca la sesión de Supabase y manda a cada rol a su área (lib/auth/rutas.ts).
@@ -31,11 +32,28 @@ export async function middleware(request: NextRequest) {
     rol = (data?.rol as Rol | undefined) ?? null;
   }
 
-  const destino = decidirRuta(request.nextUrl.pathname, rol);
-  if (!destino) return respuesta;
+  const pathname = request.nextUrl.pathname;
+  // El equipo solo cuenta con segundo factor (aal2) y una sesión usada en los últimos 30 minutos.
+  let segundoFactor = false;
+  if (esRolEquipo(rol)) {
+    const { data: nivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    segundoFactor = nivel?.currentLevel === "aal2";
+    if (segundoFactor && !esPublica(pathname) && !actividadVigente(request.cookies.get(COOKIE_ACTIVIDAD)?.value)) {
+      await supabase.auth.signOut();
+      const salida = redirigir(request, respuesta, `${ENTRADA_EQUIPO}?motivo=inactividad`);
+      salida.cookies.delete(COOKIE_ACTIVIDAD);
+      return salida;
+    }
+    if (segundoFactor) respuesta.cookies.set(COOKIE_ACTIVIDAD, String(Date.now()), opcionesCookieActividad);
+  }
 
+  const destino = decidirRuta(pathname, rol, segundoFactor);
+  return destino ? redirigir(request, respuesta, destino) : respuesta;
+}
+
+function redirigir(request: NextRequest, respuesta: NextResponse, destino: string) {
   const redireccion = NextResponse.redirect(new URL(destino, request.url));
-  // Conserva las cookies de sesión que Supabase acaba de refrescar.
+  // Conserva las cookies de sesión que Supabase acaba de refrescar (o borrar).
   respuesta.cookies.getAll().forEach((c) => redireccion.cookies.set(c));
   return redireccion;
 }

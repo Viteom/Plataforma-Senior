@@ -3,14 +3,17 @@ import {
   BadgeCheck,
   BookOpen,
   Building2,
-  ClipboardList,
+  ClipboardCheck,
   Compass,
+  FileCheck,
   Handshake,
+  Heart,
   House,
   Inbox,
   LayoutList,
   LifeBuoy,
   Search,
+  SlidersHorizontal,
   Sprout,
   UserRound,
   UserRoundPlus,
@@ -71,39 +74,33 @@ export const navEmpresaCelular: ItemNav[] = [
   },
 ];
 
-export const navEquipo: ItemNav[] = [
+// Equipo: menú por áreas. El número de pendientes de cada destino lo calcula el layout del panel.
+export const inicioEquipo: ItemNav = { href: "/equipo", etiqueta: "Inicio", icono: House };
+
+export const gruposEquipo: { titulo: string; items: ItemNav[] }[] = [
   {
-    href: "/equipo/condiciones",
-    etiqueta: "Condiciones de trabajo",
-    icono: ClipboardList,
+    titulo: "Retos y acuerdos",
+    items: [
+      { href: "/equipo/curaduria", etiqueta: "Curaduría de retos", icono: ClipboardCheck },
+      { href: "/equipo/condiciones", etiqueta: "Condiciones de acuerdos", icono: FileCheck },
+      { href: "/equipo/semaforo", etiqueta: "Reglas del semáforo", icono: SlidersHorizontal },
+    ],
   },
   {
-    href: "/equipo/bienestar",
-    etiqueta: "Bienestar y seguimiento",
-    icono: LifeBuoy,
+    titulo: "Personas",
+    items: [
+      { href: "/equipo/bienestar", etiqueta: "Bienestar", icono: Heart },
+      { href: "/equipo/ayuda", etiqueta: "Solicitudes de ayuda", icono: Inbox },
+      { href: "/equipo/evidencias", etiqueta: "Evidencias y tarifas", icono: BadgeCheck },
+      { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
+      { href: "/equipo/experiencias", etiqueta: "Talento del campo", icono: Sprout },
+      // ?desde=equipo: en la demostración muestra el enlace de vuelta al panel.
+      { href: "/gestor/registrar?desde=equipo", etiqueta: "Registro asistido", icono: UserRoundPlus },
+    ],
   },
-  { href: "/equipo", etiqueta: "Curaduría", icono: ClipboardList },
   {
-    href: "/equipo/empresas",
-    etiqueta: "Empresas y reportes",
-    icono: Building2,
-  },
-  {
-    href: "/equipo/evidencias",
-    etiqueta: "Evidencias y tarifas",
-    icono: BadgeCheck,
-  },
-  { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
-  {
-    href: "/equipo/experiencias",
-    etiqueta: "Talento del campo",
-    icono: Sprout,
-  },
-  { href: "/equipo/ayuda", etiqueta: "Solicitudes de ayuda", icono: Inbox },
-  {
-    href: "/gestor/registrar",
-    etiqueta: "Registro asistido",
-    icono: UserRoundPlus,
+    titulo: "Organizaciones",
+    items: [{ href: "/equipo/empresas", etiqueta: "Organizaciones y reportes", icono: Building2 }],
   },
 ];
 

@@ -28,7 +28,7 @@ export default async function EquipoExperiencias() {
   return (
     <Pantalla
       titulo="Talento del campo"
-      intro="Talleres, experiencias y oficios por encargo que Vasees arma con personas del territorio. Se publican solo cuando quien lo hace aprobó cómo aparece."
+      intro="Talleres, experiencias y oficios por encargo que Kánna arma con personas del territorio. Se publican solo cuando quien lo hace aprobó cómo aparece."
     >
       <Button asChild className="self-start">
         <Link href="/equipo/experiencias/nueva">

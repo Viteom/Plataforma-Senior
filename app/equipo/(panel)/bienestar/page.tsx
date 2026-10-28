@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { crearClienteServidor } from "@/lib/supabase/server";
+import { casosBienestarDemo } from "@/lib/datos/equipo";
 import { MODO_DEMO } from "@/lib/demo";
 import { gestionarCaso } from "./acciones";
-export const metadata = { title: "Acompañamiento de bienestar" };
+export const metadata = { title: "Bienestar" };
 
 type CasoEquipo = {
   id: string;
@@ -25,11 +26,13 @@ export default async function Seguimientos() {
     if (!data) redirect("/entrar");
   }
   // La función deja registro de cada lectura; el equipo no tiene acceso directo a las tablas.
-  const { data, error } = supabase ? await supabase.rpc("casos_bienestar_equipo") : { data: [], error: null };
+  const { data, error } = supabase
+    ? await supabase.rpc("casos_bienestar_equipo")
+    : { data: casosBienestarDemo(), error: null };
   const casos = (data ?? []) as CasoEquipo[];
   return (
     <Pantalla
-      titulo="Acompañamiento de bienestar"
+      titulo="Bienestar"
       intro="Cola privada del equipo. Revisa las señales, toma el caso y registra el cierre. Ninguna organización recibe las respuestas, y cada vez que abres esta cola queda registrado."
     >
       <p>

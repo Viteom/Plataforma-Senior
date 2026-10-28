@@ -59,7 +59,7 @@ export default function Portada() {
           { tipo: "titulo", texto: "Talento del campo", color: "bg-text text-bg" },
           { tipo: "dato", texto: "Talleres para equipos con sabedoras y sabedores", corto: "Talleres para equipos", color: "bg-bg text-text" },
           { tipo: "dato", texto: "Oficios por encargo: tejidos, muebles, restauración", corto: "Oficios por encargo", color: "bg-bg text-text" },
-          { tipo: "dato", texto: "Vasees los arma con personas que no usan tecnología", corto: "Hecho con Vasees", color: "bg-bg text-text" },
+          { tipo: "dato", texto: "Kánna los arma con personas que no usan tecnología", corto: "Hecho con Kánna", color: "bg-bg text-text" },
           { tipo: "accion", texto: "Conocer Talento del campo", corto: "Conocerlo", href: "/campo", color: "bg-primary text-on-primary" },
         ]}
         posiciones={[0, 8, 13, 18, 5]}

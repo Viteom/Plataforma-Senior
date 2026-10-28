@@ -13,7 +13,7 @@ import { etiquetaForma, pesos } from "@/lib/formas";
 import { calcularPropuestos, revisarCondicionesReto, completarCondicionesReto, revisarMuestra } from "../../acciones";
 import { ElegirPropuestos } from "./elegir";
 
-export const metadata: Metadata = { title: "Curar búsqueda" };
+export const metadata: Metadata = { title: "Curar reto" };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -37,14 +37,14 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
 
   return (
     <Pantalla
-      titulo={`Búsqueda de ${empresa.nombre}`}
+      titulo={`Reto de ${empresa.nombre}`}
       antesDelTitulo={
         <Link
-          href="/equipo"
+          href="/equipo/curaduria"
           className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline-offset-4 hover:underline"
         >
           <ArrowLeft aria-hidden className="size-5" />
-          Panel
+          Curaduría de retos
         </Link>
       }
       intro={`«${necesidad.problema}»`}

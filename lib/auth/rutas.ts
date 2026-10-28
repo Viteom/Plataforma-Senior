@@ -45,16 +45,27 @@ export function esPublica(pathname: string) {
   return PUBLICAS.some((p) => (p === "/" ? pathname === "/" : coincide(pathname, p)));
 }
 
+// Curaduría y administración solo tienen permisos tras el segundo factor (la base lo exige con
+// mi_rol()). Mientras tanto, su única puerta es la entrada del equipo.
+export const ENTRADA_EQUIPO = "/equipo/entrar";
+export const esRolEquipo = (rol: Rol | null) => rol === "curador" || rol === "admin";
+
 // Devuelve a dónde redirigir, o null si puede seguir.
-export function decidirRuta(pathname: string, rol: Rol | null): string | null {
+export function decidirRuta(pathname: string, rol: Rol | null, segundoFactor = false): string | null {
+  if (coincide(pathname, ENTRADA_EQUIPO)) {
+    if (!rol) return null;
+    if (!esRolEquipo(rol)) return inicioDe(rol);
+    return segundoFactor ? inicioDe(rol) : null;
+  }
   // Con sesión, la pantalla de entrar no tiene sentido: va a su inicio.
   if (rol && coincide(pathname, "/entrar")) return inicioDe(rol);
   if (esPublica(pathname)) return null;
+  if (esRolEquipo(rol) && !segundoFactor) return ENTRADA_EQUIPO;
 
   const area = AREAS.find((a) => a.prefijos.some((p) => coincide(pathname, p)));
   // Rutas que no pertenecen a ningún área (por ejemplo, una que no existe): que responda Next
   // con su página de "no encontrada", sin pedir sesión.
   if (!area) return null;
-  if (!rol) return "/entrar";
+  if (!rol) return area.prefijos.includes("/equipo") ? ENTRADA_EQUIPO : "/entrar";
   return area.roles.includes(rol) ? null : inicioDe(rol);
 }

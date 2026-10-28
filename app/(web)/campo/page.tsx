@@ -17,7 +17,7 @@ import { pesos } from "@/lib/formas";
 export const metadata: Metadata = {
   title: "Talento del campo",
   description:
-    "Talleres para equipos y oficios por encargo con personas del territorio que no usan tecnología. Vasees los arma con ellas.",
+    "Talleres para equipos y oficios por encargo con personas del territorio que no usan tecnología. Kánna los arma con ellas.",
 };
 
 const ENTRAR = MODO_DEMO ? "/empresa/campo" : "/entrar?para=empresa";
@@ -56,7 +56,7 @@ export default async function PaginaCampo() {
             <span className="font-editorial font-normal tracking-normal text-primary italic">del campo</span>
           </>
         }
-        texto="Talleres y oficios por encargo con personas del territorio que no usan tecnología. Vasees los arma con ellas, y nada se publica sin su aprobación."
+        texto="Talleres y oficios por encargo con personas del territorio que no usan tecnología. Kánna los arma con ellas, y nada se publica sin su aprobación."
         acciones={
           <Button asChild className="active:scale-[0.97]">
             <Link href={ENTRAR}>Pedir una cotización</Link>
@@ -152,11 +152,11 @@ export default async function PaginaCampo() {
       <Pasos
         id="cotizar"
         titulo="Cómo se pide"
-        texto="Del pedido al reporte final, Vasees acompaña cada paso."
+        texto="Del pedido al reporte final, Kánna acompaña cada paso."
         pasos={[
           { titulo: "Pides una cotización", texto: "Eliges el taller u oficio, cuántas personas o piezas y en qué mes." },
-          { titulo: "Te enviamos el valor", texto: "El equipo de Vasees habla con quien lo hace y te manda la cotización." },
-          { titulo: "Confirmas", texto: "Acordamos la fecha, el lugar o la entrega. Vasees acompaña todo el proceso." },
+          { titulo: "Te enviamos el valor", texto: "El equipo de Kánna habla con quien lo hace y te manda la cotización." },
+          { titulo: "Confirmas", texto: "Acordamos la fecha, el lugar o la entrega. Kánna acompaña todo el proceso." },
           {
             titulo: "Recibes el reporte",
             texto: "Cuántas personas participaron, cuántas horas y cuánto recibió quien lo hizo.",
@@ -169,7 +169,7 @@ export default async function PaginaCampo() {
           {
             pregunta: "¿Quién hace los talleres y los oficios?",
             respuesta:
-              "Personas del territorio con un saber propio: tejedoras, sabedoras, carpinteros. Vasees las acompaña porque muchas no usan tecnología.",
+              "Personas del territorio con un saber propio: tejedoras, sabedoras, carpinteros. Kánna las acompaña porque muchas no usan tecnología.",
           },
           {
             pregunta: "¿Se publica algo sin su permiso?",

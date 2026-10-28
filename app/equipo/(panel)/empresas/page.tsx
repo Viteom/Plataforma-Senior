@@ -9,7 +9,7 @@ import { MODO_DEMO } from "@/lib/demo";
 
 import { resolverReporte, verificarEmpresa } from "../acciones";
 
-export const metadata: Metadata = { title: "Empresas y reportes" };
+export const metadata: Metadata = { title: "Organizaciones y reportes" };
 
 const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-CO", { day: "numeric", month: "long" });
 
@@ -21,8 +21,8 @@ export default async function Empresas() {
 
   return (
     <Pantalla
-      titulo="Empresas y reportes"
-      intro="Ninguna empresa llega al talento sin verificar (regla 9). Revisa el NIT en el RUES antes de marcarla."
+      titulo="Organizaciones y reportes"
+      intro="Ninguna organización llega al talento sin verificar su NIT. Revísalo en el RUES antes de marcarla."
     >
       <section aria-labelledby="verificar" className="flex flex-col gap-4">
         <h2 id="verificar" className="text-xl">
@@ -49,7 +49,7 @@ export default async function Empresas() {
                   </p>
                 </div>
                 <BotonAccion accion={verificarEmpresa} campos={{ id: e.id }} texto="Marcar como verificada" className="max-w-xl">
-                  <Campo id={`fuente-${e.id}`} etiqueta="¿Dónde lo verificó?" ayuda="Por ejemplo: RUES, matrícula activa, mismo NIT y nombre.">
+                  <Campo id={`fuente-${e.id}`} etiqueta="¿Dónde lo verificaste?" ayuda="Por ejemplo: RUES, matrícula activa, mismo NIT y nombre.">
                     {(p) => <Input {...p} name="fuente" defaultValue="RUES: " />}
                   </Campo>
                 </BotonAccion>
@@ -57,7 +57,7 @@ export default async function Empresas() {
             ))}
           </ul>
         ) : (
-          <p className="text-text-muted">No hay empresas esperando verificación.</p>
+          <p className="text-text-muted">No hay organizaciones esperando verificación.</p>
         )}
       </section>
 
@@ -65,7 +65,7 @@ export default async function Empresas() {
         <h2 id="reportes" className="text-xl">
           Reportes abiertos ({abiertos.length})
         </h2>
-        <p className="text-text-muted">Revisa en máximo 2 días hábiles. Con dos reportes confirmados, la empresa queda en pausa para todo el talento.</p>
+        <p className="text-text-muted">Revisa en máximo 2 días hábiles. Con dos reportes confirmados, la organización queda en pausa para todo el talento.</p>
         {abiertos.length ? (
           <ul className="flex flex-col gap-4">
             {abiertos.map((r) => (

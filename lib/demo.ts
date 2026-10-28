@@ -313,7 +313,7 @@ export const experienciaEjemplo: ExperienciaVista = {
   aprobada_por_sabedora_en: null,
 };
 
-// Oficio por encargo de muestra: Vasees lo arma con la artesana, que no usa la app.
+// Oficio por encargo de muestra: Kánna lo arma con la artesana, que no usa la app.
 export const oficioEjemplo: ExperienciaVista = {
   id: "00000000-0000-4000-9400-000000000002",
   slug: "tejidos-en-guanga-por-encargo",
@@ -329,7 +329,7 @@ export const oficioEjemplo: ExperienciaVista = {
   momentos: [
     { titulo: "Diseño", descripcion: "Eliges colores y tamaño con nuestro equipo." },
     { titulo: "Tejido", descripcion: "Las tejedoras trabajan en sus casas, a su ritmo." },
-    { titulo: "Entrega", descripcion: "Vasees revisa cada pieza y la lleva a tu sede." },
+    { titulo: "Entrega", descripcion: "Kánna revisa cada pieza y la lleva a tu sede." },
   ],
   formatos: ["sede"],
   lugar: null,

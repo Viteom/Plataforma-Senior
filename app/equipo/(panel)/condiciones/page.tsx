@@ -6,7 +6,7 @@ import { crearClienteServidor } from "@/lib/supabase/server";
 import { MODO_DEMO } from "@/lib/demo";
 import { textoAcuerdo } from "@/lib/procesos";
 import { revisarAcuerdoTrabajo } from "../acciones";
-export const metadata = { title: "Condiciones de trabajo" };
+export const metadata = { title: "Condiciones de acuerdos" };
 export default async function Condiciones() {
   const supabase = MODO_DEMO ? null : await crearClienteServidor();
   if (supabase) {
@@ -26,7 +26,7 @@ export default async function Condiciones() {
         .limit(100);
   return (
     <Pantalla
-      titulo="Revisar condiciones de trabajo"
+      titulo="Condiciones de acuerdos"
       intro="Aquí solo llegan los acuerdos que el semáforo no pudo aprobar solo. Acompaña a ambas partes. Confirma remuneración justa, tareas claras, descansos, seguridad y ajustes acordados; no solicites diagnósticos ni uses la edad para decidir."
     >
       {error && <p role="alert">No pudimos cargar los acuerdos.</p>}

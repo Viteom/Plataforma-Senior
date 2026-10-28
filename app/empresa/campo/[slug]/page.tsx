@@ -108,7 +108,7 @@ export default async function FichaCampo({ params }: { params: Promise<{ slug: s
 
         {exp.testimonio && <blockquote className="border-l-4 border-deep pl-4 text-lg italic">{exp.testimonio}</blockquote>}
         <p className="rounded-md bg-surface p-4">
-          Vasees arma esta oferta con quienes la hacen, en su territorio. Ellas y ellos no tienen que usar la app: nosotros
+          Kánna arma esta oferta con quienes la hacen, en su territorio. Ellas y ellos no tienen que usar la app: nosotros
           cotizamos, coordinamos y te acompañamos.
         </p>
         {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo.</p>}
