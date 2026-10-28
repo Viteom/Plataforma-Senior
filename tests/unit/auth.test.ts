@@ -47,7 +47,8 @@ describe("decidirRuta", () => {
     expect(decidirRuta("/empresa/campo", null)).toBe("/entrar");
     expect(decidirRuta("/inicio", null)).toBe("/entrar");
     expect(decidirRuta("/empresa/explorar", null)).toBe("/entrar");
-    expect(decidirRuta("/equipo", null)).toBe("/entrar");
+    expect(decidirRuta("/equipo", null)).toBe("/equipo/entrar");
+    expect(decidirRuta("/equipo/entrar", null)).toBeNull();
   });
 
   it("cada rol queda en su área", () => {
@@ -55,9 +56,25 @@ describe("decidirRuta", () => {
     expect(decidirRuta("/inicio", "empresa")).toBe("/empresa/explorar");
     expect(decidirRuta("/equipo", "empresa")).toBe("/empresa/explorar");
     expect(decidirRuta("/equipo/ayuda", "gestor")).toBe("/gestor/registrar");
-    expect(decidirRuta("/gestor/registrar", "curador")).toBe("/equipo");
+    expect(decidirRuta("/gestor/registrar", "curador", true)).toBe("/equipo");
     expect(decidirRuta("/huella", "talento")).toBeNull();
     expect(decidirRuta("/empresa/procesos", "empresa")).toBeNull();
+  });
+
+  it("el equipo solo pasa con segundo factor; su entrada no es para otros roles", () => {
+    for (const rol of ["curador", "admin"] as const) {
+      expect(decidirRuta("/equipo", rol)).toBe("/equipo/entrar");
+      expect(decidirRuta("/equipo/bienestar", rol)).toBe("/equipo/entrar");
+      expect(decidirRuta("/inicio", rol)).toBe("/equipo/entrar");
+      expect(decidirRuta("/equipo/entrar", rol)).toBeNull();
+      expect(decidirRuta("/ayuda", rol)).toBeNull();
+      expect(decidirRuta("/equipo", rol, true)).toBeNull();
+      expect(decidirRuta("/equipo/entrar", rol, true)).toBe("/equipo");
+      expect(decidirRuta("/entrar", rol)).toBe("/equipo");
+    }
+    expect(decidirRuta("/equipo/entrar", "talento")).toBe("/inicio");
+    expect(decidirRuta("/equipo/entrar", "empresa")).toBe("/empresa/explorar");
+    expect(decidirRuta("/gestor/registrar", "gestor")).toBeNull();
   });
 
   it("no confunde prefijos parecidos", () => {
@@ -75,9 +92,9 @@ describe("decidirRuta", () => {
     expect(decidirRuta("/entrar", "empresa")).toBe(inicioDe("empresa"));
   });
 
-  it("admin entra a todas las áreas", () => {
+  it("admin con segundo factor entra a todas las áreas", () => {
     for (const r of ["/inicio", "/empresa/explorar", "/equipo", "/gestor/registrar"]) {
-      expect(decidirRuta(r, "admin")).toBeNull();
+      expect(decidirRuta(r, "admin", true)).toBeNull();
     }
   });
 });

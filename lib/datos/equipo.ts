@@ -1,6 +1,7 @@
 import "server-only";
 
 import { redirect } from "next/navigation";
+import { cache } from "react";
 
 import { MODO_DEMO, necesidadEjemplo, perfilesEjemplo } from "@/lib/demo";
 import type { Capa } from "@/lib/ia/tipos";
@@ -17,7 +18,7 @@ async function cliente() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/entrar");
+  if (!user) redirect("/equipo/entrar");
   return supabase;
 }
 
@@ -40,6 +41,106 @@ export type NecesidadEnCola = {
   creado_en: string;
   semaforo?: string | null;
 };
+
+// Lo que resumen_equipo() calcula en la base: cifras y nombres de organizaciones, nunca datos de
+// una persona del talento.
+export type ResumenEquipo = {
+  bienestar: { abiertos: number; vencidos: number; mas_antiguo: string | null };
+  ayuda: { abiertas: number; mas_antigua: string | null };
+  avisos: number;
+  condiciones: number;
+  personas_nuevas: number;
+  personas_publicadas: number;
+  organizaciones_verificadas: number;
+  conversaciones: number;
+  acuerdos_en_curso: number;
+  acuerdos_nuevos: number;
+  semaforo: { verde: number; amarillo: number; rojo: number; muestra: number };
+  actividad: { en: string; tipo: "reto_aprobado" | "organizacion_verificada"; organizacion: string; quien: string | null }[];
+};
+
+export type EstadoEquipo = { conteos: Conteos; resumen: ResumenEquipo; nombre: string | null; rol: "curador" | "admin" };
+
+const haceHoras = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+
+// Para el menú y el inicio en la misma visita: cache() evita repetir las consultas.
+export const estadoEquipo = cache(async (): Promise<EstadoEquipo> => {
+  if (MODO_DEMO) {
+    return {
+      conteos: {
+        necesidades: 2,
+        empresas: 3,
+        evidencias: 6,
+        reportes: 1,
+        ayuda: 5,
+        avisos: 2,
+        cotizaciones: 1,
+        etiquetas: 2,
+        amarillos: 4,
+        muestra: 1,
+      },
+      resumen: {
+        bienestar: { abiertos: 3, vencidos: 1, mas_antiguo: haceHoras(52) },
+        ayuda: { abiertas: 5, mas_antigua: haceHoras(20) },
+        avisos: 2,
+        condiciones: 2,
+        personas_nuevas: 18,
+        personas_publicadas: 12,
+        organizaciones_verificadas: 4,
+        conversaciones: 11,
+        acuerdos_en_curso: 9,
+        acuerdos_nuevos: 2,
+        semaforo: { verde: 15, amarillo: 6, rojo: 2, muestra: 2 },
+        actividad: [
+          { en: haceHoras(0.2), tipo: "reto_aprobado", organizacion: "Ferretería El Roble", quien: "Ana" },
+          { en: haceHoras(1), tipo: "reto_aprobado", organizacion: "Alimentos del Oriente SAS", quien: null },
+          { en: haceHoras(2), tipo: "organizacion_verificada", organizacion: "Café La Montaña", quien: "Carlos" },
+        ],
+      },
+      nombre: "Laura",
+      rol: "admin",
+    };
+  }
+  const supabase = await cliente();
+  const [conteos, { data: resumen, error }, { data: rol }, { data: usuario }] = await Promise.all([
+    contar(supabase),
+    supabase.rpc("resumen_equipo"),
+    supabase.rpc("mi_rol"),
+    supabase.auth.getUser(),
+  ]);
+  if (error) throw error;
+  const meta = usuario.user?.user_metadata as { nombre?: string } | undefined;
+  return {
+    conteos,
+    resumen: resumen as ResumenEquipo,
+    nombre: meta?.nombre?.split(" ")[0] ?? null,
+    rol: rol === "admin" ? "admin" : "curador",
+  };
+});
+
+async function contar(supabase: Awaited<ReturnType<typeof cliente>>): Promise<Conteos> {
+  const cuenta = { count: "exact" as const, head: true };
+  const resultados = await Promise.all([
+    supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
+    supabase.from("companies").select("*", cuenta).is("verificada_en", null),
+    supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
+    supabase.from("company_reports").select("*", cuenta).eq("estado", "abierto"),
+    supabase.from("help_requests").select("*", cuenta).eq("estado", "abierta"),
+    supabase.from("notifications").select("*", cuenta).in("estado", ["pendiente", "omitido"]),
+    supabase.from("experience_requests").select("*", cuenta).eq("estado", "recibida"),
+    supabase
+      .from("footprint_tags")
+      .select("*", cuenta)
+      .eq("confirmada", true)
+      .is("taxonomy_id", null)
+      .is("aprobada_en", null),
+    supabase.from("needs").select("*", cuenta).eq("dignidad_estado", "pendiente").eq("semaforo", "amarillo"),
+    supabase.from("needs").select("*", cuenta).eq("en_muestra", true),
+  ]);
+  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas, amarillos, muestra] =
+    resultados.map((r) => r.count ?? 0);
+  return { necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas, amarillos, muestra };
+}
 
 export async function panelEquipo(): Promise<{
   conteos: Conteos;
@@ -70,54 +171,16 @@ export async function panelEquipo(): Promise<{
     };
   }
   const supabase = await cliente();
-  const cuenta = { count: "exact" as const, head: true };
-  const [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, { data: cola }] = await Promise.all([
-    supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
-    supabase.from("companies").select("*", cuenta).is("verificada_en", null),
-    supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
-    supabase.from("company_reports").select("*", cuenta).eq("estado", "abierto"),
-    supabase.from("help_requests").select("*", cuenta).eq("estado", "abierta"),
-    supabase.from("notifications").select("*", cuenta).in("estado", ["pendiente", "omitido"]),
-    supabase.from("experience_requests").select("*", cuenta).eq("estado", "recibida"),
-    supabase
-      .from("footprint_tags")
-      .select("*", cuenta)
-      .eq("confirmada", true)
-      .is("taxonomy_id", null)
-      .is("aprobada_en", null),
-    supabase.from("needs").select("*", cuenta).eq("dignidad_estado", "pendiente").eq("semaforo", "amarillo"),
-    supabase.from("needs").select("*", cuenta).eq("en_muestra", true),
+  const [conteos, { data: cola }] = await Promise.all([
+    contar(supabase),
     supabase
       .from("needs")
       .select("id, problema, creado_en, semaforo, companies(nombre)")
       .eq("estado", "en_curaduria")
       .order("creado_en"),
   ]);
-  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas, amarillos, muestra] = [
-    r1,
-    r2,
-    r3,
-    r4,
-    r5,
-    r6,
-    r7,
-    r8,
-    r9,
-    r10,
-  ].map((r) => r.count ?? 0);
   return {
-    conteos: {
-      necesidades,
-      empresas,
-      evidencias,
-      reportes,
-      ayuda,
-      avisos,
-      cotizaciones,
-      etiquetas,
-      amarillos,
-      muestra,
-    },
+    conteos,
     cola: (cola ?? []).map((n) => ({
       id: n.id as string,
       problema: n.problema as string,

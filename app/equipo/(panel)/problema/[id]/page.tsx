@@ -40,11 +40,11 @@ export default async function CurarProblema({ params }: { params: Promise<{ id: 
       titulo={`Búsqueda de ${empresa.nombre}`}
       antesDelTitulo={
         <Link
-          href="/equipo"
+          href="/equipo/curaduria"
           className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline-offset-4 hover:underline"
         >
           <ArrowLeft aria-hidden className="size-5" />
-          Panel
+          Curaduría de retos
         </Link>
       }
       intro={`«${necesidad.problema}»`}
