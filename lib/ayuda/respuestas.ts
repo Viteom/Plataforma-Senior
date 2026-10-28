@@ -100,7 +100,7 @@ const PREGUNTAS: { claves: string[]; texto: string; enlace?: Enlace }[] = [
   },
   {
     claves: ["taller", "experiencia", "sabedora", "sabedor", "tejido", "campo", "encargo", "artesania", "artesanía"],
-    texto: "Talento del campo son talleres y oficios por encargo con personas del territorio, que Vasees arma con ellas. Si tienes un oficio o un saber tradicional, cuéntanos y te ayudamos a armar tu oferta.",
+    texto: "Talento del campo son talleres y oficios por encargo con personas del territorio, que Kánna arma con ellas. Si tienes un oficio o un saber tradicional, cuéntanos y te ayudamos a armar tu oferta.",
   },
   {
     claves: ["celular", "cambiar numero", "otro numero"],

@@ -26,7 +26,7 @@ export default async function TalentoDelCampo({ searchParams }: { searchParams: 
   return (
     <Pantalla
       titulo="Talento del campo"
-      intro="Talleres, experiencias y oficios por encargo con personas del territorio. Vasees los arma con ellas y te acompaña de principio a fin."
+      intro="Talleres, experiencias y oficios por encargo con personas del territorio. Kánna los arma con ellas y te acompaña de principio a fin."
     >
       {/* Filtros como enlaces: funcionan sin JavaScript y el tipo no es un dato personal. */}
       <nav aria-label="Qué buscas">

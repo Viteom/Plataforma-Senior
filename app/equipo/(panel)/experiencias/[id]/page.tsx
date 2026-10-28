@@ -67,7 +67,7 @@ export default async function EditarExperiencia({ params }: { params: Promise<{ 
             <Campo id="beneficios" etiqueta="Lo que recibe la empresa" ayuda="Uno por línea.">
               {(p) => <Textarea {...p} name="beneficios" rows={3} className={`${p.className} min-h-28`} defaultValue={e?.beneficios.join("\n")} />}
             </Campo>
-            <Campo id="momentos" etiqueta="Pasos" ayuda="Uno por línea, así: «Apertura: tejemos juntos el primer punto» o «Entrega: Vasees lleva las piezas».">
+            <Campo id="momentos" etiqueta="Pasos" ayuda="Uno por línea, así: «Apertura: tejemos juntos el primer punto» o «Entrega: Kánna lleva las piezas».">
               {(p) => (
                 <Textarea
                   {...p}
