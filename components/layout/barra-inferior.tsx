@@ -18,7 +18,7 @@ export function BarraInferior({ items = navTalento, className }: { items?: ItemN
     >
       <ul className="mx-auto grid max-w-xl px-2" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
         {items.map(({ href, etiqueta, corta, icono: Icono }) => {
-          const activo = estaActivo(pathname, href);
+          const activo = estaActivo(pathname, href, ["/empresa"]);
           return (
             <li key={href}>
               <Link

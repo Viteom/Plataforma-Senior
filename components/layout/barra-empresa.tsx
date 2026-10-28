@@ -22,7 +22,7 @@ export function BarraEmpresa() {
       <header className="border-b-2 border-border-subtle bg-bg">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 sm:gap-x-6 xl:flex-nowrap xl:px-8">
           {/* shrink-0: sin esto el logo se encoge y «Empresas» se monta sobre el menú. */}
-          <Link href="/empresa/explorar" className="inline-flex min-h-tap shrink-0 items-center gap-2">
+          <Link href="/empresa" className="inline-flex min-h-tap shrink-0 items-center gap-2">
             <Logo alto={28} />
             {/* En celular no cabe junto a Salir y Ayuda; ahí el área la dice la barra inferior. */}
             <span className="hidden rounded-sm bg-surface-strong px-2 text-sm font-bold sm:inline-block">Empresas</span>
@@ -30,7 +30,7 @@ export function BarraEmpresa() {
           <nav aria-label="Principal" className="hidden min-w-0 xl:block xl:flex-1">
             <ul className="flex gap-1">
               {navEmpresa.map(({ href, etiqueta, icono: Icono }) => {
-                const activo = estaActivo(pathname, href);
+                const activo = estaActivo(pathname, href, ["/empresa"]);
                 return (
                   <li key={href}>
                     <Link
@@ -51,6 +51,13 @@ export function BarraEmpresa() {
             </ul>
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-3 xl:ml-0">
+            <Link
+              href="/empresa/equipo"
+              aria-current={estaActivo(pathname, "/empresa/equipo") ? "page" : undefined}
+              className="hidden min-h-tap items-center px-1 text-base font-bold whitespace-nowrap underline underline-offset-4 hover:decoration-2 xl:inline-flex"
+            >
+              Equipo
+            </Link>
             <Link
               href="/empresa/datos"
               aria-current={estaActivo(pathname, "/empresa/datos") ? "page" : undefined}

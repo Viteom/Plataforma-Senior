@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Encuentra nuevas perspectivas para los retos de tu organización, con talento con trayectoria.",
 };
 
-const ENTRAR = MODO_DEMO ? "/empresa/explorar" : "/entrar?para=empresa";
+const ENTRAR = MODO_DEMO ? "/empresa" : "/entrar?para=empresa";
 
 export default function PaginaOrganizaciones() {
   return (
