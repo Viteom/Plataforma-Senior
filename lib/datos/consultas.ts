@@ -18,7 +18,7 @@ import { rutaFotoValida } from "@/lib/privacidad/foto";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
-import type { ConexionEmpresa, EvidenciaVista, MiEmpresa, NecesidadVista, Oportunidad, PerfilVista } from "./tipos";
+import type { ConexionEmpresa, EvidenciaVista, MiEmpresa, NecesidadVista, Oportunidad, PerfilVista, RolOrganizacion } from "./tipos";
 
 // Lecturas para las pantallas. En modo demostración devuelven los ejemplos de lib/demo.ts con la
 // misma forma; con Supabase leen solo de las vistas pensadas para cada rol.
@@ -42,11 +42,14 @@ async function cliente() {
 
 export async function obtenerMiEmpresa(): Promise<MiEmpresa | null> {
   if (MODO_DEMO) return empresaEjemplo;
-  const { supabase, user } = await cliente();
+  const { supabase } = await cliente();
+  // La organización de la que esta cuenta es parte (company_members), con su rol en ella.
+  const [{ data: id }, { data: rol }] = await Promise.all([supabase.rpc("mi_empresa"), supabase.rpc("mi_rol_empresa")]);
+  if (!id) return null;
   const { data } = await supabase
     .from("companies")
     .select("id, nombre, nit, verificada_en, estado")
-    .eq("owner_id", user.id)
+    .eq("id", id)
     .maybeSingle();
   if (!data) return null;
   return {
@@ -55,6 +58,7 @@ export async function obtenerMiEmpresa(): Promise<MiEmpresa | null> {
     nit: data.nit,
     verificada: data.verificada_en !== null,
     estado: data.estado,
+    rol: (rol as RolOrganizacion | null) ?? "lectura",
   };
 }
 
@@ -140,7 +144,7 @@ export async function listarConexiones(): Promise<{
     supabase.from("company_connections_view").select("*").order("actualizado_en", { ascending: false }),
     supabase
       .from("needs")
-      .select("id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en")
+      .select("id, problema, formatos, modalidad, ubicacion, presupuesto, estado, creado_en, dignidad_estado, semaforo_motivos")
       .order("creado_en", { ascending: false }),
   ]);
   const ids = [...new Set((conexiones ?? []).map((c) => c.talent_id as string))];

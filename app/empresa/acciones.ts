@@ -53,6 +53,7 @@ function mensaje(error: { message?: string } | null): string {
   const m = error?.message ?? "";
   if (/sin verificar|pausada/.test(m))
     return "Tu empresa todavía no está verificada o está en pausa. Te escribimos cuando quede lista.";
+  if (/solo lectura/.test(m)) return "Tu rol en la organización es de solo lectura. Pídele a alguien con administración que te lo cambie.";
   if (/registrada/.test(m)) return "Primero registra los datos de tu empresa.";
   if (/una_conexion_viva|duplicate/.test(m)) return "Ya pediste conocer este perfil. Lo verás en Mis procesos.";
   if (/no disponible/.test(m)) return "Este perfil ya no está disponible.";

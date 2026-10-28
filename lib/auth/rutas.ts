@@ -4,7 +4,7 @@ export type Rol = "talento" | "empresa" | "curador" | "gestor" | "admin";
 export function inicioDe(rol: Rol): string {
   switch (rol) {
     case "empresa":
-      return "/empresa/explorar";
+      return "/empresa";
     case "curador":
     case "admin":
       return "/equipo";

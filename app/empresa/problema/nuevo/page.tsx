@@ -27,7 +27,14 @@ export default async function ProblemaNuevo() {
         intro="Cuéntanos qué necesitas resolver y qué debe saber la persona. Nuestro equipo revisa y te propone hasta 5 perfiles; solo verás los que digan que les interesa."
       >
         <AvisoEmpresa empresa={empresa} />
-        <FormularioProblema taxonomia={taxonomia} />
+        {empresa?.rol === "lectura" ? (
+          <p className="rounded-md bg-surface p-5">
+            Tu rol en la organización es de solo lectura. Para contar un reto, pídele a alguien con administración que te
+            cambie el rol.
+          </p>
+        ) : (
+          <FormularioProblema taxonomia={taxonomia} />
+        )}
       </Pantalla>
     </div>
   );

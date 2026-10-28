@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { normalizarCelular } from "@/lib/auth/destino";
+import { MODO_DEMO } from "@/lib/demo";
 import { esForma, type FormaContratar } from "@/lib/formas";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -261,7 +262,7 @@ export async function cambiarAutorizacion(datos: FormData) {
 // parte que solo lee el equipo; el archivo explica cómo pedirlas.
 export async function descargarDatos(): Promise<string> {
   const { supabase, user, perfil } = await sesion();
-  const [perfilCompleto, ofertas, historias, huella, evidencias, ayudas, metas, seguimientos] = await Promise.all([
+  const [perfilCompleto, ofertas, historias, huella, evidencias, ayudas, metas, seguimientos, pagos] = await Promise.all([
     supabase
       .from("talent_profiles")
       .select("nombre, ubicacion, oficio, resumen, visibilidad, estado, created_at, zona_local")
@@ -283,6 +284,7 @@ export async function descargarDatos(): Promise<string> {
       .from("wellbeing_checkins")
       .select("connection_id, energia, trato_respetuoso, pago_a_tiempo, quiere_contacto, creado_en")
       .eq("talent_id", perfil.id),
+    supabase.from("talent_payout_preferences").select("metodo, celular, actualizado_en").eq("talent_id", perfil.id),
   ]);
   return JSON.stringify(
     {
@@ -296,6 +298,7 @@ export async function descargarDatos(): Promise<string> {
       solicitudes_de_ayuda: ayudas.data,
       metas_privadas: metas.data,
       seguimiento_bienestar: seguimientos.data,
+      como_recibir_pagos: pagos.data,
       nota: "Tu fecha de nacimiento y tu autorización de datos las guarda el equipo aparte. Puedes pedirlas desde Ayuda.",
     },
     null,
@@ -334,4 +337,28 @@ export async function borrarCuenta(): Promise<Estado> {
   }
   await supabase.auth.signOut();
   redirect("/?cuenta=borrada");
+}
+
+// Cómo prefiere recibir sus pagos. Solo la preferencia: el número de una cuenta de banco se escribe
+// en la página del proveedor de pagos, no en Kánna. Para Nequi o Daviplata, sin celular aparte se
+// usa el mismo con el que entra.
+const METODOS_PAGO = new Set(["nequi", "daviplata", "banco", "giro"]);
+
+export async function guardarPreferenciaPago(_previo: Estado, datos: FormData): Promise<Estado> {
+  const metodo = String(datos.get("metodo") ?? "");
+  if (!METODOS_PAGO.has(metodo)) return { error: "Elige cómo quieres recibir tus pagos." };
+  let celular: string | null = null;
+  if ((metodo === "nequi" || metodo === "daviplata") && datos.get("mismo_celular") !== "si") {
+    const normalizado = normalizarCelular(String(datos.get("celular") ?? ""));
+    if (!normalizado) return { error: "Escribe los 10 números del celular. Empieza por 3, por ejemplo 300 123 4567." };
+    celular = normalizado.slice(3); // sin el +57
+  }
+  if (MODO_DEMO) return { aviso: "En la demostración no se guarda nada." };
+  const { supabase, perfil } = await sesion();
+  const { error } = await supabase
+    .from("talent_payout_preferences")
+    .upsert({ talent_id: perfil.id, metodo, celular, actualizado_en: new Date().toISOString() });
+  if (error) return { error: ERROR };
+  revalidatePath("/mi-perfil", "layout");
+  return { aviso: "Listo. Lo usaremos cuando tengas un acuerdo con pago." };
 }

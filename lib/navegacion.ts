@@ -37,6 +37,7 @@ export const navTalento: ItemNav[] = [
 ];
 
 export const navEmpresa: ItemNav[] = [
+  { href: "/empresa", etiqueta: "Inicio", icono: House },
   {
     href: "/empresa/explorar",
     etiqueta: "Explorar perfiles",
@@ -63,9 +64,10 @@ export const navEmpresa: ItemNav[] = [
   },
 ];
 
-// En celular, la organización usa la misma barra inferior que el talento, con «Mi empresa» al final.
+// En celular, la organización usa la misma barra inferior que el talento: cinco destinos, con
+// «Mi empresa» al final. Talento del campo y Equipo quedan como atajos en el inicio.
 export const navEmpresaCelular: ItemNav[] = [
-  ...navEmpresa,
+  ...navEmpresa.filter((i) => i.href !== "/empresa/campo"),
   {
     href: "/empresa/datos",
     etiqueta: "Mi empresa",

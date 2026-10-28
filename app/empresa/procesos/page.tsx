@@ -114,7 +114,7 @@ export default async function Procesos() {
       )}
 
       <section aria-labelledby="experiencias" className="flex flex-col gap-3">
-        <h2 id="experiencias" className="text-xl">
+        <h2 id="experiencias" className="scroll-mt-6 text-xl">
           Talento del campo
         </h2>
         {solicitudes.length ? (

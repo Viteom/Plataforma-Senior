@@ -41,7 +41,11 @@ export type MiEmpresa = {
   nit: string | null;
   verificada: boolean;
   estado: "activa" | "pausada";
+  // Rol de quien mira dentro del equipo de la organización.
+  rol: RolOrganizacion;
 };
+
+export type RolOrganizacion = "admin" | "procesos" | "lectura";
 
 // Estados como los ve la empresa (company_connections_view).
 export type EstadoEmpresa =

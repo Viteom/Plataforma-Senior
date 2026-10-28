@@ -78,6 +78,12 @@ export default async function MiPerfil() {
       >
         Mi ritmo, mis metas y mi bienestar
       </Link>
+      <Link
+        href="/mi-perfil/pagos"
+        className="inline-flex min-h-action items-center rounded-md bg-surface p-4 font-bold underline"
+      >
+        Cómo recibir mis pagos
+      </Link>
       <Seccion titulo="Quién ve mi perfil">
         <Visibilidad visibilidad={perfil.visibilidad} />
         <form action={cambiarVisibilidad}>

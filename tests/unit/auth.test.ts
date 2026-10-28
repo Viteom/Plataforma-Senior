@@ -53,8 +53,8 @@ describe("decidirRuta", () => {
 
   it("cada rol queda en su área", () => {
     expect(decidirRuta("/empresa/perfil/1", "talento")).toBe("/inicio");
-    expect(decidirRuta("/inicio", "empresa")).toBe("/empresa/explorar");
-    expect(decidirRuta("/equipo", "empresa")).toBe("/empresa/explorar");
+    expect(decidirRuta("/inicio", "empresa")).toBe("/empresa");
+    expect(decidirRuta("/equipo", "empresa")).toBe("/empresa");
     expect(decidirRuta("/equipo/ayuda", "gestor")).toBe("/gestor/registrar");
     expect(decidirRuta("/gestor/registrar", "curador", true)).toBe("/equipo");
     expect(decidirRuta("/huella", "talento")).toBeNull();
@@ -73,7 +73,7 @@ describe("decidirRuta", () => {
       expect(decidirRuta("/entrar", rol)).toBe("/equipo");
     }
     expect(decidirRuta("/equipo/entrar", "talento")).toBe("/inicio");
-    expect(decidirRuta("/equipo/entrar", "empresa")).toBe("/empresa/explorar");
+    expect(decidirRuta("/equipo/entrar", "empresa")).toBe("/empresa");
     expect(decidirRuta("/gestor/registrar", "gestor")).toBeNull();
   });
 

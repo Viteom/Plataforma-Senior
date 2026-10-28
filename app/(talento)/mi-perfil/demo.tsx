@@ -17,6 +17,12 @@ export function MiPerfilDemo() {
       >
         Mi ritmo, mis metas y mi bienestar
       </Link>
+      <Link
+        href="/mi-perfil/pagos"
+        className="inline-flex min-h-action items-center rounded-md bg-surface p-4 font-bold underline"
+      >
+        Cómo recibir mis pagos
+      </Link>
       <Seccion titulo="Quién ve mi perfil">
         <div className="flex items-start gap-3">
           <EyeOff aria-hidden className="mt-0.5 size-6 shrink-0" />

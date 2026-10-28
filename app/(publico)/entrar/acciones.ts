@@ -100,6 +100,9 @@ export async function verificarCodigo(_previo: EstadoEntrar, datos: FormData): P
 
   await borrarPendiente();
 
+  // Si una organización invitó este correo, la cuenta queda en su equipo (y con rol de organización).
+  if (pendiente.tipo === "correo") await supabase.rpc("aceptar_invitacion");
+
   const { data: fila } = await supabase.from("user_roles").select("rol").eq("user_id", data.user.id).maybeSingle();
   const rol = (fila?.rol as Rol | undefined) ?? "talento";
 

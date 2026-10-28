@@ -89,6 +89,7 @@ export const empresaEjemplo: MiEmpresa = {
   nit: "900123456",
   verificada: true,
   estado: "activa",
+  rol: "admin",
 };
 
 export const necesidadEjemplo: NecesidadVista = {
