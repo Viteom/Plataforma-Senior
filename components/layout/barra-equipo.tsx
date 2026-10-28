@@ -43,7 +43,7 @@ export function BarraEquipo({ cuentas, nombre, rol }: Props) {
           {n > 0 && (
             <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-primary px-2 text-sm font-bold text-on-primary">
               {n}
-              <span className="sr-only"> pendientes</span>
+              <span className="sr-only">{n === 1 ? " pendiente" : " pendientes"}</span>
             </span>
           )}
         </Link>
@@ -52,7 +52,7 @@ export function BarraEquipo({ cuentas, nombre, rol }: Props) {
   };
 
   return (
-    <aside className="sticky top-0 z-20 border-b-2 border-border-subtle bg-surface lg:h-dvh lg:w-76 lg:shrink-0 lg:overflow-y-auto lg:border-r-2 lg:border-b-0">
+    <aside className="sticky top-0 z-20 max-h-dvh overflow-y-auto overscroll-contain border-b-2 border-border-subtle bg-surface lg:h-dvh lg:w-76 lg:shrink-0 lg:overflow-y-auto lg:border-r-2 lg:border-b-0">
       <div className="flex h-full flex-col gap-2 p-3 lg:p-4">
         <div className="flex items-center justify-between gap-3">
           <Link href="/equipo" className="inline-flex min-h-tap flex-col justify-center gap-0.5 px-1">

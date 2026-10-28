@@ -94,12 +94,13 @@ export const gruposEquipo: { titulo: string; items: ItemNav[] }[] = [
       { href: "/equipo/evidencias", etiqueta: "Evidencias y tarifas", icono: BadgeCheck },
       { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
       { href: "/equipo/experiencias", etiqueta: "Talento del campo", icono: Sprout },
-      { href: "/gestor/registrar", etiqueta: "Registro asistido", icono: UserRoundPlus },
+      // ?desde=equipo: en la demostración muestra el enlace de vuelta al panel.
+      { href: "/gestor/registrar?desde=equipo", etiqueta: "Registro asistido", icono: UserRoundPlus },
     ],
   },
   {
     titulo: "Organizaciones",
-    items: [{ href: "/equipo/empresas", etiqueta: "Empresas y reportes", icono: Building2 }],
+    items: [{ href: "/equipo/empresas", etiqueta: "Organizaciones y reportes", icono: Building2 }],
   },
 ];
 

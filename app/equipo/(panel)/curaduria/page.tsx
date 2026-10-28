@@ -23,7 +23,7 @@ export default async function CuraduriaRetos() {
   ];
 
   return (
-    <Pantalla titulo="Curaduría de retos" intro="Búsquedas de las organizaciones que esperan una decisión del equipo.">
+    <Pantalla titulo="Curaduría de retos" intro="Retos de las organizaciones que esperan una decisión del equipo.">
       <ul className="grid gap-4 sm:grid-cols-2">
         {resumen.map(({ cuantos, que }) => (
           <li key={que} className="flex flex-col rounded-md border-2 border-border-subtle p-5">
@@ -42,7 +42,7 @@ export default async function CuraduriaRetos() {
 
       <section aria-labelledby="titulo-cola" className="flex flex-col gap-3">
         <h2 id="titulo-cola" className="text-xl">
-          Búsquedas por curar ({cola.length})
+          Retos por curar ({cola.length})
         </h2>
         {cola.length ? (
           <ul className="flex flex-col gap-3">
@@ -67,7 +67,7 @@ export default async function CuraduriaRetos() {
             ))}
           </ul>
         ) : (
-          <p className="text-text-muted">No hay búsquedas esperando.</p>
+          <p className="text-text-muted">No hay retos esperando.</p>
         )}
       </section>
       {MODO_DEMO && <p className="text-base text-text-muted">Datos de ejemplo.</p>}

@@ -69,7 +69,7 @@ export default async function InicioEquipo() {
             Icono={ClipboardCheck}
             filas={[
               { n: c.amarillos, texto: plural(c.amarillos, "reto en amarillo por revisar", "retos en amarillo por revisar"), href: "/equipo/curaduria" },
-              { n: c.necesidades, texto: plural(c.necesidades, "búsqueda por curar", "búsquedas por curar"), href: "/equipo/curaduria" },
+              { n: c.necesidades, texto: plural(c.necesidades, "reto por curar", "retos por curar"), href: "/equipo/curaduria" },
               {
                 n: c.muestra,
                 texto: plural(c.muestra, "aprobación automática por confirmar", "aprobaciones automáticas por confirmar"),

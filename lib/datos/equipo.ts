@@ -8,6 +8,7 @@ import type { Capa } from "@/lib/ia/tipos";
 import { proponer, type TalentoParaMatching } from "@/lib/matching/puntaje";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
+import { listarSolicitudes } from "./experiencias";
 import type { NecesidadVista } from "./tipos";
 
 // Lecturas del equipo (curador y admin). RLS les da acceso a las tablas; nada de esto pasa por
@@ -63,44 +64,83 @@ export type EstadoEquipo = { conteos: Conteos; resumen: ResumenEquipo; nombre: s
 
 const haceHoras = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
 
+// Casos de bienestar de ejemplo: los mismos en la cola y en el inicio. Uno ya pasó la revisión
+// sugerida de 48 horas.
+export const casosBienestarDemo = () =>
+  [
+    { id: "00000000-0000-4000-9800-000000000001", horas: 52, prioridad: "preferente", estado: "abierto", energia: "pausa", trato: true, pago: true, contacto: true, nombre: "Rosa Pérez (ejemplo)" },
+    { id: "00000000-0000-4000-9800-000000000002", horas: 20, prioridad: "normal", estado: "en_curso", energia: "ajustar", trato: true, pago: null, contacto: false, nombre: "Jorge Díaz (ejemplo)" },
+  ].map((c) => ({
+    id: c.id,
+    prioridad: c.prioridad,
+    permite_contacto: c.contacto,
+    estado: c.estado,
+    asignado_a_mi: c.estado === "en_curso",
+    creado_en: haceHoras(c.horas),
+    revision_sugerida_en: haceHoras(c.horas - 48),
+    nombre: c.nombre,
+    energia: c.energia,
+    trato_respetuoso: c.trato,
+    pago_a_tiempo: c.pago,
+  }));
+
+// En la demostración, el inicio y el menú cuentan lo mismo que muestra cada cola de ejemplo.
+async function estadoDemo(): Promise<EstadoEquipo> {
+  const [{ conteos: base, cola }, { empresas, reportes }, { evidencias }, { solicitudes, avisos }, etiquetas, pedidos] =
+    await Promise.all([
+      panelEquipo(),
+      empresasYReportes(),
+      evidenciasYTarifas(),
+      ayudaYAvisos(),
+      etiquetasPorRevisar(),
+      listarSolicitudes(),
+    ]);
+  const abiertas = solicitudes.filter((s) => s.estado === "abierta");
+  const casos = casosBienestarDemo();
+  const masAntiguo = (fechas: string[]) => (fechas.length ? fechas.reduce((a, b) => (a < b ? a : b)) : null);
+  return {
+    conteos: {
+      ...base,
+      necesidades: cola.length,
+      empresas: empresas.filter((e) => !e.verificada).length,
+      reportes: reportes.length,
+      evidencias: evidencias.length,
+      ayuda: abiertas.length,
+      avisos: avisos.length,
+      etiquetas: etiquetas.length,
+      cotizaciones: pedidos.filter((p) => p.estado === "recibida").length,
+    },
+    resumen: {
+      bienestar: {
+        abiertos: casos.length,
+        vencidos: casos.filter((c) => c.revision_sugerida_en < new Date().toISOString()).length,
+        mas_antiguo: masAntiguo(casos.map((c) => c.creado_en)),
+      },
+      ayuda: { abiertas: abiertas.length, mas_antigua: masAntiguo(abiertas.map((s) => s.creado_en)) },
+      avisos: avisos.length,
+      // La cola de condiciones de la demostración está vacía.
+      condiciones: 0,
+      personas_nuevas: 18,
+      personas_publicadas: 12,
+      organizaciones_verificadas: 4,
+      conversaciones: 11,
+      acuerdos_en_curso: 9,
+      acuerdos_nuevos: 2,
+      semaforo: { verde: 15, amarillo: 6, rojo: 2, muestra: 2 },
+      actividad: [
+        { en: haceHoras(0.2), tipo: "reto_aprobado", organizacion: "Ferretería El Roble", quien: "Ana" },
+        { en: haceHoras(1), tipo: "reto_aprobado", organizacion: "Alimentos del Oriente SAS", quien: null },
+        { en: haceHoras(2), tipo: "organizacion_verificada", organizacion: "Café La Montaña", quien: "Carlos" },
+      ],
+    },
+    nombre: "Laura",
+    rol: "admin",
+  };
+}
+
 // Para el menú y el inicio en la misma visita: cache() evita repetir las consultas.
 export const estadoEquipo = cache(async (): Promise<EstadoEquipo> => {
-  if (MODO_DEMO) {
-    return {
-      conteos: {
-        necesidades: 2,
-        empresas: 3,
-        evidencias: 6,
-        reportes: 1,
-        ayuda: 5,
-        avisos: 2,
-        cotizaciones: 1,
-        etiquetas: 2,
-        amarillos: 4,
-        muestra: 1,
-      },
-      resumen: {
-        bienestar: { abiertos: 3, vencidos: 1, mas_antiguo: haceHoras(52) },
-        ayuda: { abiertas: 5, mas_antigua: haceHoras(20) },
-        avisos: 2,
-        condiciones: 2,
-        personas_nuevas: 18,
-        personas_publicadas: 12,
-        organizaciones_verificadas: 4,
-        conversaciones: 11,
-        acuerdos_en_curso: 9,
-        acuerdos_nuevos: 2,
-        semaforo: { verde: 15, amarillo: 6, rojo: 2, muestra: 2 },
-        actividad: [
-          { en: haceHoras(0.2), tipo: "reto_aprobado", organizacion: "Ferretería El Roble", quien: "Ana" },
-          { en: haceHoras(1), tipo: "reto_aprobado", organizacion: "Alimentos del Oriente SAS", quien: null },
-          { en: haceHoras(2), tipo: "organizacion_verificada", organizacion: "Café La Montaña", quien: "Carlos" },
-        ],
-      },
-      nombre: "Laura",
-      rol: "admin",
-    };
-  }
+  if (MODO_DEMO) return estadoDemo();
   const supabase = await cliente();
   const [conteos, { data: resumen, error }, { data: rol }, { data: usuario }] = await Promise.all([
     contar(supabase),
