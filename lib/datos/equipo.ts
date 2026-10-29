@@ -138,49 +138,25 @@ async function estadoDemo(): Promise<EstadoEquipo> {
   };
 }
 
-// Para el menú y el inicio en la misma visita: cache() evita repetir las consultas.
+// Para el menú y el inicio en la misma visita: cache() evita repetir la consulta. Es una sola
+// llamada a la base (panel_equipo): antes eran unas 13. El middleware ya confirmó la sesión y el
+// segundo factor; si la base no reconoce al equipo, se vuelve a la entrada.
 export const estadoEquipo = cache(async (): Promise<EstadoEquipo> => {
   if (MODO_DEMO) return estadoDemo();
-  const supabase = await cliente();
-  const [conteos, { data: resumen, error }, { data: rol }, { data: usuario }] = await Promise.all([
-    contar(supabase),
-    supabase.rpc("resumen_equipo"),
-    supabase.rpc("mi_rol"),
-    supabase.auth.getUser(),
-  ]);
-  if (error) throw error;
-  const meta = usuario.user?.user_metadata as { nombre?: string } | undefined;
+  const supabase = await crearClienteServidor();
+  const { data, error } = await supabase.rpc("panel_equipo");
+  if (error) {
+    if (error.code === "42501") redirect("/equipo/entrar");
+    throw error;
+  }
+  const panel = data as { rol: string | null; nombre: string | null; resumen: ResumenEquipo; conteos: Conteos };
   return {
-    conteos,
-    resumen: resumen as ResumenEquipo,
-    nombre: meta?.nombre?.split(" ")[0] ?? null,
-    rol: rol === "admin" ? "admin" : "curador",
+    conteos: panel.conteos,
+    resumen: panel.resumen,
+    nombre: panel.nombre,
+    rol: panel.rol === "admin" ? "admin" : "curador",
   };
 });
-
-async function contar(supabase: Awaited<ReturnType<typeof cliente>>): Promise<Conteos> {
-  const cuenta = { count: "exact" as const, head: true };
-  const resultados = await Promise.all([
-    supabase.from("needs").select("*", cuenta).eq("estado", "en_curaduria"),
-    supabase.from("companies").select("*", cuenta).is("verificada_en", null),
-    supabase.from("evidence").select("*", cuenta).eq("estado", "pendiente"),
-    supabase.from("company_reports").select("*", cuenta).eq("estado", "abierto"),
-    supabase.from("help_requests").select("*", cuenta).eq("estado", "abierta"),
-    supabase.from("notifications").select("*", cuenta).in("estado", ["pendiente", "omitido"]),
-    supabase.from("experience_requests").select("*", cuenta).eq("estado", "recibida"),
-    supabase
-      .from("footprint_tags")
-      .select("*", cuenta)
-      .eq("confirmada", true)
-      .is("taxonomy_id", null)
-      .is("aprobada_en", null),
-    supabase.from("needs").select("*", cuenta).eq("dignidad_estado", "pendiente").eq("semaforo", "amarillo"),
-    supabase.from("needs").select("*", cuenta).eq("en_muestra", true),
-  ]);
-  const [necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas, amarillos, muestra] =
-    resultados.map((r) => r.count ?? 0);
-  return { necesidades, empresas, evidencias, reportes, ayuda, avisos, cotizaciones, etiquetas, amarillos, muestra };
-}
 
 export async function panelEquipo(): Promise<{
   conteos: Conteos;
@@ -211,8 +187,8 @@ export async function panelEquipo(): Promise<{
     };
   }
   const supabase = await cliente();
-  const [conteos, { data: cola }] = await Promise.all([
-    contar(supabase),
+  const [{ conteos }, { data: cola }] = await Promise.all([
+    estadoEquipo(),
     supabase
       .from("needs")
       .select("id, problema, creado_en, semaforo, companies(nombre)")

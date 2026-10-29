@@ -7,8 +7,13 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseConfigurado } from "@/lib/supa
 
 // Refresca la sesión de Supabase y manda a cada rol a su área (lib/auth/rutas.ts).
 // Sin Supabase configurado, la app corre en modo demostración y no protege rutas.
+// Las páginas públicas (web, ayuda, privacidad) no necesitan sesión: pasan sin consultar nada.
+// Solo las de entrar la revisan, para mandar a su inicio a quien ya entró.
 export async function middleware(request: NextRequest) {
   if (!supabaseConfigurado) return NextResponse.next();
+  const pathname = request.nextUrl.pathname;
+  const esEntrada = pathname === "/entrar" || pathname.startsWith("/entrar/");
+  if (esPublica(pathname) && !esEntrada) return NextResponse.next();
 
   let respuesta = NextResponse.next({ request });
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -22,22 +27,22 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims verifica la firma del token: con llaves asimétricas lo hace aquí mismo, sin ir al
+  // servidor de Auth. Los claims ya traen el nivel de verificación (aal), así que el segundo factor
+  // no necesita otra consulta.
+  const { data } = await supabase.auth.getClaims();
+  const claims = data?.claims;
 
   let rol: Rol | null = null;
-  if (user) {
-    const { data } = await supabase.from("user_roles").select("rol").eq("user_id", user.id).maybeSingle();
-    rol = (data?.rol as Rol | undefined) ?? null;
+  if (claims?.sub) {
+    const { data: fila } = await supabase.from("user_roles").select("rol").eq("user_id", claims.sub).maybeSingle();
+    rol = (fila?.rol as Rol | undefined) ?? null;
   }
 
-  const pathname = request.nextUrl.pathname;
   // El equipo solo cuenta con segundo factor (aal2) y una sesión usada en los últimos 30 minutos.
   let segundoFactor = false;
   if (esRolEquipo(rol)) {
-    const { data: nivel } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    segundoFactor = nivel?.currentLevel === "aal2";
+    segundoFactor = claims?.aal === "aal2";
     if (segundoFactor && !esPublica(pathname) && !actividadVigente(request.cookies.get(COOKIE_ACTIVIDAD)?.value)) {
       await supabase.auth.signOut();
       const salida = redirigir(request, respuesta, `${ENTRADA_EQUIPO}?motivo=inactividad`);
@@ -59,8 +64,9 @@ function redirigir(request: NextRequest, respuesta: NextResponse, destino: strin
 }
 
 export const config = {
-  // Todo menos archivos estáticos, íconos, manifest y service worker.
+  // Todo menos archivos estáticos, íconos, manifest, service worker e imágenes y fuentes de public/:
+  // un archivo no necesita sesión, y cada foto de la web consultaba la sesión por su cuenta.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|manifest.webmanifest|sw.js|swe-worker|iconos/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|manifest.webmanifest|sw.js|swe-worker|iconos/|.*\\.(?:svg|png|jpe?g|webp|avif|gif|ico|txt|xml|woff2?)$).*)",
   ],
 };
