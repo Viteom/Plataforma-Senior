@@ -1,3 +1,4 @@
+import { AyudaFlotante } from "@/components/web/ayuda-flotante";
 import { CabeceraWeb } from "@/components/web/cabecera";
 import { MovimientoWeb } from "@/components/web/movimiento";
 import { PieWeb } from "@/components/web/pie";
@@ -10,6 +11,7 @@ export default function LayoutWeb({ children }: { children: React.ReactNode }) {
       <CabeceraWeb />
       <main id="contenido">{children}</main>
       <PieWeb />
+      <AyudaFlotante />
       <MovimientoWeb />
     </>
   );
