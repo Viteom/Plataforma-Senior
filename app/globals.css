@@ -32,9 +32,23 @@
   --color-danger: #b42318; /* siempre con ícono y palabra */
   --color-success: #1e2a47;
   --color-white: #ffffff;
+  /* Web informativa (home 2026-11): fondos neutros, tinta fría y una línea propia para el campo.
+     tinta-suave solo en titulares grandes (3:1, AA texto grande). campo-acento sobre campo: 5,6:1. */
+  --color-azul-claro: #b9c6e8; /* texto suave sobre noche profunda: 10,1:1 */
+  --color-neutro: #f1f0ec;
+  --color-neutro-2: #e8e6e0;
+  --color-tinta: #121722;
+  --color-tinta-suave: #8b8f97;
+  --color-noche-suave: #7f8aa8;
+  --color-campo: #3a4128;
+  --color-campo-claro: #e9e3d2;
+  --color-campo-acento: #c9b37e;
+  --color-exito-fondo: #dff1e6;
+  --color-exito-texto: #1e5a38;
   --color-transparent: transparent;
 
   --font-sans: var(--font-atkinson), system-ui, sans-serif; /* toda la app */
+  --font-web: var(--font-geist), "Helvetica Neue", Arial, sans-serif; /* web informativa */
   --font-display: var(--font-bricolage), "Arial Black", system-ui, sans-serif; /* titulares de marca */
   --font-editorial: var(--font-instrument), Georgia, serif; /* remates en cursiva */
 
@@ -64,12 +78,22 @@
   --text-afiche--line-height: 0.95;
   --text-gigante: clamp(2.125rem, 8.6vw, 8.25rem);
   --text-gigante--line-height: 0.92;
+  /* Home: banner, titulares de sección y cierre (Geist, dos tonos). */
+  --text-banner: clamp(2.75rem, 7.6vw, 7.4rem);
+  --text-banner--line-height: 0.95;
+  --text-seccion: clamp(2.25rem, 4.8vw, 4rem);
+  --text-seccion--line-height: 1.03;
+  --text-oficio: clamp(1.75rem, 3.1vw, 2.9rem);
+  --text-oficio--line-height: 1.1;
 
   --radius-sm: 0.5rem; /* campos */
   --radius-md: 1rem; /* avisos y tarjetas pequeñas */
   --radius-lg: 1.75rem; /* tarjetas y puertas */
 
   --shadow-float: 0 8px 24px rgb(0 0 0 / 0.16);
+  --shadow-tarjeta: 0 1px 2px rgb(0 0 0 / 0.05), 0 10px 26px -14px rgb(18 23 34 / 0.3);
+  --shadow-panel: 0 30px 70px -28px rgb(0 0 0 / 0.55);
+  --shadow-cara: 0 0 0 6px #ffffff, 0 10px 26px -10px rgb(0 0 0 / 0.35);
 
   /* Alturas táctiles */
   --spacing-tap: 2.75rem; /* 44 px: mínimo para todo lo interactivo */
@@ -237,6 +261,54 @@
     transform: none;
   }
   .banda-pista {
+    animation: none;
+  }
+}
+
+/* ── Home (maqueta aprobada el 1 de noviembre de 2026) ── */
+@layer components {
+  /* Banner: velo para leer el titular blanco sobre los retratos. */
+  .velo-banner {
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 52%, rgb(8 11 20 / 0.62), rgb(8 11 20 / 0.15) 70%),
+      linear-gradient(rgb(8 11 20 / 0.45), transparent 22%);
+  }
+  .respira {
+    animation: respira 14s ease-in-out infinite alternate;
+  }
+  /* Talento del campo: semitono sobre el verde tierra. */
+  .semitono::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: url("/web/home/caficultor-cafetal.webp") left center / cover;
+    filter: grayscale(1) contrast(1.3);
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+    mask-image: radial-gradient(circle, #000 42%, transparent 46%);
+    mask-size: 7px 7px;
+  }
+  /* Cómo funciona: la línea que une los pasos y la cuadrícula de puntos. */
+  .linea-pasos {
+    background: linear-gradient(var(--color-accent), #f3a0b4 60%, var(--color-accent));
+  }
+  .puntos-fondo {
+    background-image: radial-gradient(var(--color-border-subtle) 1.2px, transparent 1.2px);
+    background-size: 26px 26px;
+  }
+}
+
+@keyframes respira {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .respira {
     animation: none;
   }
 }

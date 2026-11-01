@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible, Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
+import { Atkinson_Hyperlegible, Bricolage_Grotesque, Geist, Instrument_Serif } from "next/font/google";
 
 import { ToqueActivo } from "@/components/layout/toque-activo";
 import { esProduccion } from "@/lib/ambiente";
@@ -20,6 +20,14 @@ const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   weight: ["600", "800"],
   variable: "--font-bricolage",
+  display: "swap",
+});
+
+// Web informativa: una sans limpia para los titulares en dos tonos. La app sigue en Atkinson.
+const geist = Geist({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-geist",
   display: "swap",
 });
 
@@ -49,7 +57,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-CO" className={`${atkinson.variable} ${bricolage.variable} ${instrument.variable}`}>
+    <html lang="es-CO" className={`${atkinson.variable} ${bricolage.variable} ${geist.variable} ${instrument.variable}`}>
       <body className="min-h-dvh antialiased">
         <a
           href="#contenido"

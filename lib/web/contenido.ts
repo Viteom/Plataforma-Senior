@@ -2,13 +2,6 @@
 // Los perfiles son ejemplos de redacción sobre fotos de banco (Pexels, uso libre): no describen a esas personas y
 // las fotografías son ilustrativas: no identifican a talento de Kánna.
 
-export const MENU_WEB = [
-  { href: "/talento", etiqueta: "Talento" },
-  { href: "/organizaciones", etiqueta: "Organizaciones" },
-  { href: "/campo", etiqueta: "Talento del campo" },
-  { href: "/ayuda", etiqueta: "Ayuda" },
-] as const;
-
 export type Retrato = { src: string; ancho: number; alto: number; alt: string };
 
 export const RETRATOS = {

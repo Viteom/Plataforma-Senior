@@ -50,7 +50,7 @@ const enlace = "inline-flex min-h-tap items-center text-lg underline-offset-4 ho
 export function PieWeb() {
   return (
     <footer className="bg-deep text-on-deep">
-      <div className={`${MARCO} flex flex-col gap-16 pt-12 pb-10 lg:gap-24`}>
+      <div className={`${MARCO} flex flex-col gap-16 pt-12 pb-28 lg:gap-24 lg:pb-10`}>
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="flex max-w-[40ch] flex-col gap-4">
             <Logo alto={36} negativo />
