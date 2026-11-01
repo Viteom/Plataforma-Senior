@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, Bricolage_Grotesque, Instrument_Serif } from "next/font/google";
 
 import { ToqueActivo } from "@/components/layout/toque-activo";
+import { esProduccion } from "@/lib/ambiente";
 import { MARCA } from "@/lib/marca";
+import { supabaseConfigurado } from "@/lib/supabase/config";
 
 import "./globals.css";
 
@@ -35,6 +37,8 @@ export const metadata: Metadata = {
   applicationName: MARCA.nombre,
   appleWebApp: { capable: true, title: MARCA.nombreCorto, statusBarStyle: "default" },
   formatDetection: { telephone: false },
+  // El ambiente de pruebas no debe aparecer en buscadores (la demostración sin base sí).
+  ...(supabaseConfigurado && !esProduccion ? { robots: { index: false, follow: false } } : {}),
 };
 
 export const viewport: Viewport = {
@@ -53,6 +57,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Saltar al contenido
         </a>
+        {/* Con Supabase conectado y fuera de producción: que nadie confunda pruebas con datos reales. */}
+        {supabaseConfigurado && !esProduccion && (
+          <p className="bg-accent px-4 py-1 text-center text-sm font-bold text-on-accent">
+            Ambiente de pruebas: los datos son de ejemplo
+          </p>
+        )}
         {children}
         <ToqueActivo />
       </body>
