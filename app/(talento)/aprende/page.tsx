@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Pantalla } from "@/components/layout/pantalla";
+import { EscucharPantalla, TarjetaVideo } from "@/components/talento/voz";
 import { Tarjeta } from "@/components/ui/tarjeta";
 import { listarCursos, TEMAS } from "@/lib/datos/aprende";
+import { VIDEOS_TALENTO } from "@/lib/talento/videos";
 import type { TemaCurso } from "@/lib/emprende/ruta";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +20,24 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
   const cursos = await listarCursos(tema);
 
   return (
-    <Pantalla titulo="Aprende" intro="Cursos gratuitos de otras entidades, elegidos para ti.">
+    <Pantalla titulo="Aprende">
+      <EscucharPantalla className="-mt-4" />
+
+      <section aria-labelledby="videos" className="flex flex-col gap-3">
+        <h2 id="videos" className="text-2xl">
+          Videos cortos
+        </h2>
+        <TarjetaVideo v={VIDEOS_TALENTO[0]} forma="destacado" />
+        <ul className="flex flex-col gap-2.5">
+          {VIDEOS_TALENTO.slice(1).map((v) => (
+            <li key={v.id}>
+              <TarjetaVideo v={v} forma="fila" />
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <h2 className="-mb-4 text-2xl">Cursos gratis</h2>
       {/* Filtros como enlaces: funcionan sin JavaScript y el tema no es un dato personal. */}
       <nav aria-label="Temas">
         <ul className="flex flex-wrap gap-2">
@@ -31,7 +50,7 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
                   aria-current={activo ? "page" : undefined}
                   className={cn(
                     "inline-flex min-h-tap items-center rounded-full border-2 px-4 transition-colors duration-150",
-                    activo ? "border-text bg-primary font-bold text-on-primary" : "border-border hover:bg-surface",
+                    activo ? "border-text bg-text font-bold text-bg" : "border-transparent bg-raised font-bold hover:bg-surface",
                   )}
                 >
                   {t.etiqueta}
@@ -46,7 +65,7 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
         <ul className="flex flex-col gap-4">
           {cursos.map((c) => (
             <li key={c.id}>
-              <Tarjeta>
+              <Tarjeta className="rounded-lg border-0 bg-raised shadow-tarjeta">
                 <p className="text-base text-text-muted">
                   {c.entidad}
                   {c.modalidad && ` · ${MODALIDAD[c.modalidad]}`}
@@ -64,10 +83,10 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
           ))}
         </ul>
       ) : (
-        <p className="rounded-md bg-surface p-5">Todavía no hay cursos de este tema. Estamos buscando los mejores para ti.</p>
+        <p className="rounded-lg bg-raised p-5">Todavía no hay cursos de este tema. Estamos buscando los mejores para ti.</p>
       )}
 
-      <Tarjeta className="bg-surface">
+      <Tarjeta className="rounded-lg border-0 bg-surface">
         <Lightbulb aria-hidden className="size-8" />
         <h2 className="text-xl">¿Quieres emprender?</h2>
         <p>Responde unas preguntas y te sugerimos una ruta según la etapa de tu idea.</p>

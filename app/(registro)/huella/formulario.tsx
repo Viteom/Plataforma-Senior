@@ -8,37 +8,17 @@ import { ImportarHojaVida } from "@/components/perfil/importar-hoja-vida";
 import { ChipAlternable } from "@/components/huella/chip";
 import { Dictado } from "@/components/huella/dictado";
 import { Pantalla } from "@/components/layout/pantalla";
+import { EscucharPantalla, FraseConVoz, TarjetaVideo } from "@/components/talento/voz";
 import { Button } from "@/components/ui/button";
 import { Campo, Textarea } from "@/components/ui/campo";
-import { Opcion } from "@/components/ui/opcion";
 import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre } from "@/lib/capas";
 import { prepararHistoria } from "@/lib/ia/preparar";
+import { EJEMPLO_HISTORIA, PREGUNTAS_GUIA, video } from "@/lib/talento/videos";
 import type { Capa } from "@/lib/ia/tipos";
 
 import { confirmarHuella, guardarHistoria, type EstadoHuella } from "./acciones";
 
-type Modo = "escribir" | "dictar" | "llamada";
-
-const modos = [
-  {
-    valor: "escribir" as const,
-    titulo: "Escribirla",
-    descripcion: "A tu ritmo, con tus palabras.",
-    icono: PenLine,
-  },
-  {
-    valor: "dictar" as const,
-    titulo: "Contarla hablando",
-    descripcion: "El celular escribe lo que dices.",
-    icono: Mic,
-  },
-  {
-    valor: "llamada" as const,
-    titulo: "Que me llamen",
-    descripcion: "Una persona del equipo te ayuda por teléfono.",
-    icono: Phone,
-  },
-];
+type Modo = "escribir" | "dictar";
 
 type Props = { ia: boolean; nombre: string | null; historiaInicial?: string };
 
@@ -58,6 +38,8 @@ export function FormularioHuella({ ia, nombre, historiaInicial }: Props) {
   );
 }
 
+// Paso 1 de 2. Hablar es lo principal: un micrófono grande, un ejemplo y tres preguntas guía que
+// también se escuchan. Escribir o que te llamen quedan a un toque.
 function Contar({
   historiaInicial,
   ia,
@@ -73,7 +55,7 @@ function Contar({
   guardar: (d: FormData) => void;
   guardando: boolean;
 }) {
-  const [modo, setModo] = useState<Modo>("escribir");
+  const [modo, setModo] = useState<Modo>(historiaInicial ? "escribir" : "dictar");
   const [historia, setHistoria] = useState(historiaInicial ?? "");
 
   // Lo mismo que hará el servidor antes de enviarla al asistente: se lo contamos a la persona.
@@ -92,47 +74,54 @@ function Contar({
   const listaQuitados = new Intl.ListFormat("es", {
     type: "conjunction",
   }).format(quitados);
+  const verTexto = modo === "escribir" || historia.trim().length > 0;
 
   return (
-    <Pantalla
-      titulo="Cuéntanos un reto difícil que resolviste"
-      intro="¿Qué pasó, qué hiciste y cómo terminó? Con eso armamos tu huella de experiencia: lo que las empresas ven de ti."
-    >
-      <ImportarHojaVida
-        onConfirmar={(d) => {
-          setHistoria(d.historia);
-          setModo("escribir");
-        }}
-      />
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 text-lg font-bold">¿Cómo prefieres contarla?</legend>
-        {modos.map(({ valor, titulo, descripcion, icono: Icono }) => (
-          <Opcion
-            key={valor}
-            name="modo"
-            value={valor}
-            checked={modo === valor}
-            onChange={() => setModo(valor)}
-            icono={<Icono aria-hidden className="mt-0.5 size-6 shrink-0" />}
-            titulo={titulo}
-            descripcion={descripcion}
-          />
-        ))}
-      </fieldset>
-
-      {modo === "llamada" ? (
-        <div className="flex flex-col gap-6">
-          <p className="text-lg">
-            Déjanos tu número y la hora en que te queda bien. Nunca te vamos a pedir códigos, contraseñas ni dinero.
-          </p>
-          <Button asChild ancho="completo">
-            <Link href="/ayuda#llameme">Pedir que me llamen</Link>
-          </Button>
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
+        <div role="img" aria-label="Paso 1 de 2" className="flex gap-1.5">
+          <span className="h-2 flex-1 rounded-full bg-primary" />
+          <span className="h-2 flex-1 rounded-full bg-surface-strong" />
         </div>
-      ) : (
-        <form action={guardar} className="flex flex-col gap-6">
-          <input type="hidden" name="origen" value={modo === "dictar" ? "dictado" : "escrito"} />
-          {modo === "dictar" && <Dictado onTexto={(t) => setHistoria((h) => (h ? `${h} ${t}` : t))} />}
+        <h1 className="text-3xl">Cuéntanos qué sabes hacer</h1>
+        <EscucharPantalla />
+      </div>
+
+      <div className="flex flex-col gap-2.5">
+        <TarjetaVideo v={{ ...video("contar-historia"), titulo: "Escucha un ejemplo", guion: EJEMPLO_HISTORIA }} forma="fila" />
+        {PREGUNTAS_GUIA.map((p, i) => (
+          <FraseConVoz key={p} id={`pregunta-${i}`} texto={p} />
+        ))}
+      </div>
+
+      <form action={guardar} className="flex flex-col gap-6">
+        <input type="hidden" name="origen" value={modo === "dictar" ? "dictado" : "escrito"} />
+        {modo === "dictar" && (
+          <Dictado
+            onTexto={(t) => setHistoria((h) => (h ? `${h} ${t}` : t))}
+            onNoSoportado={() => setModo("escribir")}
+          />
+        )}
+
+        <div data-no-leer className="flex flex-wrap justify-center gap-2">
+          {modo === "dictar" ? (
+            <button type="button" onClick={() => setModo("escribir")} className={pildora}>
+              <PenLine aria-hidden className="size-5" />
+              Prefiero escribir
+            </button>
+          ) : (
+            <button type="button" onClick={() => setModo("dictar")} className={pildora}>
+              <Mic aria-hidden className="size-5" />
+              Prefiero hablar
+            </button>
+          )}
+          <Link href="/ayuda#llameme" className={pildora}>
+            <Phone aria-hidden className="size-5" />
+            Que me llamen
+          </Link>
+        </div>
+
+        {verTexto && (
           <Campo
             id="historia"
             etiqueta={modo === "dictar" ? "Lo que dijiste (puedes corregirlo)" : "Tu historia"}
@@ -146,45 +135,54 @@ function Contar({
                 rows={8}
                 value={historia}
                 onChange={(e) => setHistoria(e.target.value)}
+                className={`${p.className} bg-raised`}
               />
             )}
           </Campo>
+        )}
+        {!verTexto && estado.error && (
+          <p role="alert" className="font-bold text-danger">
+            {estado.error}
+          </p>
+        )}
 
-          {revision && (quitados.length > 0 || revision.nombresPosibles.length > 0) && (
-            <div className="flex flex-col gap-3 rounded-md bg-surface p-4">
-              {quitados.length > 0 && (
-                <p className="flex items-start gap-3">
-                  <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0" />
-                  <span>Antes de enviarla al asistente quitamos {listaQuitados}. Tu texto aquí no cambia.</span>
-                </p>
-              )}
-              {revision.nombresPosibles.length > 0 && (
-                <p>
-                  ¿Estos son nombres de otras personas?{" "}
-                  <span className="font-bold">{revision.nombresPosibles.join(", ")}</span>. Si quieres, cámbialos por el
-                  cargo, por ejemplo «el jefe de planta».
-                </p>
-              )}
-            </div>
-          )}
+        {revision && (quitados.length > 0 || revision.nombresPosibles.length > 0) && (
+          <div className="flex flex-col gap-3 rounded-md bg-raised p-4">
+            {quitados.length > 0 && (
+              <p className="flex items-start gap-3">
+                <ShieldCheck aria-hidden className="mt-0.5 size-6 shrink-0" />
+                <span>Antes de enviarla al asistente quitamos {listaQuitados}. Tu texto aquí no cambia.</span>
+              </p>
+            )}
+            {revision.nombresPosibles.length > 0 && (
+              <p>
+                ¿Estos son nombres de otras personas?{" "}
+                <span className="font-bold">{revision.nombresPosibles.join(", ")}</span>. Si quieres, cámbialos por el
+                cargo, por ejemplo «el jefe de planta».
+              </p>
+            )}
+          </div>
+        )}
 
-          {!ia && (
-            <p className="text-base text-text-muted">
-              Después de guardarla, puedes escribir con tus palabras las capacidades que quieres destacar.
-            </p>
-          )}
-
-          <Button type="submit" ancho="completo" disabled={guardando}>
+        {verTexto && (
+          <Button type="submit" ancho="completo" disabled={guardando || !historia.trim()}>
             {guardando
               ? ia
                 ? "Leyendo tu historia…"
                 : "Guardando…"
               : ia
-                ? "Guardar y ver mis etiquetas"
+                ? "Seguir: ver lo que entendimos"
                 : "Guardar mi historia"}
           </Button>
-        </form>
-      )}
+        )}
+      </form>
+
+      <ImportarHojaVida
+        onConfirmar={(d) => {
+          setHistoria(d.historia);
+          setModo("escribir");
+        }}
+      />
 
       <Link
         href="/inicio"
@@ -192,9 +190,12 @@ function Contar({
       >
         Hacerlo más tarde
       </Link>
-    </Pantalla>
+    </div>
   );
 }
+
+const pildora =
+  "inline-flex min-h-tap items-center gap-2 rounded-full bg-raised px-4 text-base font-bold shadow-tarjeta transition-transform duration-100 active:scale-[0.97]";
 
 const MENSAJE_MANUAL = {
   apagada: "Elige solo lo que se parezca a lo tuyo. Si no lo encuentras, escríbelo con tus palabras.",
@@ -216,6 +217,12 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
 
   return (
     <Pantalla
+      antesDelTitulo={
+        <div role="img" aria-label="Paso 2 de 2" className="flex gap-1.5">
+          <span className="h-2 flex-1 rounded-full bg-primary" />
+          <span className="h-2 flex-1 rounded-full bg-primary" />
+        </div>
+      }
       titulo={manual ? "Escribe lo que sabes hacer" : "Esto entendimos de tu historia"}
       intro={
         manual

@@ -1,78 +1,110 @@
-import { ArrowRight, BookOpen, Handshake } from "lucide-react";
+import { BookOpen, Lightbulb, UserRound, Wallet } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 import { AvisoBienestar } from "@/components/bienestar/aviso";
-import { Pantalla } from "@/components/layout/pantalla";
+import { EscucharPantalla, TarjetaVideo } from "@/components/talento/voz";
 import { Button } from "@/components/ui/button";
-import { Tarjeta } from "@/components/ui/tarjeta";
 import { listarOportunidades } from "@/lib/datos/consultas";
+import { MODO_DEMO } from "@/lib/demo";
+import { crearClienteServidor } from "@/lib/supabase/server";
+import { video } from "@/lib/talento/videos";
 
 export const metadata: Metadata = { title: "Inicio" };
 
+// Inicio del talento: lo que le toca primero, en grande; después videos cortos y atajos. Sin párrafos.
 export default async function Inicio() {
-  const nuevas = (await listarOportunidades()).filter((o) => o.estado === "enviada_talento").length;
+  const [nuevas, nombre] = await Promise.all([
+    listarOportunidades().then((o) => o.filter((x) => x.estado === "enviada_talento").length),
+    primerNombre(),
+  ]);
 
   return (
-    <Pantalla titulo="Hola">
+    <div className="flex flex-col gap-7">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          {nombre && (
+            <span aria-hidden className="grid size-13 shrink-0 place-items-center rounded-full bg-primary font-web text-xl font-semibold text-accent">
+              {nombre[0]}
+            </span>
+          )}
+          <h1 className="text-3xl">{nombre ? `Hola, ${nombre}` : "Hola"}</h1>
+        </div>
+        <EscucharPantalla />
+      </div>
+
+      <section aria-labelledby="siguiente" className="overflow-hidden rounded-lg bg-deep text-on-deep">
+        <div className="relative h-40">
+          <Image
+            src={nuevas > 0 ? "/web/home/gerente.webp" : "/web/home/carpintero.webp"}
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 640px) 36rem, 100vw"
+            className="object-cover object-[center_25%]"
+          />
+        </div>
+        <div className="flex flex-col items-start gap-3 p-5">
+          {nuevas > 0 && (
+            <span className="rounded-full bg-accent px-3 py-0.5 text-base font-bold text-on-accent">Te toca a ti</span>
+          )}
+          <h2 id="siguiente" className="text-2xl">
+            {nuevas === 0
+              ? "Cuéntanos qué sabes hacer"
+              : nuevas === 1
+                ? "Una organización quiere conocerte"
+                : `${nuevas} organizaciones quieren conocerte`}
+          </h2>
+          {nuevas === 0 && <p className="text-azul-claro">Hablando toma unos 5 minutos.</p>}
+          <Button asChild variant="acento" ancho="completo" className="mt-1">
+            <Link href={nuevas > 0 ? "/oportunidades" : "/huella"}>{nuevas > 0 ? "Ver de qué se trata" : "Contar mi historia"}</Link>
+          </Button>
+        </div>
+      </section>
+
+      <section aria-labelledby="como-funciona" className="flex flex-col gap-3">
+        <h2 id="como-funciona" className="text-xl">
+          Mira cómo funciona
+        </h2>
+        <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pt-1 pb-3 [scrollbar-width:none]">
+          {["como-funciona", "te-quieren-conocer", "estafas"].map((id) => (
+            <TarjetaVideo key={id} v={video(id)} />
+          ))}
+        </div>
+      </section>
+
+      <nav aria-label="Atajos" className="grid grid-cols-2 gap-3">
+        {ATAJOS.map(({ href, etiqueta, icono: Icono, fondo }) => (
+          <Link key={href} href={href} className="flex min-h-28 flex-col justify-between gap-3 rounded-lg bg-raised p-4 shadow-tarjeta transition-transform duration-100 active:scale-[0.97]">
+            <span className={`grid size-11 place-items-center rounded-md ${fondo}`}>
+              <Icono aria-hidden className="size-6" />
+            </span>
+            <span className="font-bold leading-tight">{etiqueta}</span>
+          </Link>
+        ))}
+      </nav>
+
       <AvisoBienestar />
-      {nuevas > 0 ? (
-        <section aria-labelledby="siguiente" className="flex flex-col gap-4 rounded-lg bg-surface p-5">
-          <p className="text-base font-bold text-text-muted">Tu siguiente paso</p>
-          <h2 id="siguiente" className="text-xl">
-            {nuevas === 1 ? "Tienes una oportunidad nueva" : `Tienes ${nuevas} oportunidades nuevas`}
-          </h2>
-          <p>Una organización busca a alguien con una experiencia como la tuya. Tú decides si te interesa.</p>
-          <Button asChild ancho="completo">
-            <Link href="/oportunidades">Ver oportunidades</Link>
-          </Button>
-        </section>
-      ) : (
-        <section aria-labelledby="siguiente" className="flex flex-col gap-4 rounded-lg bg-surface p-5">
-          <p className="text-base font-bold text-text-muted">Tu siguiente paso</p>
-          <h2 id="siguiente" className="text-xl">
-            Cuenta un reto que resolviste
-          </h2>
-          <p>Es lo que las empresas miran primero. Toma unos 10 minutos.</p>
-          <Button asChild ancho="completo">
-            <Link href="/huella">Contar mi historia</Link>
-          </Button>
-        </section>
-      )}
-
-      <section aria-labelledby="oportunidades" className="flex flex-col gap-3">
-        <h2 id="oportunidades" className="text-xl">
-          Oportunidades
-        </h2>
-        <Tarjeta>
-          <Handshake aria-hidden className="size-8" />
-          <p>Cuando una empresa necesite a alguien como tú, te lo contamos aquí y tú decides si te interesa.</p>
-          <EnlaceFlecha href="/oportunidades">Ver oportunidades</EnlaceFlecha>
-        </Tarjeta>
-      </section>
-
-      <section aria-labelledby="aprende" className="flex flex-col gap-3">
-        <h2 id="aprende" className="text-xl">
-          Aprende
-        </h2>
-        <Tarjeta>
-          <BookOpen aria-hidden className="size-8" />
-          <p>Cursos gratuitos para ponerte al día y para empezar tu propio negocio.</p>
-          <EnlaceFlecha href="/aprende">Ver cursos</EnlaceFlecha>
-        </Tarjeta>
-      </section>
-    </Pantalla>
+    </div>
   );
 }
 
-function EnlaceFlecha({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline underline-offset-4"
-    >
-      {children}
-      <ArrowRight aria-hidden className="size-5" />
-    </Link>
-  );
+const ATAJOS = [
+  { href: "/mi-perfil", etiqueta: "Mi perfil", icono: UserRound, fondo: "bg-azul-claro/50" },
+  { href: "/mi-perfil/pagos", etiqueta: "Cómo me pagan", icono: Wallet, fondo: "bg-accent/50" },
+  { href: "/aprende", etiqueta: "Aprende", icono: BookOpen, fondo: "bg-exito-fondo" },
+  { href: "/emprende", etiqueta: "Emprende", icono: Lightbulb, fondo: "bg-campo-claro" },
+];
+
+async function primerNombre(): Promise<string | null> {
+  if (MODO_DEMO) return "Gloria";
+  const supabase = await crearClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const { data } = await supabase.from("talent_profiles").select("nombre").eq("user_id", user.id).maybeSingle();
+  const nombre = (data?.nombre as string | null)?.trim().split(/\s+/)[0];
+  return nombre || null;
 }

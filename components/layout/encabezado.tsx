@@ -11,12 +11,13 @@ type Props = {
   volver?: { href: string; etiqueta?: string };
   ancho?: "celular" | "amplio";
   sinAyuda?: boolean;
+  tono?: "borde" | "lleno";
 };
 
 // Encabezado de celular: marca o "Volver" a la izquierda, Ayuda a la derecha.
-export function Encabezado({ inicioHref = "/", volver, ancho = "celular", sinAyuda }: Props) {
+export function Encabezado({ inicioHref = "/", volver, ancho = "celular", sinAyuda, tono }: Props) {
   return (
-    <header className="sticky top-0 z-20 border-b-2 border-border-subtle bg-bg">
+    <header className={cn("sticky top-0 z-20 bg-bg", tono === "lleno" ? "bg-bg/90 backdrop-blur" : "border-b-2 border-border-subtle")}>
       <div
         className={cn(
           "mx-auto flex min-h-16 items-center justify-between gap-3 px-4",
@@ -36,7 +37,7 @@ export function Encabezado({ inicioHref = "/", volver, ancho = "celular", sinAyu
             <Logo alto={30} />
           </Link>
         )}
-        {!sinAyuda && <BotonAyuda />}
+        {!sinAyuda && <BotonAyuda tono={tono} />}
       </div>
     </header>
   );
