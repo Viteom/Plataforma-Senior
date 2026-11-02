@@ -1,9 +1,11 @@
-import { BadgeCheck, Flag, Handshake, MapPin, ShieldAlert } from "lucide-react";
+import { BadgeCheck, Briefcase, Flag, Handshake, MapPin, Phone, ShieldAlert } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { AvisoDemo } from "@/components/demo/aviso-demo";
 import { Pantalla } from "@/components/layout/pantalla";
 import { Calificacion, Motivos } from "@/components/procesos/campos";
+import { EscucharPantalla, Reproductor } from "@/components/talento/voz";
 import { CuadroSituacion, LineaProceso } from "@/components/procesos/linea";
 import { BotonAccion } from "@/components/ui/boton-accion";
 import { Campo, Textarea } from "@/components/ui/campo";
@@ -13,7 +15,7 @@ import type { CargaAcuerdo } from "@/lib/bienestar/resumen";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import type { Oportunidad } from "@/lib/datos/tipos";
 import { MODO_DEMO } from "@/lib/demo";
-import { etiquetaForma } from "@/lib/formas";
+import { etiquetaForma, modalidades } from "@/lib/formas";
 import { situacion, type Situacion } from "@/lib/procesos";
 
 import {
@@ -82,18 +84,22 @@ export default async function Oportunidades() {
 
   return (
     <Pantalla titulo="Oportunidades" intro="Aquí ves cómo va cada una y qué sigue.">
+      <EscucharPantalla className="-mt-4" />
       <AvisoDemo lado="talento" />
       {/* Aviso antifraude fijo (regla 9). */}
-      <p className="flex items-start gap-3 rounded-md border-2 border-text p-4">
-        <ShieldAlert aria-hidden className="mt-0.5 size-6 shrink-0" />
+      <p className="flex items-start gap-3 rounded-lg bg-deep p-4 text-on-deep">
+        <ShieldAlert aria-hidden className="mt-0.5 size-6 shrink-0 text-accent" />
         <span>
-          <span className="font-bold">Nadie de Kánna ni de una empresa te va a pedir dinero</span>, códigos,
-          contraseñas, ni pagos por «exámenes», «aportes a salud y pensión» o cursos. Si alguien lo hace, repórtalo.
+          <span className="font-bold">Nadie te va a pedir dinero.</span>{" "}
+          <span className="text-azul-claro">
+            Ni códigos, ni contraseñas, ni pagos por «exámenes», «aportes a salud y pensión» o cursos. Si alguien lo
+            hace, repórtalo.
+          </span>
         </span>
       </p>
 
       {oportunidades.length === 0 && (
-        <div className="flex flex-col items-center gap-3 rounded-lg bg-surface px-5 py-10 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-lg bg-raised px-5 py-10 text-center shadow-tarjeta">
           <Handshake aria-hidden className="size-12" />
           <h2 className="text-xl">Todavía no hay oportunidades</h2>
           <p className="max-w-prose text-text-muted">Cuando una empresa te busque, te avisamos por mensaje de texto.</p>
@@ -137,7 +143,7 @@ export default async function Oportunidades() {
           </h2>
           <ul className="flex flex-col gap-3">
             {cerradas.map(({ o, s }) => (
-              <li key={o.id} className="flex flex-col gap-1 rounded-md border-2 border-border-subtle p-4">
+              <li key={o.id} className="flex flex-col gap-1 rounded-lg bg-raised p-4 shadow-tarjeta">
                 <p className="font-bold">{o.empresa}</p>
                 <p>{s.titulo}</p>
                 {s.detalle && <p className="text-base text-text-muted">{s.detalle}</p>}
@@ -163,17 +169,20 @@ function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?:
   const nueva = o.estado === "enviada_talento";
   const abierta = ["abierta", "conversacion", "acuerdo", "en_curso"].includes(o.estado);
 
+  const donde = [o.ciudad, modalidades.find((m) => m.valor === o.modalidad)?.etiqueta].filter(Boolean).join(" · ");
+  const como = o.formatos?.length ? o.formatos.map(etiquetaForma).join(", ") : null;
+
   return (
-    <article className="flex flex-col gap-4 rounded-lg border-2 border-border-subtle p-5">
+    <article className="flex flex-col gap-4 rounded-lg bg-raised p-5 shadow-tarjeta">
       <div className="flex flex-col gap-1">
-        <h3 className="text-xl">{o.empresa}</h3>
+        <h3 className="text-2xl">{o.empresa}</h3>
         {o.empresa_verificada && (
           <p className="flex items-center gap-2 font-bold">
             <BadgeCheck aria-hidden className="size-5" />
             Empresa verificada
           </p>
         )}
-        {(o.sector || o.ciudad) && (
+        {!nueva && (o.sector || o.ciudad) && (
           <p className="flex items-center gap-1 text-base text-text-muted">
             <MapPin aria-hidden className="size-4" />
             {[o.sector, o.ciudad].filter(Boolean).join(" · ")}
@@ -181,11 +190,31 @@ function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?:
         )}
       </div>
 
+      {nueva && (
+        <Reproductor
+          id={`oportunidad-${o.id}`}
+          titulo="Escucha de qué se trata"
+          texto={[
+            `${o.empresa}${o.empresa_verificada ? ", una organización verificada por Kánna," : ""} quiere conocerte.`,
+            o.problema ? `Esto es lo que necesita: ${o.problema}` : "Vio tu perfil y quiere conocerte.",
+            donde && `Es en ${donde}.`,
+            como && `Busca a alguien para: ${como}.`,
+            "Si te interesa, toca Me interesa. Si no, toca No me interesa: tu perfil sigue ahí.",
+            "Recuerda: nadie te va a pedir dinero.",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        />
+      )}
       {(nueva || o.problema) && (
         <p className="text-lg">{o.problema ? `«${o.problema}»` : "Vio tu perfil y quiere conocerte."}</p>
       )}
-      {nueva && o.formatos && o.formatos.length > 0 && (
-        <p className="text-base">Busca: {o.formatos.map(etiquetaForma).join(", ")}</p>
+      {nueva && (donde || como || o.sector) && (
+        <ul className="flex flex-col gap-2.5">
+          {donde && <Dato icono={MapPin} titulo={donde} nota="Dónde" />}
+          {como && <Dato icono={Handshake} titulo={como} nota="Cómo trabajarían juntos" />}
+          {o.sector && <Dato icono={Briefcase} titulo={o.sector} nota="Sector" />}
+        </ul>
       )}
 
       {s.etapa && <LineaProceso etapa={s.etapa} />}
@@ -206,6 +235,10 @@ function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?:
             variant="secundario"
             ancho="completo"
           />
+          <Link href="/ayuda#llameme" className={`${enlace} self-center`}>
+            <Phone aria-hidden className="size-5" />
+            Tengo una pregunta: que me llamen
+          </Link>
         </>
       )}
       {o.estado === "conversacion" && !o.conversacion_confirmada && (
@@ -331,5 +364,19 @@ function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?:
         </details>
       )}
     </article>
+  );
+}
+
+function Dato({ icono: Icono, titulo, nota }: { icono: typeof MapPin; titulo: string; nota: string }) {
+  return (
+    <li className="flex items-center gap-4 rounded-md bg-surface px-4 py-3">
+      <span className="grid size-12 shrink-0 place-items-center rounded-md bg-raised">
+        <Icono aria-hidden className="size-6" />
+      </span>
+      <span className="flex flex-col">
+        <span className="text-base text-text-muted">{nota}</span>
+        <span className="font-web text-xl font-semibold tracking-tight">{titulo}</span>
+      </span>
+    </li>
   );
 }

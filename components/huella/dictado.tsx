@@ -3,10 +3,9 @@
 import { Mic, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-
 // Dictado con la Web Speech API del navegador (brief: sin costo en v1). No todos los navegadores
-// la tienen (en iPhone depende de la versión); si falta, se ofrecen las otras vías.
+// la tienen (en iPhone depende de la versión); si falta, se avisa y se ofrecen las otras vías.
+// Se presenta como un micrófono grande: es la forma principal de contar la historia.
 
 type Reconocimiento = {
   lang: string;
@@ -26,17 +25,21 @@ function crearReconocimiento(): Reconocimiento | null {
   return Clase ? new Clase() : null;
 }
 
-type Props = { onTexto: (texto: string) => void };
+type Props = { onTexto: (texto: string) => void; onNoSoportado?: () => void };
 
-export function Dictado({ onTexto }: Props) {
+export function Dictado({ onTexto, onNoSoportado }: Props) {
   const [soportado, setSoportado] = useState<boolean | null>(null);
   const [escuchando, setEscuchando] = useState(false);
   const [aviso, setAviso] = useState("");
   const rec = useRef<Reconocimiento | null>(null);
 
   useEffect(() => {
-    setSoportado(crearReconocimiento() !== null);
+    const hay = crearReconocimiento() !== null;
+    setSoportado(hay);
+    if (!hay) onNoSoportado?.();
     return () => rec.current?.stop();
+    // Solo al montar: el aviso de que no hay dictado se da una vez.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function empezar() {
@@ -73,27 +76,32 @@ export function Dictado({ onTexto }: Props) {
 
   if (soportado === false) {
     return (
-      <p className="rounded-md bg-surface p-4">
+      <p className="rounded-md bg-raised p-4">
         Este navegador no permite dictar. Puedes escribir tu historia o pedir que te llamemos.
       </p>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {escuchando ? (
-        <Button type="button" variant="secundario" ancho="completo" onClick={detener}>
-          <Square aria-hidden />
-          Detener
-        </Button>
-      ) : (
-        <Button type="button" variant="secundario" ancho="completo" onClick={empezar} disabled={soportado === null}>
-          <Mic aria-hidden />
-          Empezar a hablar
-        </Button>
-      )}
-      <p aria-live="polite" className="text-base text-text-muted">
-        {escuchando ? "Te estamos escuchando. Habla con calma; lo que digas aparece abajo." : aviso}
+    <div className="flex flex-col items-center gap-4 py-6">
+      <button
+        type="button"
+        onClick={escuchando ? detener : empezar}
+        disabled={soportado === null}
+        aria-pressed={escuchando}
+        data-escuchando={escuchando || undefined}
+        className="anillos-mic grid size-36 place-items-center rounded-full bg-accent text-on-accent transition-transform duration-100 active:scale-95 disabled:opacity-60"
+      >
+        {escuchando ? <Square aria-hidden className="size-12 fill-current" /> : <Mic aria-hidden className="size-14" strokeWidth={1.8} />}
+        <span className="sr-only">{escuchando ? "Parar" : "Empezar a hablar"}</span>
+      </button>
+      <p aria-hidden className="mt-3 font-web text-2xl font-semibold tracking-tight">
+        {escuchando ? "Te escuchamos… toca para parar" : "Toca y habla"}
+      </p>
+      <p aria-live="polite" className="max-w-[30ch] text-center text-base text-text-muted">
+        {escuchando
+          ? "Habla con calma. Lo que digas aparece abajo."
+          : aviso || "Como si se lo contaras a un amigo. No importa equivocarte."}
       </p>
     </div>
   );

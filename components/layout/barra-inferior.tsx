@@ -32,7 +32,7 @@ export function BarraInferior({ items = navTalento, className }: { items?: ItemN
                 <span
                   className={cn(
                     "flex h-8 w-14 items-center justify-center rounded-full transition-[background-color,transform] duration-100 group-active:scale-90 group-active:bg-surface-strong",
-                    activo && "bg-surface-strong",
+                    activo && "bg-accent text-on-accent",
                   )}
                 >
                   <Icono aria-hidden className="size-6" strokeWidth={activo ? 2.5 : 2} />

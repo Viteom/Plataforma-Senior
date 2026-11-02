@@ -312,3 +312,68 @@
     animation: none;
   }
 }
+
+/* ── Pantallas del talento (misma línea de la web, 1 de noviembre de 2026) ──
+   El fondo neutro de la web y las superficies en gris claro. Los titulares en Geist; el texto de
+   lectura sigue en Atkinson Hyperlegible. */
+.talento {
+  --color-bg: var(--color-neutro);
+  --color-surface: var(--color-neutro-2);
+  --color-surface-strong: #dcd9d1;
+  --color-border-subtle: #dcd9d1;
+  background: var(--color-neutro);
+}
+
+@layer components {
+  .talento h1,
+  .talento h2,
+  .talento h3 {
+    font-family: var(--font-web);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+  /* Portadas de video: oscurece abajo para leer el título. */
+  .velo-video {
+    background: linear-gradient(transparent 35%, rgb(8 11 20 / 0.8));
+  }
+  /* Micrófono grande: anillos de maíz; laten mientras escucha. */
+  .anillos-mic {
+    box-shadow:
+      0 0 0 14px rgb(250 216 106 / 0.35),
+      0 0 0 30px rgb(250 216 106 / 0.15);
+  }
+  .anillos-mic[data-escuchando] {
+    animation: late 1.4s ease-in-out infinite;
+  }
+  .onda {
+    animation: onda 0.9s ease-in-out infinite alternate;
+    transform-origin: center;
+  }
+  .onda:nth-child(3n) {
+    animation-delay: -0.3s;
+  }
+  .onda:nth-child(3n + 1) {
+    animation-delay: -0.6s;
+  }
+}
+
+@keyframes late {
+  50% {
+    box-shadow:
+      0 0 0 20px rgb(250 216 106 / 0.4),
+      0 0 0 40px rgb(250 216 106 / 0.12);
+  }
+}
+
+@keyframes onda {
+  to {
+    transform: scaleY(0.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anillos-mic[data-escuchando],
+  .onda {
+    animation: none;
+  }
+}
