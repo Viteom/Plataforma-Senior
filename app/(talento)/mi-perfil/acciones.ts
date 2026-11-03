@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { normalizarCelular } from "@/lib/auth/destino";
 import { MODO_DEMO } from "@/lib/demo";
 import { esForma, type FormaContratar } from "@/lib/formas";
+import { borrarArchivosPerfil } from "@/lib/privacidad/borrar-archivos";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
@@ -308,31 +309,25 @@ export async function descargarDatos(): Promise<string> {
 
 export async function borrarCuenta(): Promise<Estado> {
   const { supabase, user, perfil } = await sesion();
-
-  // Archivos primero: al borrar el perfil se pierde la referencia a sus rutas.
-  const { data: archivos } = await supabase
-    .from("evidence")
-    .select("archivo_path")
-    .eq("talent_id", perfil.id)
-    .not("archivo_path", "is", null);
-  const rutas = (archivos ?? []).map((a) => a.archivo_path as string);
-  if (rutas.length) await supabase.storage.from("evidencias").remove(rutas);
-  const { data: conFoto } = await supabase.from("talent_profiles").select("foto_path").eq("id", perfil.id).single();
-  if (conFoto?.foto_path) await supabase.storage.from("fotos").remove([conFoto.foto_path as string]);
+  const admin = crearClienteAdmin();
+  if (!admin) {
+    await supabase.from("help_requests").insert({user_id:user.id,canal:"borrar_cuenta",motivo:"Solicitó borrar su cuenta. Falta limpiar los archivos y eliminar el acceso."});
+    return { error: "El equipo debe completar el borrado. Conservamos la solicitud y tus referencias para hacerlo." };
+  }
+  try { await borrarArchivosPerfil(admin, perfil.id); }
+  catch { return { error: "No pudimos terminar de borrar los archivos. Tu perfil sigue disponible para reintentar o pedir ayuda." }; }
 
   // Borra el perfil y, en cascada, ofertas, historias, huella, evidencias y datos privados.
   const { error } = await supabase.from("talent_profiles").delete().eq("id", perfil.id);
   if (error) return { error: ERROR };
 
   // El usuario de Auth solo se borra con la llave de servicio. Sin ella, el equipo lo termina.
-  const admin = crearClienteAdmin();
-  if (admin) {
-    await admin.auth.admin.deleteUser(user.id);
-  } else {
+  const { error: errorAcceso } = await admin.auth.admin.deleteUser(user.id);
+  if (errorAcceso) {
     await supabase.from("help_requests").insert({
       user_id: user.id,
       canal: "borrar_cuenta",
-      motivo: "Borró su perfil. Falta eliminar su usuario de acceso.",
+      motivo: "Archivos y perfil eliminados. Falta eliminar su usuario de acceso.",
     });
   }
   await supabase.auth.signOut();

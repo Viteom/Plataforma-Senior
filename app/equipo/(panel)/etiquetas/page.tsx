@@ -31,9 +31,9 @@ export default async function EtiquetasNuevas() {
               </p>
               <p className="text-lg font-bold">{t.etiqueta}</p>
               <div className="flex flex-wrap gap-3">
-                <BotonAccion accion={revisarEtiqueta} campos={{ id: t.id, decision: "sumar" }} texto="Aprobar y sumar a la lista" size="normal" />
-                <BotonAccion accion={revisarEtiqueta} campos={{ id: t.id, decision: "aprobar" }} texto="Aprobar solo aquí" variant="secundario" size="normal" />
-                <BotonAccion accion={revisarEtiqueta} campos={{ id: t.id, decision: "quitar" }} texto="Quitar" variant="suave" size="normal" />
+                <BotonAccion accion={revisarEtiqueta} campos={{ id: t.id, etiqueta: t.etiqueta, capa: t.capa, decision: "sumar" }} texto="Aprobar y sumar a la lista" size="normal" />
+                <BotonAccion accion={revisarEtiqueta} campos={{ id: t.id, etiqueta: t.etiqueta, capa: t.capa, decision: "aprobar" }} texto="Aprobar solo aquí" variant="secundario" size="normal" />
+                <BotonAccion accion={revisarEtiqueta} campos={{ id: t.id, etiqueta: t.etiqueta, capa: t.capa, decision: "quitar" }} texto="Quitar" variant="suave" size="normal" />
               </div>
             </li>
           ))}

@@ -9,6 +9,8 @@ create table auth.users (
   id uuid primary key,
   phone text, -- Supabase lo guarda sin "+": 573001234567
   email text,
+  phone_confirmed_at timestamptz,
+  email_confirmed_at timestamptz,
   raw_user_meta_data jsonb not null default '{}'::jsonb
 );
 

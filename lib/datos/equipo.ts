@@ -395,6 +395,7 @@ export async function empresasYReportes(): Promise<{
 
 export type EvidenciaPendiente = {
   id: string;
+  revision: string;
   tipo: "referencia" | "archivo";
   descripcion: string | null;
   referencia_nombre: string | null;
@@ -419,6 +420,7 @@ export async function evidenciasYTarifas(): Promise<{
       evidencias: [
         {
           id: "00000000-0000-4000-9100-000000000001",
+          revision: "00000000-0000-4000-9100-000000000001",
           tipo: "referencia",
           descripcion: "Fue mi jefe en la planta",
           referencia_nombre: "Carlos Pérez",
@@ -428,6 +430,7 @@ export async function evidenciasYTarifas(): Promise<{
         },
         {
           id: "00000000-0000-4000-9100-000000000002",
+          revision: "00000000-0000-4000-9100-000000000002",
           tipo: "archivo",
           descripcion: "Certificado de buenas prácticas",
           referencia_nombre: null,
@@ -443,7 +446,7 @@ export async function evidenciasYTarifas(): Promise<{
   const [{ data: evidencias }, { data: guias }] = await Promise.all([
     supabase
       .from("evidence")
-      .select("id, tipo, descripcion, referencia_nombre, referencia_telefono, archivo_path, talent_profiles(nombre)")
+      .select("id, revision, tipo, descripcion, referencia_nombre, referencia_telefono, archivo_path, talent_profiles(nombre)")
       .eq("estado", "pendiente")
       .in("tipo", ["referencia", "archivo"])
       .order("creado_en")
@@ -459,6 +462,7 @@ export async function evidenciasYTarifas(): Promise<{
       }
       return {
         id: e.id as string,
+        revision: e.revision as string,
         tipo: e.tipo as "referencia" | "archivo",
         descripcion: e.descripcion as string | null,
         referencia_nombre: e.referencia_nombre as string | null,

@@ -159,7 +159,7 @@ describe("registro asistido del gestor", () => {
     expect(nada).toBeNull();
 
     const rosa = await crearUsuario(db, "talento");
-    await filas(db, "update auth.users set phone = '573115556677' where id = $1", [rosa]);
+    await filas(db, "update auth.users set phone = '573115556677',phone_confirmed_at=now() where id = $1", [rosa]);
     await db.exec("set role authenticated");
     await db.query("select set_config('request.jwt.claim.sub', $1, false)", [rosa]);
     const [{ r }] = await filas(db, "select reclamar_perfil() as r");

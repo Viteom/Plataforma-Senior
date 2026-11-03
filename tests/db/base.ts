@@ -6,9 +6,10 @@ import { PGlite, type Transaction } from "@electric-sql/pglite";
 const RAIZ = join(__dirname, "..", "..", "supabase");
 
 // Base de datos en memoria con el stub de Supabase y todas las migraciones, en orden.
-export async function crearBase() {
+export async function crearBase(opciones: { storage?: boolean } = {}) {
   const db = new PGlite();
   await db.exec(readFileSync(join(RAIZ, "tests", "stub-supabase.sql"), "utf8"));
+  if (opciones.storage) await db.exec(readFileSync(join(RAIZ, "tests", "stub-storage.sql"), "utf8"));
   const migraciones = readdirSync(join(RAIZ, "migrations")).filter((f) => f.endsWith(".sql")).sort();
   for (const m of migraciones) {
     await db.exec(readFileSync(join(RAIZ, "migrations", m), "utf8"));

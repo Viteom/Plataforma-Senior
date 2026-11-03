@@ -58,7 +58,7 @@ export default async function Evidencias() {
                     </span>
                   </p>
                 )}
-                <BotonAccion accion={revisarEvidencia} campos={{ id: e.id, decision: "verificada" }} texto="Verificar" className="max-w-xl">
+                <BotonAccion accion={revisarEvidencia} campos={{ id: e.id, revision: e.revision, decision: "verificada" }} texto="Verificar" className="max-w-xl">
                   <Campo
                     id={`nota-${e.id}`}
                     etiqueta="Lo que confirmó (lo verá la empresa)"
@@ -67,7 +67,7 @@ export default async function Evidencias() {
                     {(p) => <Input {...p} name="nota" maxLength={200} />}
                   </Campo>
                 </BotonAccion>
-                <BotonAccion accion={revisarEvidencia} campos={{ id: e.id, decision: "rechazada" }} texto="No se pudo verificar" variant="secundario" size="normal" className="self-start" />
+                <BotonAccion accion={revisarEvidencia} campos={{ id: e.id, revision: e.revision, decision: "rechazada" }} texto="No se pudo verificar" variant="secundario" size="normal" className="self-start" />
               </li>
             ))}
           </ul>

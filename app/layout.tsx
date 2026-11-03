@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Atkinson_Hyperlegible, Bricolage_Grotesque, Geist, Instrument_Serif } from "next/font/google";
+import localFont from "next/font/local";
 
 import { ToqueActivo } from "@/components/layout/toque-activo";
 import { esProduccion } from "@/lib/ambiente";
@@ -8,33 +8,33 @@ import { supabaseConfigurado } from "@/lib/supabase/config";
 
 import "./globals.css";
 
-const atkinson = Atkinson_Hyperlegible({
-  subsets: ["latin"],
-  weight: ["400", "700"],
+const atkinson = localFont({
+  src: [
+    { path: "./fonts/atkinsonhyperlegible/AtkinsonHyperlegible-Regular.ttf", weight: "400", style: "normal" },
+    { path: "./fonts/atkinsonhyperlegible/AtkinsonHyperlegible-Bold.ttf", weight: "700", style: "normal" },
+  ],
   variable: "--font-atkinson",
   display: "swap",
 });
 
 // Letras de marca: solo en titulares grandes de la web. La app se lee en Atkinson.
-const bricolage = Bricolage_Grotesque({
-  subsets: ["latin"],
-  weight: ["600", "800"],
+const bricolage = localFont({
+  src: [{ path: "./fonts/bricolagegrotesque/BricolageGrotesque[opsz,wdth,wght].ttf", weight: "600 800", style: "normal" }],
   variable: "--font-bricolage",
   display: "swap",
 });
 
 // Web informativa: una sans limpia para los titulares en dos tonos. La app sigue en Atkinson.
-const geist = Geist({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const geist = localFont({
+  src: [{ path: "./fonts/geist/Geist[wght].ttf", weight: "400 600", style: "normal" }],
   variable: "--font-geist",
   display: "swap",
 });
 
-const instrument = Instrument_Serif({
-  subsets: ["latin"],
+const instrument = localFont({
+  src: "./fonts/instrumentserif/InstrumentSerif-Italic.ttf",
   weight: "400",
-  style: ["italic"],
+  style: "italic",
   variable: "--font-instrument",
   display: "swap",
 });

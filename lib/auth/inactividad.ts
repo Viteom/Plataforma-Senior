@@ -11,9 +11,32 @@ export const opcionesCookieActividad = {
   maxAge: 8 * 60 * 60,
 };
 
-// true si la última actividad registrada (milisegundos, en texto) sigue vigente.
-export function actividadVigente(valor: string | undefined, ahora = Date.now()): boolean {
-  const ultima = Number(valor);
-  if (!valor || !Number.isFinite(ultima) || ultima > ahora + 60_000) return false;
-  return ahora - ultima < MINUTOS_INACTIVIDAD * 60_000;
+type IdentidadActividad = { usuario: string; sesion: string };
+
+async function llave(secreto: string) {
+  if (secreto.length < 32) return null;
+  return crypto.subtle.importKey("raw", new TextEncoder().encode(secreto), { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"]);
+}
+const mensaje = (marca: string, identidad: IdentidadActividad) =>
+  new TextEncoder().encode(JSON.stringify(["actividad-equipo-v1", identidad.usuario, identidad.sesion, marca]));
+
+// HttpOnly evita leer la cookie desde JavaScript, pero no prueba quién la creó. La firma impide
+// inventar fechas y vincula la marca a la cuenta y a la sesión verificadas por Supabase.
+export async function crearActividad(identidad: IdentidadActividad, secreto: string, ahora = Date.now()): Promise<string | null> {
+  const clave = await llave(secreto);
+  if (!clave || !identidad.usuario || !identidad.sesion) return null;
+  const marca = String(ahora);
+  const firma = await crypto.subtle.sign("HMAC", clave, mensaje(marca, identidad));
+  return `${marca}.${Array.from(new Uint8Array(firma), b => b.toString(16).padStart(2,"0")).join("")}`;
+}
+
+export async function actividadVigente(valor: string | undefined, identidad: IdentidadActividad, secreto: string, ahora = Date.now()): Promise<boolean> {
+  if (!valor || !identidad.usuario || !identidad.sesion) return false;
+  const [marca, firma, extra] = valor.split(".");
+  const ultima = Number(marca);
+  if (extra !== undefined || !/^\d+$/.test(marca) || !/^[0-9a-f]{64}$/.test(firma ?? "")
+    || !Number.isSafeInteger(ultima) || ultima > ahora || ahora - ultima >= MINUTOS_INACTIVIDAD * 60_000) return false;
+  const clave = await llave(secreto);
+  if (!clave) return false;
+  return crypto.subtle.verify("HMAC", clave, Uint8Array.from(firma.match(/../g)!, h => parseInt(h,16)), mensaje(marca,identidad));
 }

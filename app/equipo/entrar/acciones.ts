@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { COOKIE_ACTIVIDAD, opcionesCookieActividad } from "@/lib/auth/inactividad";
+import { crearActividad, COOKIE_ACTIVIDAD, opcionesCookieActividad } from "@/lib/auth/inactividad";
 import { ENTRADA_EQUIPO, esRolEquipo, type Rol } from "@/lib/auth/rutas";
 import { normalizarCorreo } from "@/lib/auth/destino";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -59,7 +59,18 @@ export async function verificarSegundoFactor(
   }
 
   // Sin esta marca el middleware cierra la sesión: es el inicio de los 30 minutos de actividad.
-  (await cookies()).set(COOKIE_ACTIVIDAD, String(Date.now()), opcionesCookieActividad);
+  const { data: sesion } = await supabase.auth.getClaims();
+  const claims = sesion?.claims;
+  if (claims?.aal !== "aal2") return { error: "No pudimos confirmar el segundo factor. Vuelve a entrar." };
+  const marca = await crearActividad(
+    { usuario: String(claims.sub ?? ""), sesion: String(claims.session_id ?? "") },
+    process.env.EQUIPO_SESSION_SECRET ?? "",
+  );
+  if (!marca) {
+    await supabase.auth.signOut();
+    return { error: "No pudimos iniciar una sesión segura. Pide ayuda a administración del equipo." };
+  }
+  (await cookies()).set(COOKIE_ACTIVIDAD, marca, opcionesCookieActividad);
   redirect("/equipo");
 }
 

@@ -49,6 +49,7 @@ describe("limpieza de datos vencidos", () => {
         ('${talento}','boton','reciente cerrada','cerrada',now());
       insert into private_access_log(talent_id,visto_por,motivo,visto_en) values
         ('${perfil}','${curador}','revisión',${viejo}), ('${perfil}','${curador}','revisión',now());
+      update help_requests set cerrada_en=${viejo} where motivo='vieja cerrada';
     `);
 
     const r = (await db.query<{ r: Record<string, number> }>("select limpiar_datos_vencidos() as r")).rows[0].r;

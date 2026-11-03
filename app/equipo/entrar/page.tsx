@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BotonAyuda } from "@/components/layout/boton-ayuda";
+import { FormularioSalida } from "@/components/layout/formulario-salida";
 import { Logo } from "@/components/marca/logo";
 import { MINUTOS_INACTIVIDAD } from "@/lib/auth/inactividad";
 import { MODO_DEMO } from "@/lib/demo";
@@ -198,10 +199,10 @@ export default async function EntradaEquipo({
 function OtraCuenta() {
   if (MODO_DEMO) return null;
   return (
-    <form action={salirEquipo}>
+    <FormularioSalida accion={salirEquipo}>
       <button type="submit" className="min-h-tap font-bold underline underline-offset-4">
         Entrar con otra cuenta
       </button>
-    </form>
+    </FormularioSalida>
   );
 }

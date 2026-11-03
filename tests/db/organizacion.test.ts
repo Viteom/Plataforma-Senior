@@ -15,7 +15,7 @@ async function real(db: PGlite, u: string, sql: string, args: unknown[] = []) {
 
 async function cuenta(db: PGlite, rol: "empresa" | "talento", correo: string) {
   const id = await crearUsuario(db, rol);
-  await db.query("update auth.users set email=$1 where id=$2", [correo, id]);
+  await db.query("update auth.users set email=$1,email_confirmed_at=now() where id=$2", [correo, id]);
   return id;
 }
 
@@ -122,7 +122,7 @@ describe("equipo de la organización", () => {
 });
 
 describe("preferencia de pago del talento", () => {
-  it("la persona la guarda, el equipo la ve y ninguna organización", async () => {
+  it("la persona la guarda y solo ella la ve, sin acceso del equipo ni organizaciones", async () => {
     const s = await escenario();
     const rosa = await cuenta(s.db, "talento", "rosa@correo.co");
     const perfil = (
@@ -133,7 +133,7 @@ describe("preferencia de pago del talento", () => {
     await expect(
       real(s.db, rosa, "update talent_payout_preferences set metodo='banco' where talent_id=$1", [perfil]),
     ).rejects.toThrow();
-    expect((await real(s.db, s.curador, "select metodo from talent_payout_preferences")).rows).toEqual([{ metodo: "daviplata" }]);
+    expect((await real(s.db, s.curador, "select metodo from talent_payout_preferences")).rows).toHaveLength(0);
     expect((await real(s.db, s.marta, "select * from talent_payout_preferences")).rows).toHaveLength(0);
     const otra = await cuenta(s.db, "talento", "otra@correo.co");
     expect((await real(s.db, otra, "select * from talent_payout_preferences")).rows).toHaveLength(0);

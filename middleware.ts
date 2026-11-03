@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { actividadVigente, COOKIE_ACTIVIDAD, opcionesCookieActividad } from "@/lib/auth/inactividad";
+import { actividadVigente, crearActividad, COOKIE_ACTIVIDAD, opcionesCookieActividad } from "@/lib/auth/inactividad";
 import { decidirRuta, ENTRADA_EQUIPO, esPublica, esRolEquipo, type Rol } from "@/lib/auth/rutas";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseConfigurado } from "@/lib/supabase/config";
 
@@ -16,12 +16,14 @@ export async function middleware(request: NextRequest) {
   if (esPublica(pathname) && !esEntrada) return NextResponse.next();
 
   let respuesta = NextResponse.next({ request });
+  respuesta.headers.set("Cache-Control", "private, no-store, max-age=0");
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (lista) => {
         lista.forEach(({ name, value }) => request.cookies.set(name, value));
         respuesta = NextResponse.next({ request });
+        respuesta.headers.set("Cache-Control", "private, no-store, max-age=0");
         lista.forEach(({ name, value, options }) => respuesta.cookies.set(name, value, options));
       },
     },
@@ -43,13 +45,18 @@ export async function middleware(request: NextRequest) {
   let segundoFactor = false;
   if (esRolEquipo(rol)) {
     segundoFactor = claims?.aal === "aal2";
-    if (segundoFactor && !esPublica(pathname) && !actividadVigente(request.cookies.get(COOKIE_ACTIVIDAD)?.value)) {
+    const identidad = { usuario: String(claims?.sub ?? ""), sesion: String(claims?.session_id ?? "") };
+    const secreto = process.env.EQUIPO_SESSION_SECRET ?? "";
+    if (segundoFactor && !await actividadVigente(request.cookies.get(COOKIE_ACTIVIDAD)?.value, identidad, secreto)) {
       await supabase.auth.signOut();
       const salida = redirigir(request, respuesta, `${ENTRADA_EQUIPO}?motivo=inactividad`);
       salida.cookies.delete(COOKIE_ACTIVIDAD);
       return salida;
     }
-    if (segundoFactor) respuesta.cookies.set(COOKIE_ACTIVIDAD, String(Date.now()), opcionesCookieActividad);
+    if (segundoFactor) {
+      const marca = await crearActividad(identidad, secreto);
+      if (marca) respuesta.cookies.set(COOKIE_ACTIVIDAD, marca, opcionesCookieActividad);
+    }
   }
 
   const destino = decidirRuta(pathname, rol, segundoFactor);
@@ -58,6 +65,7 @@ export async function middleware(request: NextRequest) {
 
 function redirigir(request: NextRequest, respuesta: NextResponse, destino: string) {
   const redireccion = NextResponse.redirect(new URL(destino, request.url));
+  redireccion.headers.set("Cache-Control", "private, no-store, max-age=0");
   // Conserva las cookies de sesión que Supabase acaba de refrescar (o borrar).
   respuesta.cookies.getAll().forEach((c) => redireccion.cookies.set(c));
   return redireccion;

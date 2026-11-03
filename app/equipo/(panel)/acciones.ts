@@ -207,16 +207,13 @@ export async function revisarEvidencia(_p: Estado, datos: FormData): Promise<Est
     };
   }
   if (MODO_DEMO) return DEMO;
-  const { supabase, user } = await equipo();
-  const { error } = await supabase
-    .from("evidence")
-    .update({
-      estado: decision,
-      nota_equipo: nota || null,
-      verificada_por: user.id,
-    })
-    .eq("id", id);
-  if (error) return { error: "No pudimos guardar." };
+  const { supabase } = await equipo();
+  const revision = String(datos.get("revision") ?? "");
+  if (!UUID.test(revision)) return { error: "Recarga la página para revisar la versión actual." };
+  const { error } = await supabase.rpc("revisar_evidencia", {
+    evidencia_id: id, decision, nota, revision_esperada: revision,
+  });
+  if (error) return { error: "No pudimos verificarla. Comprueba si cambió y revisa que no tenga datos privados." };
   revalidatePath("/equipo/evidencias");
   return {
     aviso: decision === "verificada" ? "Verificada." : "Marcada como no verificable.",
@@ -479,52 +476,16 @@ export async function revisarEtiqueta(_p: Estado, datos: FormData): Promise<Esta
   if (MODO_DEMO) return DEMO;
   const { supabase } = await equipo();
 
-  if (decision === "quitar") {
-    const { error } = await supabase.from("footprint_tags").delete().eq("id", id);
-    if (error) return { error: "No pudimos quitarla." };
-    revalidatePath("/equipo/etiquetas");
-    return { aviso: "Quitada del perfil." };
-  }
-
-  const { data: etiqueta } = await supabase.from("footprint_tags").select("capa, etiqueta").eq("id", id).maybeSingle();
-  if (!etiqueta) return { error: "Esa etiqueta ya no existe." };
-  // Lo que ven las empresas no puede revelar la edad (regla 1).
-  if (/\baños\b|\bedad\b|naci[óo]|pension|jubil|\b(19|20)\d\d\b|\d{5,}|@/i.test(etiqueta.etiqueta as string)) {
-    return { error: "Tiene edad, fechas o datos de contacto. Quítala." };
-  }
-
-  let taxonomyId: string | null = null;
-  if (decision === "sumar") {
-    const { data: existente } = await supabase
-      .from("taxonomy")
-      .select("id")
-      .eq("capa", etiqueta.capa)
-      .ilike("etiqueta", etiqueta.etiqueta as string)
-      .maybeSingle();
-    if (existente) {
-      taxonomyId = existente.id as string;
-    } else {
-      const { data: nueva, error } = await supabase
-        .from("taxonomy")
-        .insert({ capa: etiqueta.capa, etiqueta: etiqueta.etiqueta })
-        .select("id")
-        .single();
-      if (error || !nueva) return { error: "No pudimos sumarla a la lista." };
-      taxonomyId = nueva.id as string;
-    }
-  }
-
-  const { error } = await supabase
-    .from("footprint_tags")
-    .update({
-      aprobada_en: new Date().toISOString(),
-      ...(taxonomyId ? { taxonomy_id: taxonomyId } : {}),
-    })
-    .eq("id", id);
-  if (error) return { error: "No pudimos aprobarla." };
+  const { error } = await supabase.rpc("revisar_etiqueta", {
+    etiqueta_id: id,
+    decision,
+    etiqueta_esperada: String(datos.get("etiqueta") ?? ""),
+    capa_esperada: String(datos.get("capa") ?? ""),
+  });
+  if (error) return { error: "No pudimos revisarla. Si cambió, recarga la página y comprueba el texto." };
   revalidatePath("/equipo/etiquetas");
   return {
-    aviso: decision === "sumar" ? "Aprobada y sumada a la lista." : "Aprobada.",
+    aviso: decision === "quitar" ? "Quitada del perfil." : decision === "sumar" ? "Aprobada y sumada a la lista." : "Aprobada.",
   };
 }
 

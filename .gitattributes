@@ -1,2 +1,4 @@
 *.pdf binary
 *.docx binary
+# Conservar el formato original de las licencias distribuidas con las fuentes.
+app/fonts/**/OFL.txt -whitespace
