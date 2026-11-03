@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   resolve: {
@@ -10,6 +10,8 @@ export default defineConfig({
     },
   },
   test: {
+    // e2e/ es de Playwright: sus *.spec.ts no corren con Vitest.
+    exclude: [...configDefaults.exclude, "e2e/**"],
     // PGlite arranca Postgres en memoria: la primera vez tarda unos segundos.
     // Las pruebas que arman la base dentro del test (no en un hook) necesitan el mismo margen,
     // sobre todo si el computador está ocupado con la app local.
