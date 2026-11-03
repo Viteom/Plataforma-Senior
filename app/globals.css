@@ -288,14 +288,6 @@
     mask-image: radial-gradient(circle, #000 42%, transparent 46%);
     mask-size: 7px 7px;
   }
-  /* Cómo funciona: la línea que une los pasos y la cuadrícula de puntos. */
-  .linea-pasos {
-    background: linear-gradient(var(--color-accent), #f3a0b4 60%, var(--color-accent));
-  }
-  .puntos-fondo {
-    background-image: radial-gradient(var(--color-border-subtle) 1.2px, transparent 1.2px);
-    background-size: 26px 26px;
-  }
 }
 
 @keyframes respira {

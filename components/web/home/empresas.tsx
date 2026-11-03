@@ -47,7 +47,7 @@ export function Empresas() {
           </div>
           <div className="grid gap-2.5">
             {[
-              { reto: "Ordenar el inventario de la bodega", nota: "3 personas interesadas", estado: "✓ Recibiendo interés", verde: true },
+              { reto: "Ordenar el inventario de la bodega", nota: "3 personas interesadas", estado: "Recibiendo interés", verde: true },
               { reto: "Mentoría en costos para compras", nota: "Kánna está eligiendo perfiles", estado: "En revisión", verde: false },
             ].map((r) => (
               <div key={r.reto} className="flex items-center justify-between gap-3 rounded-md bg-raised px-4 py-3.5">
