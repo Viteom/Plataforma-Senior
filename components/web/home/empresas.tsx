@@ -11,8 +11,7 @@ export function Empresas() {
     <section id="empresas" aria-labelledby="titulo-empresas" className="scroll-mt-20 overflow-hidden bg-deep py-20 font-web text-white lg:py-32">
       <div className="mx-auto grid max-w-web items-center gap-14 px-4 md:px-8 xl:grid-cols-[1fr_1.05fr]">
         <div>
-          <span className="inline-flex rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium">Para empresas</span>
-          <h2 id="titulo-empresas" className="mt-5 text-seccion font-medium tracking-[-0.035em] text-balance">
+          <h2 id="titulo-empresas" className="text-seccion font-medium tracking-[-0.035em] text-balance">
             Experiencia que <span className="block text-noche-suave">abre posibilidades.</span>
           </h2>
           <p className="mt-7 max-w-[44ch] text-lg text-azul-claro sm:text-xl">
@@ -40,7 +39,7 @@ export function Empresas() {
           </Link>
         </div>
 
-        <div aria-hidden className="max-w-[40rem] -rotate-[1.5deg] rounded-lg bg-neutro p-5 text-tinta shadow-panel">
+        <div aria-hidden data-ui className="max-w-[40rem] -rotate-[1.5deg] rounded-lg bg-neutro p-5 text-tinta shadow-panel">
           <div className="flex items-center justify-between pb-3.5">
             <Logo alto={22} />
             <span className="rounded-full bg-primary px-2.5 py-1 text-sm font-semibold text-on-primary">Alimentos del Oriente</span>

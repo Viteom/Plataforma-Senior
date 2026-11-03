@@ -21,8 +21,7 @@ export function Oficios() {
           </span>
         </div>
         <div className="flex flex-col items-center gap-3 text-center">
-          <span className="mb-2 inline-flex rounded-full bg-raised px-3.5 py-1.5 text-sm font-medium">Oficios y profesiones</span>
-          <h2 id="titulo-oficios" className="sr-only">
+          <h2 id="titulo-oficios" className="mb-2 text-2xl font-medium tracking-tight">
             Oficios y profesiones, al mismo nivel
           </h2>
           <div role="group" aria-label="Elige un oficio o profesión" className="flex flex-col items-center gap-3">

@@ -13,7 +13,7 @@ export function Importa() {
         {REJILLA.map(({ vacio, fotos }, i) => (
           <div key={i} className={`flex flex-col gap-2 md:gap-3.5 ${i >= 7 ? "hidden xl:flex" : i >= 5 ? "hidden md:flex" : ""}`}>
             <div
-              className="h-[min(var(--vacio),4.5rem)] rounded-md bg-gradient-to-b from-white/0 to-white xl:h-(--vacio)"
+              className="h-[min(var(--vacio),4.5rem)] xl:h-(--vacio)"
               style={{ "--vacio": `${vacio}px` } as React.CSSProperties}
             />
             {fotos.map((f, j) => (
@@ -31,8 +31,7 @@ export function Importa() {
         ))}
       </div>
       <div className="mx-auto mt-7 max-w-web px-4 text-center md:px-8">
-        <span className="inline-flex rounded-full bg-raised px-3.5 py-1.5 text-sm font-medium">Lo que sabes importa</span>
-        <h2 id="titulo-importa" className="mt-4 text-seccion font-medium tracking-[-0.035em] text-balance">
+        <h2 id="titulo-importa" className="text-seccion font-medium tracking-[-0.035em] text-balance">
           Lo vivido vale más <span className="block text-tinta-suave">que un diploma.</span>
         </h2>
         <p className="mx-auto mt-5 max-w-[46ch] text-lg sm:text-xl">

@@ -50,18 +50,24 @@ export function BarraEmpresa() {
               })}
             </ul>
           </nav>
-          <div className="ml-auto flex shrink-0 items-center gap-3 xl:ml-0">
+          <div className="ml-auto flex shrink-0 items-center gap-1 xl:ml-0">
             <Link
               href="/empresa/equipo"
               aria-current={estaActivo(pathname, "/empresa/equipo") ? "page" : undefined}
-              className="hidden min-h-tap items-center px-1 text-base font-bold whitespace-nowrap underline underline-offset-4 hover:decoration-2 xl:inline-flex"
+              className={cn(
+                "hidden min-h-tap items-center rounded-md px-3 text-base whitespace-nowrap transition-colors duration-150 active:bg-surface-strong xl:inline-flex",
+                estaActivo(pathname, "/empresa/equipo") ? "bg-surface-strong font-bold text-text" : "text-text-muted hover:bg-surface hover:text-text",
+              )}
             >
               Equipo
             </Link>
             <Link
               href="/empresa/datos"
               aria-current={estaActivo(pathname, "/empresa/datos") ? "page" : undefined}
-              className="hidden min-h-tap items-center px-1 text-base font-bold whitespace-nowrap underline underline-offset-4 hover:decoration-2 xl:inline-flex"
+              className={cn(
+                "hidden min-h-tap items-center rounded-md px-3 text-base whitespace-nowrap transition-colors duration-150 active:bg-surface-strong xl:inline-flex",
+                estaActivo(pathname, "/empresa/datos") ? "bg-surface-strong font-bold text-text" : "text-text-muted hover:bg-surface hover:text-text",
+              )}
             >
               Mi empresa
             </Link>

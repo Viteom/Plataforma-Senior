@@ -21,7 +21,7 @@ export function Puertas() {
                 <Image src={p.foto} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover object-[center_18%] transition-transform duration-500 group-hover:scale-[1.04]" />
               </span>
               <span className="flex flex-col items-start px-6 pt-7 pb-8 md:px-8">
-                <span className="text-sm font-semibold tracking-[0.1em] text-accent uppercase">{p.quien}</span>
+                <span className="text-lg font-semibold text-accent">{p.quien}</span>
                 <span className="mt-1.5 text-3xl font-semibold tracking-tight md:text-display">{p.titulo}</span>
                 <span className={`mt-5 inline-flex min-h-action items-center rounded-full px-7 text-lg font-semibold ${p.boton}`}>{p.accion}</span>
               </span>

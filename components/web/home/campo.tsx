@@ -12,8 +12,7 @@ export function Campo() {
         </div>
         <div className="semitono relative flex flex-col justify-center overflow-hidden bg-campo px-6 py-16 text-campo-claro md:px-12 xl:px-16 xl:py-20">
           <div className="relative">
-            <span className="text-sm tracking-[0.14em] text-campo-acento uppercase">Soy talento · del campo</span>
-            <h2 id="titulo-campo" className="mt-4 font-editorial text-afiche">
+            <h2 id="titulo-campo" className="font-editorial text-afiche">
               Saberes que se <br />
               hacen <em className="text-campo-acento">a mano.</em>
             </h2>

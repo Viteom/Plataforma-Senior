@@ -75,9 +75,9 @@ export default async function Inicio() {
       </section>
 
       <nav aria-label="Atajos" className="grid grid-cols-2 gap-3">
-        {ATAJOS.map(({ href, etiqueta, icono: Icono, fondo }) => (
+        {ATAJOS.map(({ href, etiqueta, icono: Icono }) => (
           <Link key={href} href={href} className="flex min-h-28 flex-col justify-between gap-3 rounded-lg bg-raised p-4 shadow-tarjeta transition-transform duration-100 active:scale-[0.97]">
-            <span className={`grid size-11 place-items-center rounded-md ${fondo}`}>
+            <span className="grid size-11 place-items-center rounded-md bg-neutro-2">
               <Icono aria-hidden className="size-6" />
             </span>
             <span className="font-bold leading-tight">{etiqueta}</span>
@@ -91,10 +91,10 @@ export default async function Inicio() {
 }
 
 const ATAJOS = [
-  { href: "/mi-perfil", etiqueta: "Mi perfil", icono: UserRound, fondo: "bg-azul-claro/50" },
-  { href: "/mi-perfil/pagos", etiqueta: "Cómo me pagan", icono: Wallet, fondo: "bg-accent/50" },
-  { href: "/aprende", etiqueta: "Aprende", icono: BookOpen, fondo: "bg-exito-fondo" },
-  { href: "/emprende", etiqueta: "Emprende", icono: Lightbulb, fondo: "bg-campo-claro" },
+  { href: "/mi-perfil", etiqueta: "Mi perfil", icono: UserRound },
+  { href: "/mi-perfil/pagos", etiqueta: "Cómo me pagan", icono: Wallet },
+  { href: "/aprende", etiqueta: "Aprende", icono: BookOpen },
+  { href: "/emprende", etiqueta: "Emprende", icono: Lightbulb },
 ];
 
 async function primerNombre(): Promise<string | null> {

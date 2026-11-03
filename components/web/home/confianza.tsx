@@ -23,8 +23,7 @@ export function Confianza() {
     <section aria-labelledby="titulo-confianza" className="bg-neutro-2 py-20 font-web text-tinta lg:py-32">
       <div className="mx-auto grid max-w-web items-center gap-10 px-4 md:px-8 lg:grid-cols-2 lg:gap-14">
         <div>
-          <span className="inline-flex rounded-full bg-raised px-3.5 py-1.5 text-sm font-medium">Confianza</span>
-          <h2 id="titulo-confianza" className="mt-5 text-seccion font-medium tracking-[-0.035em]">
+          <h2 id="titulo-confianza" className="text-seccion font-medium tracking-[-0.035em]">
             Confianza para <span className="block text-tinta-suave">los dos lados.</span>
           </h2>
           <p aria-live="polite" className="mt-6 min-h-[4.8em] max-w-[40ch] text-lg sm:text-xl">
