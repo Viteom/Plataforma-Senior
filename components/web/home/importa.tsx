@@ -33,7 +33,7 @@ export function Importa() {
       <div className="mx-auto mt-7 max-w-web px-4 text-center md:px-8">
         <span className="inline-flex rounded-full bg-raised px-3.5 py-1.5 text-sm font-medium">Lo que sabes importa</span>
         <h2 id="titulo-importa" className="mt-4 text-seccion font-medium tracking-[-0.035em] text-balance">
-          Lo que has resuelto en la vida <span className="block text-tinta-suave">vale más que un diploma.</span>
+          Lo vivido vale más <span className="block text-tinta-suave">que un diploma.</span>
         </h2>
         <p className="mx-auto mt-5 max-w-[46ch] text-lg sm:text-xl">
           Kánna convierte tu historia en una huella de capacidades que las organizaciones entienden. La cuentas con tu voz o

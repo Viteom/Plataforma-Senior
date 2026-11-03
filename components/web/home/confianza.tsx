@@ -25,7 +25,7 @@ export function Confianza() {
         <div>
           <span className="inline-flex rounded-full bg-raised px-3.5 py-1.5 text-sm font-medium">Confianza</span>
           <h2 id="titulo-confianza" className="mt-5 text-seccion font-medium tracking-[-0.035em]">
-            Seguro para las personas. <span className="block text-tinta-suave">Claro para las empresas.</span>
+            Confianza para <span className="block text-tinta-suave">los dos lados.</span>
           </h2>
           <p aria-live="polite" className="mt-6 min-h-[4.8em] max-w-[40ch] text-lg sm:text-xl">
             {GARANTIAS[actual].texto}

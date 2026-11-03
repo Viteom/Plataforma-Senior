@@ -13,7 +13,7 @@ export function Empresas() {
         <div>
           <span className="inline-flex rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-medium">Para empresas</span>
           <h2 id="titulo-empresas" className="mt-5 text-seccion font-medium tracking-[-0.035em] text-balance">
-            La experiencia puede abrir <span className="text-noche-suave">nuevas posibilidades para tu equipo.</span>
+            Experiencia que <span className="block text-noche-suave">abre posibilidades.</span>
           </h2>
           <p className="mt-7 max-w-[44ch] text-lg text-azul-claro sm:text-xl">
             Cada trayectoria reúne saberes y formas de hacer que pueden aportar de distintas maneras:
