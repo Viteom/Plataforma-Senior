@@ -2,14 +2,21 @@
 
 import { redirect } from "next/navigation";
 
-import { hashDestino, normalizarCelular, normalizarCorreo } from "@/lib/auth/destino";
+import { enmascarar, hashDestino, normalizarCelular, normalizarCorreo } from "@/lib/auth/destino";
 import { borrarPendiente, guardarPendiente, leerPendiente, type Para, type Pendiente } from "@/lib/auth/pendiente";
 import { inicioDe, type Rol } from "@/lib/auth/rutas";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 // Entrada sin contraseña (brief, "Registro sin contraseña").
 
-export type EstadoEntrar = { error?: string; aviso?: string };
+export type EstadoEntrar = {
+  error?: string;
+  aviso?: string;
+  /** El código salió: a dónde (enmascarado) y por qué medio. La pantalla pasa al paso 2. */
+  enviado?: { medio: "celular" | "correo"; a: string };
+  /** Supabase no tiene SMS activo: se ofrece recibirlo por correo. */
+  sinSms?: boolean;
+};
 
 const ERROR_GENERAL = "No pudimos enviar el código. Intenta de nuevo en un momento o pide ayuda.";
 
@@ -44,6 +51,13 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
     if (error.status === 429) {
       return { error: "Debes esperar 45 segundos antes de pedir otro código." };
     }
+    // Mientras no haya proveedor de SMS (Twilio), el código solo puede llegar por correo.
+    if (p.tipo === "celular" && (error.code === "phone_provider_disabled" || error.code === "sms_send_failed")) {
+      return {
+        error: "Por ahora no podemos enviar mensajes de texto. Recibe el código en tu correo.",
+        sinSms: true,
+      };
+    }
     console.error("[entrar] envío del código:", error.status, error.code, error.message);
     return { error: ERROR_GENERAL };
   }
@@ -70,7 +84,7 @@ export async function enviarCodigo(_previo: EstadoEntrar, datos: FormData): Prom
   if (fallo) return fallo;
 
   await guardarPendiente(pendiente);
-  redirect("/entrar/codigo");
+  return { enviado: { medio, a: enmascarar(pendiente) } };
 }
 
 export async function reenviarCodigo(_previo: EstadoEntrar): Promise<EstadoEntrar> {
@@ -126,12 +140,13 @@ export async function salir() {
   redirect("/");
 }
 
-// Modo demostración: solo navegan, pero también por POST. Si el formulario no tuviera acción,
+// Modo demostración: no envía nada, pero también va por POST. Si el formulario no tuviera acción,
 // un toque antes de que cargue la página lo enviaría por GET y el celular quedaría en la URL.
-export async function entrarDemo() {
-  redirect("/entrar/codigo");
+export async function entrarDemo(_previo: EstadoEntrar, datos: FormData): Promise<EstadoEntrar> {
+  const medio = datos.get("medio") === "correo" ? "correo" : "celular";
+  return { enviado: { medio, a: medio === "celular" ? "300 *** 4567" : "n***@correo.com" } };
 }
 
-export async function codigoDemo() {
+export async function codigoDemo(_previo: EstadoEntrar, _datos: FormData): Promise<EstadoEntrar> {
   redirect("/perfil/nuevo");
 }
