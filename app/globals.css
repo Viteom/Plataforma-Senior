@@ -89,6 +89,7 @@
   --radius-sm: 0.5rem; /* campos */
   --radius-md: 1rem; /* avisos y tarjetas pequeñas */
   --radius-lg: 1.75rem; /* tarjetas y puertas */
+  --radius-retrato: 2.75rem; /* retratos altos de la web */
 
   --shadow-float: 0 8px 24px rgb(0 0 0 / 0.16);
   /* Reposo: apenas un borde de luz. La separación la da el tono, no una sombra que flota. */
@@ -197,7 +198,8 @@
     animation: banda 60s linear infinite;
   }
   .banda[data-pausa="true"] .banda-pista,
-  .banda:hover .banda-pista {
+  .banda:hover .banda-pista,
+  .banda:focus-within .banda-pista {
     animation-play-state: paused;
   }
 
@@ -267,6 +269,33 @@
 }
 
 /* ── Home (maqueta aprobada el 1 de noviembre de 2026) ── */
+/* Resaltador de maíz detrás de una palabra del titular (texto en tinta, nunca maíz sobre crema).
+   Se pinta de izquierda a derecha al entrar en pantalla; sin soporte o con movimiento reducido,
+   queda pintado desde el principio. */
+.resaltado {
+  padding-inline: 0.1em;
+  margin-inline: -0.1em;
+  border-radius: 0.12em;
+  color: var(--color-tinta);
+  background: linear-gradient(var(--color-accent), var(--color-accent)) no-repeat 0 88% / 100% 78%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .resaltado {
+      animation: resaltar linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 40%;
+    }
+  }
+}
+@keyframes resaltar {
+  from {
+    background-size: 0% 78%;
+  }
+}
+
 @layer components {
   /* Banner: velo para leer el titular blanco sobre los retratos. */
   .velo-banner {

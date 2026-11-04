@@ -104,7 +104,7 @@ export function ComoFunciona() {
       <div className="mx-auto max-w-web px-4 md:px-8">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <h2 id="titulo-como" className="text-seccion font-medium tracking-[-0.035em]">
-            Cómo funciona <span className="block text-tinta-suave">en cinco pasos.</span>
+            Cómo funciona <span className="block text-tinta-suave">en <span className="resaltado">cinco pasos</span>.</span>
           </h2>
           <div role="group" aria-label="Ver el recorrido para" className="inline-flex gap-1 rounded-full bg-raised p-1">
             {(["empresa", "talento"] as const).map((v) => (

@@ -24,18 +24,18 @@ export const FRANJA = [
   { foto: foto("docente", 640, 960, ""), oficio: "Docente", lugar: "Manizales" },
 ];
 
-// Rejilla colgante de «Lo que sabes importa»: alto del espacio vacío arriba y una o dos fotos.
-export const REJILLA: { vacio: number; fotos: string[] }[] = [
-  { vacio: 90, fotos: ["disenador"] },
-  { vacio: 30, fotos: ["abogada", "zapatero"] },
-  { vacio: 150, fotos: ["agricultor"] },
-  { vacio: 60, fotos: ["administrador"] },
-  { vacio: 120, fotos: ["cocinera"] },
-  { vacio: 40, fotos: ["ingeniero"] },
-  { vacio: 140, fotos: ["carpintero"] },
-  { vacio: 20, fotos: ["campesino", "sabedora"] },
-  { vacio: 100, fotos: ["gerente"] },
-  { vacio: 50, fotos: ["caficultor-cafetal"] },
+// Retratos de «Lo vivido vale más»: tarjetas altas que se deslizan despacio, cada una con su oficio.
+export const RETRATOS = [
+  { foto: "disenador", oficio: "Diseñador", lugar: "Medellín" },
+  { foto: "abogada", oficio: "Abogada", lugar: "Bogotá" },
+  { foto: "agricultor", oficio: "Agricultor", lugar: "Boyacá" },
+  { foto: "administrador", oficio: "Administrador", lugar: "Cali" },
+  { foto: "cocinera", oficio: "Cocinera", lugar: "Cartagena" },
+  { foto: "ingeniero", oficio: "Ingeniero", lugar: "Bucaramanga" },
+  { foto: "carpintero", oficio: "Carpintero", lugar: "Cali" },
+  { foto: "sabedora", oficio: "Sabedora", lugar: "Cauca" },
+  { foto: "zapatero", oficio: "Zapatero", lugar: "Bogotá" },
+  { foto: "caficultor-cafetal", oficio: "Caficultor", lugar: "Huila" },
 ];
 
 export type Paso = { titulo: string; texto: string };
