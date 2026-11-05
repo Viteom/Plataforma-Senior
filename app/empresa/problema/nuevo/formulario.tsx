@@ -82,18 +82,9 @@ export function FormularioProblema({ taxonomia }: { taxonomia: EntradaTaxonomia[
         </div>
       </fieldset>
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <Campo id="ubicacion" etiqueta="Ciudad o región (opcional)">
-          {(p) => <Input {...p} name="ubicacion" />}
-        </Campo>
-        <Campo
-          id="presupuesto"
-          etiqueta="Presupuesto en pesos (opcional)"
-          ayuda="Solo números. Nos ayuda a proponerte personas en tu rango."
-        >
-          {(p) => <Input {...p} name="presupuesto" inputMode="numeric" />}
-        </Campo>
-      </div>
+      <Campo id="ubicacion" etiqueta="Ciudad o región (opcional)">
+        {(p) => <Input {...p} name="ubicacion" className={`${p.className} sm:max-w-md`} />}
+      </Campo>
 
       <fieldset className="flex flex-col gap-4">
         <legend className="mb-3 text-lg font-bold">Condiciones para un trabajo digno</legend>
@@ -101,7 +92,11 @@ export function FormularioProblema({ taxonomia }: { taxonomia: EntradaTaxonomia[
         <Campo id="jornada-reto" etiqueta="Horas totales a la semana">
           {(p) => <Input {...p} name="jornada_horas" type="number" min={1} max={48} required />}
         </Campo>
-        <Campo id="pago-reto" etiqueta="Remuneración para la persona, en pesos">
+        <Campo
+          id="pago-reto"
+          etiqueta="Remuneración para la persona, en pesos"
+          ayuda="Solo números. También nos ayuda a proponerte personas en tu rango."
+        >
           {(p) => <Input {...p} name="remuneracion" type="number" min={1} max={1000000000} required />}
         </Campo>
         <label className="flex flex-col gap-2">
@@ -126,7 +121,7 @@ export function FormularioProblema({ taxonomia }: { taxonomia: EntradaTaxonomia[
         </p>
       )}
       <Button type="submit" disabled={creando} className="self-start">
-        {creando ? "Enviando…" : "Buscar talento"}
+        {creando ? "Enviando…" : "Enviar mi reto a revisión"}
       </Button>
     </form>
   );

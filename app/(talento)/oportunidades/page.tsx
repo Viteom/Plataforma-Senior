@@ -16,7 +16,7 @@ import { listarOportunidades } from "@/lib/datos/consultas";
 import type { Oportunidad } from "@/lib/datos/tipos";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, modalidades } from "@/lib/formas";
-import { situacion, type Situacion } from "@/lib/procesos";
+import { fechaLarga, situacion, type Situacion } from "@/lib/procesos";
 
 import {
   aceptarAcuerdo,
@@ -261,7 +261,7 @@ function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?:
                 <div className="flex flex-col gap-2 rounded-md bg-surface p-4">
                   <p className="font-bold">Revisa tu tiempo antes de aceptar</p>
                   <p>
-                    Al inicio de este acuerdo ({carga.fecha}), tienes {carga.horas_previas} horas semanales pactadas en
+                    Al inicio de este acuerdo (el {fechaLarga(carga.fecha)}), tienes {carga.horas_previas} horas semanales pactadas en
                     otros acuerdos. Este suma {carga.horas_nuevas ?? "horas por definir"}.
                   </p>
                   <p>

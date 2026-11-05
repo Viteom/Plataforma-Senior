@@ -21,6 +21,7 @@ export default async function Bienestar() {
   }[] = [];
   const estadosCaso = new Map<string, string>();
   let errorDatos = false;
+  let tarifaHora: number | null = null;
   if (!MODO_DEMO) {
     const supabase = await crearClienteServidor();
     const {
@@ -29,7 +30,7 @@ export default async function Bienestar() {
     if (!user) redirect("/entrar");
     const { data: p } = await supabase.from("talent_profiles").select("id").eq("user_id", user.id).single();
     if (!p) redirect("/perfil/nuevo");
-    const [metas, seguimientos, casos] = await Promise.all([
+    const [metas, seguimientos, casos, oferta] = await Promise.all([
       supabase.from("wellbeing_preferences").select("horas_meta,ingreso_meta").eq("talent_id", p.id).maybeSingle(),
       supabase
         .from("wellbeing_checkins")
@@ -38,7 +39,10 @@ export default async function Bienestar() {
         .order("creado_en", { ascending: false })
         .limit(12),
       supabase.from("wellbeing_cases").select("checkin_id,estado").eq("talent_id", p.id),
+      // La tarifa por hora del perfil, si la puso, llena la cuenta de la meta de ingreso.
+      supabase.from("talent_offers").select("tarifa_esperada").eq("talent_id", p.id).eq("tipo", "horas").maybeSingle(),
     ]);
+    tarifaHora = (oferta.data?.tarifa_esperada as number | null | undefined) ?? null;
     for (const caso of casos.data ?? []) estadosCaso.set(caso.checkin_id, caso.estado);
     preferencias = metas.data;
     registros = seguimientos.data ?? [];
@@ -97,7 +101,7 @@ export default async function Bienestar() {
       )}
       <section className="flex flex-col gap-4">
         <h2 className="text-xl">Mis metas, a mi ritmo</h2>
-        <FormularioMetas horas={preferencias?.horas_meta} ingreso={preferencias?.ingreso_meta} />
+        <FormularioMetas horas={preferencias?.horas_meta} ingreso={preferencias?.ingreso_meta} tarifaHora={tarifaHora} />
       </section>
       <section className="flex flex-col gap-4">
         <h2 className="text-xl">¿Cómo vas con tu trabajo?</h2>

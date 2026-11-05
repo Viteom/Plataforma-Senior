@@ -194,8 +194,6 @@ export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estad
     ? String(datos.get("modalidad"))
     : null;
   const ubicacion = texto(datos.get("ubicacion"), 80) || null;
-  const presupuestoCrudo = String(datos.get("presupuesto") ?? "").replace(/[^\d]/g, "");
-  const presupuesto = presupuestoCrudo ? Number(presupuestoCrudo) : null;
   const obligatorios = datos
     .getAll("obligatorio")
     .map(String)
@@ -254,7 +252,8 @@ export async function crearNecesidad(_p: Estado, datos: FormData): Promise<Estad
       formatos,
       modalidad,
       ubicacion,
-      presupuesto,
+      // Ya no se pide aparte: el pago para la persona es la referencia económica del matching.
+      presupuesto: remuneracion,
       jornada_horas,
       remuneracion,
       remuneracion_unidad,

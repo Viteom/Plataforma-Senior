@@ -153,7 +153,7 @@ Registro asistido (gestor): pensado para celular y conexión intermitente. El ge
 
 - La persona elige celular (por defecto) o correo; el celular se normaliza a +57.
 - Código de 6 números por SMS (Twilio Verify) o correo (Resend), válido 10 minutos, con autocompletado (autocomplete="one-time-code").
-- Reenvío después de 45 segundos; máximo 5 intentos por hora por número, con mensaje claro y acceso a ayuda.
+- Reenvío después de 60 segundos (igual al intervalo mínimo de Supabase Auth); máximo 5 intentos por hora por número, con mensaje claro y acceso a ayuda.
 - Primera vez: perfil en 3 pasos y luego huella. Ya registrado: inicio.
 - Sesión de 90 días en el dispositivo. El SMS dice de dónde viene: “[MARCA]: tu código es 123456. No lo compartas con nadie.”
 - Requisito de entrada: 45 años o más, o 20+ años de experiencia u oficio. Si no cumple, mensaje amable y lista de espera.

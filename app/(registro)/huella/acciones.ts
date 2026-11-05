@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { MODO_DEMO } from "@/lib/demo";
 import { obtenerProveedor } from "@/lib/ia/entorno";
 import { extraerHuella } from "@/lib/ia/extraer";
-import type { EntradaTaxonomia } from "@/lib/ia/huella";
+import { sugerirPorPalabras, type EntradaTaxonomia } from "@/lib/ia/huella";
 import { MAX_ETIQUETA_LIBRE, problemaEtiquetaLibre } from "@/lib/capas";
 import { CAPAS, type Capa } from "@/lib/ia/tipos";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -18,6 +18,8 @@ export type EtiquetaParaConfirmar = {
   capa: Capa;
   etiqueta: string;
   nueva: boolean; // fuera de la taxonomía: el equipo la revisa
+  /** Propuesta del catálogo por palabras de la historia (sin IA): el id es el de la taxonomía. */
+  catalogo?: boolean;
 };
 
 export type EstadoHuella = {
@@ -98,7 +100,15 @@ export async function guardarHistoria(_previo: EstadoHuella, datos: FormData): P
   });
 
   if (resultado.estado === "manual") {
-    return { historiaId: guardada.id, modo: "manual", motivoManual: resultado.motivo, etiquetas: [] };
+    // Sin asistente: se proponen las palabras del catálogo que aparecen en la historia.
+    const sugeridas = sugerirPorPalabras(historia, taxonomia).map((t) => ({
+      id: t.id,
+      capa: t.capa,
+      etiqueta: t.etiqueta,
+      nueva: false,
+      catalogo: true,
+    }));
+    return { historiaId: guardada.id, modo: "manual", motivoManual: resultado.motivo, etiquetas: sugeridas };
   }
 
   // Las etiquetas llegan sin confirmar; la persona quita las que no son suyas.

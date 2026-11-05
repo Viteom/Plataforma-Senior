@@ -79,3 +79,20 @@ export function normalizarExtraccion(
 
   return { etiquetas, dudas };
 }
+
+// Sin asistente (IA apagada, sin cuota o con error): se buscan en la historia, aquí mismo y sin
+// enviarla a nadie, las palabras del catálogo y sus sinónimos. Solo se proponen; la persona elige.
+export function sugerirPorPalabras(historia: string, taxonomia: EntradaTaxonomia[], porCapa = 4): EntradaTaxonomia[] {
+  const texto = ` ${clave(historia)} `;
+  const aparece = (termino: string) => {
+    const k = clave(termino);
+    if (k.length < 4) return false;
+    return texto.includes(` ${k} `) || texto.includes(` ${k}s `) || texto.includes(` ${k}es `);
+  };
+  const sugeridas: EntradaTaxonomia[] = [];
+  for (const capa of CAPAS) {
+    const deCapa = taxonomia.filter((t) => t.capa === capa && !EDAD.test(t.etiqueta) && (aparece(t.etiqueta) || t.sinonimos.some(aparece)));
+    sugeridas.push(...deCapa.slice(0, porCapa));
+  }
+  return sugeridas;
+}

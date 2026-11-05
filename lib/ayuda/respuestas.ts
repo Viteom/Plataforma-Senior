@@ -47,7 +47,7 @@ const RIESGOS: { categoria: Categoria; re: RegExp; texto: string }[] = [
 const PREGUNTAS: { claves: string[]; texto: string; enlace?: Enlace }[] = [
   {
     claves: ["codigo", "no llega", "no me llega", "mensaje", "sms", "entrar"],
-    texto: "El código llega por mensaje de texto en menos de un minuto. Revisa que el número esté bien escrito. Si no llega, espera 45 segundos y pide otro. Si sigue sin llegar, pide que te llamemos.",
+    texto: "El código llega por mensaje de texto o por correo en menos de un minuto. Revisa que el número esté bien escrito. Si no llega, espera un minuto y pide otro. Si sigue sin llegar, pide que te llamemos.",
     enlace: { href: "/entrar", texto: "Volver a entrar" },
   },
   {

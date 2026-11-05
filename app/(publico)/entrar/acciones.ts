@@ -49,7 +49,7 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
 
   if (error) {
     if (error.status === 429) {
-      return { error: "Debes esperar 45 segundos antes de pedir otro código." };
+      return { error: "Debes esperar un minuto antes de pedir otro código." };
     }
     // Mientras no haya proveedor de SMS (Twilio), el código solo puede llegar por correo.
     if (p.tipo === "celular" && (error.code === "phone_provider_disabled" || error.code === "sms_send_failed")) {

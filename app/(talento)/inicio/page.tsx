@@ -67,7 +67,7 @@ export default async function Inicio() {
         <h2 id="como-funciona" className="text-xl">
           Mira cómo funciona
         </h2>
-        <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pt-1 pb-3 [scrollbar-width:none]">
+        <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pt-1 pb-3 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0">
           {["como-funciona", "te-quieren-conocer", "estafas"].map((id) => (
             <TarjetaVideo key={id} v={video(id)} />
           ))}

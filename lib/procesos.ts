@@ -79,6 +79,15 @@ export function textoConversacion(p: DatosProceso) {
   return `${fechaHora(p.conversacion_en)}, por ${MODOS[p.conversacion_modo ?? ""] ?? "acordar"}`;
 }
 
+// «2026-11-10» → «10 de noviembre», en hora de Colombia (mediodía, para no correr el día).
+export function fechaLarga(fecha: string) {
+  return new Date(`${fecha.slice(0, 10)}T12:00:00-05:00`).toLocaleDateString("es-CO", {
+    day: "numeric",
+    month: "long",
+    timeZone: "America/Bogota",
+  });
+}
+
 // «Por proyecto, 15 horas a la semana · $ 3.000.000 por proyecto · desde el 3 de noviembre»
 export function textoAcuerdo(p: DatosProceso) {
   const partes = [
@@ -86,8 +95,7 @@ export function textoAcuerdo(p: DatosProceso) {
       .filter(Boolean)
       .join(", "),
     p.acuerdo_valor && `${pesos(Number(p.acuerdo_valor))} ${textoUnidad(p.acuerdo_unidad ?? "")}`.trim(),
-    p.acuerdo_inicio &&
-      `desde el ${new Date(`${p.acuerdo_inicio}T12:00:00-05:00`).toLocaleDateString("es-CO", { day: "numeric", month: "long", timeZone: "America/Bogota" })}`,
+    p.acuerdo_inicio && `desde el ${fechaLarga(p.acuerdo_inicio)}`,
   ];
   return partes.filter(Boolean).join(" · ");
 }

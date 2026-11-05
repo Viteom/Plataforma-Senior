@@ -45,6 +45,23 @@ export async function guardarMetas(_p: EstadoBienestar, d: FormData): Promise<Es
   revalidatePath("/bienestar");
   return { aviso: "Metas guardadas. Puedes cambiarlas cuando quieras." };
 }
+// Orientación sobre tarifa, horas o meta: entra a la cola de ayuda del equipo (canal ya existente).
+export async function pedirOrientacionMetas(_p: EstadoBienestar): Promise<EstadoBienestar> {
+  if (MODO_DEMO) return { aviso: "En la demostración no se envían solicitudes. Alguien del equipo te escribiría." };
+  const { supabase } = await sesion();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/entrar");
+  const { error } = await supabase.from("help_requests").insert({
+    user_id: user.id,
+    canal: "orientacion_tarifa",
+    motivo: "Pidió orientación sobre cuánto cobrar, sus horas o su meta de ingreso desde Mi ritmo.",
+  });
+  if (error) return { error: "No pudimos enviar tu solicitud. Intenta de nuevo o pide ayuda." };
+  return { aviso: "Listo. Alguien del equipo te llama o te escribe en los próximos días hábiles." };
+}
+
 export async function registrarSeguimiento(_p: EstadoBienestar, d: FormData): Promise<EstadoBienestar> {
   const energia = String(d.get("energia") ?? "");
   const trato = String(d.get("trato") ?? "");

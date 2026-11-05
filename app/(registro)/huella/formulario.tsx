@@ -1,6 +1,6 @@
 "use client";
 
-import { Mic, PenLine, Phone, Plus, ShieldCheck } from "lucide-react";
+import { Check, Mic, PenLine, Phone, Plus, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 
@@ -207,13 +207,32 @@ type Libre = { capa: Capa; texto: string };
 
 function Confirmar({ estado }: { estado: EstadoHuella }) {
   const propuestas = estado.etiquetas ?? [];
-  const [seleccionadas, setSeleccionadas] = useState<string[]>(propuestas.map((e) => e.id));
+  // Las del asistente salen de la historia y llegan marcadas; las del catálogo (por palabras
+  // sueltas) llegan sin marcar: la persona toca solo las que son suyas.
+  const [seleccionadas, setSeleccionadas] = useState<string[]>(propuestas.filter((e) => !e.catalogo).map((e) => e.id));
   const [libres, setLibres] = useState<Libre[]>([]);
   const [resultado, confirmar, confirmando] = useActionState<{ error?: string }, FormData>(confirmarHuella, {});
   const manual = estado.modo === "manual";
+  const conPropuestas = propuestas.length > 0;
+  // Desplegables guiados: abre solo la primera parte (la primera con propuestas, si hay);
+  // «Listo, seguir» cierra la actual y abre la siguiente. El contador del título muestra lo elegido.
+  const [abiertas, setAbiertas] = useState<Capa[]>(() => [
+    ORDEN_CAPAS.find((c) => propuestas.some((e) => e.capa === c)) ?? "oficio",
+  ]);
+  const abrir = (capa: Capa, abierta: boolean) =>
+    setAbiertas((x) => (abierta ? [...new Set([...x, capa])] : x.filter((c) => c !== capa)));
+  const seguir = (capa: Capa) => {
+    const siguiente = ORDEN_CAPAS[ORDEN_CAPAS.indexOf(capa) + 1];
+    setAbiertas((x) => [...x.filter((c) => c !== capa), ...(siguiente ? [siguiente] : [])]);
+    if (siguiente) requestAnimationFrame(() => document.getElementById(`capa-${siguiente}`)?.scrollIntoView({ block: "start", behavior: "smooth" }));
+  };
 
   const alternar = (lista: string[], set: (v: string[]) => void, id: string) =>
     set(lista.includes(id) ? lista.filter((x) => x !== id) : [...lista, id]);
+
+  const introManual = conPropuestas
+    ? "Encontramos estas palabras en tu historia. Toca las que son tuyas y escribe con tus palabras lo que falte."
+    : MENSAJE_MANUAL[estado.motivoManual ?? "apagada"];
 
   return (
     <Pantalla
@@ -225,69 +244,97 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
       }
       titulo={manual ? "Escribe lo que sabes hacer" : "Esto entendimos de tu historia"}
       intro={
-        manual
-          ? MENSAJE_MANUAL[estado.motivoManual ?? "apagada"]
-          : "Quita lo que no sea tuyo tocando la etiqueta. Puedes agregar otras o escribirlas con tus palabras."
+        manual ? introManual : "Quita lo que no sea tuyo tocando la etiqueta. Puedes agregar otras o escribirlas con tus palabras."
       }
     >
       <form action={confirmar} className="flex flex-col gap-8">
         <input type="hidden" name="historiaId" value={estado.historiaId} />
         {seleccionadas.map((id) => (
-          <input key={id} type="hidden" name="seleccionada" value={id} />
+          <input
+            key={id}
+            type="hidden"
+            // Las del catálogo todavía no existen en la huella: se agregan al confirmar.
+            name={propuestas.find((e) => e.id === id)?.catalogo ? "agregada" : "seleccionada"}
+            value={id}
+          />
         ))}
         {libres.map((l) => (
           <input key={`${l.capa}:${l.texto}`} type="hidden" name="libre" value={`${l.capa}|${l.texto}`} />
         ))}
 
-        {ORDEN_CAPAS.map((capa) => {
-          const deCapa = propuestas.filter((e) => e.capa === capa);
-          const propias = libres.filter((l) => l.capa === capa);
-          return (
-            <details key={capa} open={deCapa.length > 0 || capa === "oficio"} className="flex flex-col gap-3">
-              <summary className="min-h-tap cursor-pointer text-lg font-bold">{nombreCapa[capa]}</summary>
-              <p className="text-base text-text-muted">{ayudaCapa[capa]}</p>
-              {deCapa.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {deCapa.map((e) => (
-                    <ChipAlternable
-                      key={e.id}
-                      texto={e.etiqueta}
-                      nueva={e.nueva}
-                      activo={seleccionadas.includes(e.id)}
-                      onAlternar={() => alternar(seleccionadas, setSeleccionadas, e.id)}
-                    />
-                  ))}
+        <div className="flex flex-col gap-3">
+          {ORDEN_CAPAS.map((capa, i) => {
+            const deCapa = propuestas.filter((e) => e.capa === capa);
+            const propias = libres.filter((l) => l.capa === capa);
+            const elegidas = deCapa.filter((e) => seleccionadas.includes(e.id)).length + propias.length;
+            const ultima = i === ORDEN_CAPAS.length - 1;
+            return (
+              <details
+                key={capa}
+                id={`capa-${capa}`}
+                open={abiertas.includes(capa)}
+                onToggle={(e) => abrir(capa, e.currentTarget.open)}
+                className="scroll-mt-24 rounded-lg bg-raised px-4 shadow-tarjeta"
+              >
+                <summary className="flex min-h-action cursor-pointer items-center justify-between gap-3 text-lg font-bold">
+                  {nombreCapa[capa]}
+                  {elegidas > 0 && (
+                    <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-surface px-3 text-base whitespace-nowrap">
+                      <Check aria-hidden className="size-4" />
+                      {elegidas} {elegidas === 1 ? "elegida" : "elegidas"}
+                    </span>
+                  )}
+                </summary>
+                <div className="flex flex-col gap-4 pb-5">
+                  <p className="text-base text-text-muted">{ayudaCapa[capa]}</p>
+                  {deCapa.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {deCapa.map((e) => (
+                        <ChipAlternable
+                          key={e.id}
+                          texto={e.etiqueta}
+                          nueva={e.nueva}
+                          activo={seleccionadas.includes(e.id)}
+                          onAlternar={() => alternar(seleccionadas, setSeleccionadas, e.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {propias.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {propias.map((l) => (
+                        <ChipAlternable
+                          key={l.texto}
+                          texto={l.texto}
+                          nueva
+                          activo
+                          onAlternar={() => setLibres((x) => x.filter((y) => !(y.capa === capa && y.texto === l.texto)))}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  <EscribirOtra
+                    capa={capa}
+                    hayPropuestas={deCapa.length > 0}
+                    onAgregar={(texto) =>
+                      setLibres((x) =>
+                        x.some((y) => y.capa === capa && y.texto.toLowerCase() === texto.toLowerCase())
+                          ? x
+                          : [...x, { capa, texto }],
+                      )
+                    }
+                  />
+                  <Button type="button" variant="suave" className="self-start" onClick={() => seguir(capa)}>
+                    {ultima ? "Listo con esta parte" : "Listo, seguir"}
+                  </Button>
                 </div>
-              )}
-              {propias.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {propias.map((l) => (
-                    <ChipAlternable
-                      key={l.texto}
-                      texto={l.texto}
-                      nueva
-                      activo
-                      onAlternar={() => setLibres((x) => x.filter((y) => !(y.capa === capa && y.texto === l.texto)))}
-                    />
-                  ))}
-                </div>
-              )}
-              <EscribirOtra
-                capa={capa}
-                onAgregar={(texto) =>
-                  setLibres((x) =>
-                    x.some((y) => y.capa === capa && y.texto.toLowerCase() === texto.toLowerCase())
-                      ? x
-                      : [...x, { capa, texto }],
-                  )
-                }
-              />
-            </details>
-          );
-        })}
+              </details>
+            );
+          })}
+        </div>
 
         <p className="text-base text-text-muted">
-          Lo que escribas con tus palabras lo revisa el equipo antes de que lo vea una empresa.
+          Lo que escribas con tus palabras lo revisa el equipo antes de que lo vea una empresa. Puedes dejar partes vacías.
         </p>
 
         {estado.dudas && estado.dudas.length > 0 && (
@@ -321,13 +368,27 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
 
 // Campo para escribir una etiqueta propia. Vive dentro del formulario principal, así que Enter
 // agrega la etiqueta en vez de enviar todo.
-function EscribirOtra({ capa, onAgregar }: { capa: Capa; onAgregar: (texto: string) => void }) {
+function EscribirOtra({
+  capa,
+  hayPropuestas,
+  onAgregar,
+}: {
+  capa: Capa;
+  hayPropuestas: boolean;
+  onAgregar: (texto: string) => void;
+}) {
   const [texto, setTexto] = useState("");
   const [error, setError] = useState<string | null>(null);
   const id = `otra-${capa}`;
 
   const agregar = () => {
     const limpio = texto.replace(/\s+/g, " ").trim();
+    // Agregar sin haber escrito nada no es un error: solo lleva al campo.
+    if (!limpio) {
+      setError(null);
+      document.getElementById(id)?.focus();
+      return;
+    }
     const problema = problemaEtiquetaLibre(limpio);
     setError(problema);
     if (problema) return;
@@ -338,7 +399,7 @@ function EscribirOtra({ capa, onAgregar }: { capa: Capa; onAgregar: (texto: stri
   return (
     <div className="flex flex-col gap-2">
       <label htmlFor={id} className="font-bold">
-        ¿No está? Escríbelo con tus palabras
+        {hayPropuestas ? "¿Falta algo? Escríbelo con tus palabras" : "Escríbelo con tus palabras"}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row">
         <input
@@ -348,7 +409,10 @@ function EscribirOtra({ capa, onAgregar }: { capa: Capa; onAgregar: (texto: stri
           autoComplete="off"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : undefined}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => {
+            setTexto(e.target.value);
+            if (error) setError(null);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();

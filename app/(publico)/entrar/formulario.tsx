@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
 
 import { codigoDemo, entrarDemo, enviarCodigo, reenviarCodigo, verificarCodigo, type EstadoEntrar } from "./acciones";
 
-const ESPERA_REENVIO = 45;
+// Igual al «Minimum interval per user» de Supabase Auth: antes, el reenvío fallaría.
+const ESPERA_REENVIO = 60;
 
 const medios = [
   { valor: "celular" as const, etiqueta: "Celular", icono: Smartphone },

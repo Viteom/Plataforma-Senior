@@ -77,12 +77,14 @@ export function AyudaFlotante() {
         onClick={() => setAbierta((a) => !a)}
         aria-expanded={abierta}
         aria-controls="panel-ayuda"
-        className="inline-flex min-h-action items-center gap-2.5 rounded-full bg-primary py-2 pr-5 pl-2.5 text-base font-semibold text-on-primary shadow-float transition-transform active:scale-[0.97] sm:text-lg"
+        className="inline-flex min-h-action items-center gap-2.5 rounded-full bg-primary py-2 pr-4 pl-2.5 sm:pr-5 text-base font-semibold text-on-primary shadow-float transition-transform active:scale-[0.97] sm:text-lg"
       >
         <span className="grid size-8 place-items-center rounded-full bg-accent text-on-accent">
           <CircleHelp aria-hidden className="size-5" />
         </span>
-        ¿Necesitas ayuda?
+        {/* En celular, corto (como el botón de la app) para tapar menos lo que se está leyendo. */}
+        <span className="sm:hidden">Ayuda</span>
+        <span className="max-sm:hidden">¿Necesitas ayuda?</span>
       </button>
     </div>
   );

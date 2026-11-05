@@ -147,7 +147,7 @@ export function TarjetaVideo({ v, forma = "carrusel" }: { v: VideoTalento; forma
     );
 
   return (
-    <button type="button" data-no-leer aria-pressed={activo} onClick={tocar} className="flex w-56 shrink-0 snap-start flex-col overflow-hidden rounded-lg bg-raised text-left shadow-tarjeta">
+    <button type="button" data-no-leer aria-pressed={activo} onClick={tocar} className="flex w-56 shrink-0 snap-start flex-col overflow-hidden rounded-lg bg-raised text-left shadow-tarjeta sm:w-auto">
       <span className="relative block h-32">
         <Image src={v.foto} alt="" fill sizes="224px" className="object-cover object-[center_22%]" />
         <span className="velo-video absolute inset-0" />

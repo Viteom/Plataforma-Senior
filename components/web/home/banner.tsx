@@ -23,7 +23,7 @@ export function Banner() {
               className="respira object-cover object-[center_22%]"
               style={{ animationDelay: `${-(i % 3) * 5}s` }}
             />
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-tinta/85 to-transparent px-2 pt-16 pb-5 text-sm leading-tight sm:px-3.5">
+            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-tinta/85 to-transparent px-3 pt-16 pb-5 text-sm leading-tight sm:px-5 sm:pb-6">
               <b className="block font-semibold sm:text-base">{oficio}</b>
               <span className="opacity-80">{lugar}</span>
             </figcaption>
