@@ -83,13 +83,14 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
   });
   if (errorPrivado) return general;
 
-  // Pensión o subsidio (opcional): solo para avisarle antes de aceptar un acuerdo.
+  // Pensión o subsidio (opcional): solo para avisarle antes de aceptar un acuerdo. Si no se
+  // guarda, el perfil sigue: la persona puede contarlo después en Mi perfil.
   if (p.ingresos) {
     const { error: errorIngresos } = await supabase.rpc("guardar_situacion_ingresos", {
       situacion: p.ingresos,
       hogar: p.hogar,
     });
-    if (errorIngresos) return general;
+    if (errorIngresos) console.error("guardar_situacion_ingresos", errorIngresos.code, errorIngresos.message);
   }
 
   if (p.orientacion) {
