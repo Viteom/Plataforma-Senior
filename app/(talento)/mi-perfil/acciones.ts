@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { normalizarCelular } from "@/lib/auth/destino";
 import { MODO_DEMO } from "@/lib/demo";
 import { esForma, type FormaContratar } from "@/lib/formas";
+import { esHogar, esSituacion } from "@/lib/ingresos";
 import { borrarArchivosPerfil } from "@/lib/privacidad/borrar-archivos";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -78,6 +79,24 @@ export async function cambiarEstado(datos: FormData) {
   if (perfil.estado === "borrador") return; // sin huella confirmada no se publica
   await supabase.from("talent_profiles").update({ estado }).eq("id", perfil.id);
   revalidatePath("/mi-perfil");
+}
+
+// Pensión o subsidio: privado, solo para avisarle a la persona antes de aceptar un acuerdo.
+export async function guardarIngresos(_p: Estado, datos: FormData): Promise<Estado> {
+  const situacion = datos.get("situacion");
+  const hogar = datos.get("hogar");
+  if (!esSituacion(situacion)) return { error: "Elige una opción." };
+  if (situacion === "colombia_mayor" && !esHogar(hogar)) return { error: "Cuéntanos con quién vives." };
+  if (MODO_DEMO) return { aviso: "En la demostración no se guarda. Así quedaría tu respuesta." };
+  const { supabase } = await sesion();
+  const { error } = await supabase.rpc("guardar_situacion_ingresos", {
+    situacion,
+    hogar: situacion === "colombia_mayor" ? hogar : null,
+  });
+  if (error) return { error: ERROR };
+  revalidatePath("/mi-perfil");
+  revalidatePath("/oportunidades");
+  return { aviso: "Guardado. Solo tú y el equipo de Kánna lo saben." };
 }
 
 export async function actualizarFormas(_p: Estado, datos: FormData): Promise<Estado> {

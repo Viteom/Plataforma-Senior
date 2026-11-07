@@ -20,6 +20,21 @@ export function FormularioEmpresa() {
       <Campo id="nit" etiqueta="NIT" ayuda="Sin el dígito de verificación.">
         {(p) => <Input {...p} name="nit" inputMode="numeric" className={`${p.className} max-w-64`} />}
       </Campo>
+      <Campo
+        id="naturaleza"
+        etiqueta="¿Tu organización es pública o privada?"
+        ayuda="Cambia la forma de contrato que puede ofrecer a algunas personas."
+      >
+        {(p) => (
+          <select {...p} name="naturaleza" required defaultValue="" className={`${p.className} min-h-action`}>
+            <option value="" disabled>
+              Elige una opción
+            </option>
+            <option value="privada">Privada (empresa, fundación, cooperativa)</option>
+            <option value="publica">Pública (entidad del Estado)</option>
+          </select>
+        )}
+      </Campo>
       <Campo id="sector" etiqueta="Sector" ayuda="Por ejemplo: alimentos, salud, servicios.">
         {(p) => <Input {...p} name="sector" />}
       </Campo>

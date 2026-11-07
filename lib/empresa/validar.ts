@@ -20,7 +20,12 @@ export function leerEmpresa(d: FormData) {
     brandbook_url: text("brandbook_url", 500) || null,
     zona_local: text("ciudad_sector", 100) || null,
     compromiso_bienestar: d.get("compromiso_bienestar") === "si",
+    // Pública o privada: con una entidad pública, quien recibe pensión solo puede trabajar por
+    // prestación de servicios. Sirve para avisarle a la persona, no para filtrarla.
+    naturaleza: text("naturaleza", 10),
   };
+  if (datos.naturaleza !== "privada" && datos.naturaleza !== "publica")
+    return { error: "Cuéntanos si tu organización es pública o privada." };
   if (
     datos.nombre.length < 2 ||
     !/^\d{9,10}$/.test(datos.nit) ||

@@ -10,6 +10,7 @@ import { nombreCapa, ORDEN_CAPAS } from "@/lib/capas";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import { MODO_DEMO } from "@/lib/demo";
 import type { GuiaTarifa } from "@/lib/formas";
+import type { Hogar, SituacionIngresos } from "@/lib/ingresos";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 import { cambiarEstado, cambiarVisibilidad, quitarEtiqueta } from "./acciones";
@@ -20,6 +21,7 @@ import {
   SeccionEvidencias,
   SeccionFormas,
   SeccionFoto,
+  SeccionIngresos,
   SeccionMisDatos,
   Visibilidad,
 } from "./secciones";
@@ -42,7 +44,7 @@ export default async function MiPerfil() {
     .maybeSingle();
   if (!perfil) redirect("/perfil/nuevo");
 
-  const [{ data: ofertas }, { data: etiquetas }, { data: evidencias }, { data: guias }] = await Promise.all([
+  const [{ data: ofertas }, { data: etiquetas }, { data: evidencias }, { data: guias }, { data: ingresos }] = await Promise.all([
     supabase
       .from("talent_offers")
       .select("tipo, horas_semana, modalidad, tarifa_esperada, quiere_orientacion")
@@ -59,6 +61,7 @@ export default async function MiPerfil() {
       .eq("talent_id", perfil.id)
       .order("creado_en"),
     supabase.from("rate_guides").select("tipo, unidad, minimo, maximo"),
+    supabase.rpc("mi_situacion_ingresos"),
   ]);
 
   const reservado = perfil.visibilidad === "reservado";
@@ -174,6 +177,11 @@ export default async function MiPerfil() {
       </Seccion>
 
       <SeccionFormas ofertas={ofertas ?? []} guias={(guias ?? []) as GuiaTarifa[]} />
+
+      <SeccionIngresos
+        situacion={(ingresos?.[0]?.situacion as SituacionIngresos | null | undefined) ?? null}
+        hogar={(ingresos?.[0]?.hogar as Hogar | null | undefined) ?? null}
+      />
 
       <SeccionEvidencias evidencias={evidencias ?? []} />
 

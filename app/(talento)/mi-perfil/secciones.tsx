@@ -4,15 +4,18 @@ import { Camera, Download, Eye, EyeOff, FileText, Pencil, Phone, Trash2, X } fro
 import { useState } from "react";
 
 import { Tarifas } from "@/components/perfil/tarifas";
+import { PreguntaIngresos } from "@/components/talento/pregunta-ingresos";
 import { Button } from "@/components/ui/button";
 import { Campo, Input, Textarea } from "@/components/ui/campo";
 import { Opcion } from "@/components/ui/opcion";
 import { useAccion } from "@/components/ui/use-accion";
 import { etiquetaForma, formasContratar, modalidades, pesos, type FormaContratar, type GuiaTarifa } from "@/lib/formas";
+import { HOGARES, SITUACIONES, type Hogar, type SituacionIngresos } from "@/lib/ingresos";
 
 import {
   actualizarDatos,
   actualizarFormas,
+  guardarIngresos,
   agregarReferencia,
   borrarCuenta,
   borrarEvidencia,
@@ -257,6 +260,54 @@ type Oferta = {
   tarifa_esperada: number | null;
   quiere_orientacion: boolean;
 };
+
+// Pensión o subsidio. Privado: nunca lo ve una organización ni cambia quién te encuentra.
+export function SeccionIngresos({ situacion, hogar }: { situacion: SituacionIngresos | null; hogar: Hogar | null }) {
+  const [editando, setEditando] = useState(false);
+  const [s, setS] = useState<SituacionIngresos | "">(situacion ?? "");
+  const [h, setH] = useState<Hogar | "">(hogar ?? "");
+  const { estado, enviar, pendiente, alEnviar } = useAccion<Estado>(async (p, d) => {
+    const r = await guardarIngresos(p, d);
+    if (!r.error) setEditando(false);
+    return r;
+  }, {});
+  const titulo = SITUACIONES.find((x) => x.valor === situacion)?.titulo;
+  const conQuien = HOGARES.find((x) => x.valor === hogar)?.titulo;
+
+  return (
+    <Seccion titulo="Pensión o subsidio">
+      {!editando ? (
+        <>
+          <p className="text-text-muted">
+            Solo tú y el equipo de Kánna lo saben. Lo usamos para avisarte si un acuerdo puede afectar tu subsidio o tus
+            aportes.
+          </p>
+          <p className="rounded-md bg-surface px-4 py-3 font-bold">
+            {titulo ? `${titulo}${situacion === "colombia_mayor" && conQuien ? ` · ${conQuien}` : ""}` : "No lo has contado"}
+          </p>
+          <Mensaje estado={estado} />
+          <Button type="button" variant="secundario" className="self-start" onClick={() => setEditando(true)}>
+            <Pencil aria-hidden />
+            {titulo ? "Cambiar" : "Contarlo"}
+          </Button>
+        </>
+      ) : (
+        <form action={enviar} onSubmit={alEnviar} className="flex flex-col gap-5">
+          <input type="hidden" name="situacion" value={s} />
+          <input type="hidden" name="hogar" value={h} />
+          <PreguntaIngresos situacion={s} hogar={h} onSituacion={setS} onHogar={setH} prefijo="mi-perfil" />
+          <Mensaje estado={estado} />
+          <div className="flex flex-wrap gap-3">
+            <Button disabled={pendiente}>{pendiente ? "Guardando…" : "Guardar"}</Button>
+            <Button type="button" variant="enlace" onClick={() => setEditando(false)}>
+              Cancelar
+            </Button>
+          </div>
+        </form>
+      )}
+    </Seccion>
+  );
+}
 
 export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: GuiaTarifa[] }) {
   const [editando, setEditando] = useState(false);

@@ -1,4 +1,5 @@
 import { esForma, type FormaContratar, type Modalidad } from "@/lib/formas";
+import { esHogar, esSituacion, type Hogar, type SituacionIngresos } from "@/lib/ingresos";
 
 // Validación del perfil en 3 pasos. La usan el formulario (para no avanzar con errores) y la
 // acción del servidor (que nunca confía en lo que llega del navegador).
@@ -16,6 +17,9 @@ export type BorradorPerfil = {
   modalidad: string;
   tarifas: Record<string, string>;
   orientacion: boolean;
+  // Opcional y privado: pensión o subsidio, solo para avisarle a la persona (nunca al matching).
+  ingresos: SituacionIngresos | "";
+  hogar: Hogar | "";
   visibilidad: string;
   autorizo: boolean;
 };
@@ -30,6 +34,8 @@ export type PerfilValido = {
   modalidad: Modalidad;
   tarifas: Partial<Record<FormaContratar, number>>;
   orientacion: boolean;
+  ingresos: SituacionIngresos | null;
+  hogar: Hogar | null;
   visibilidad: "reservado" | "visible";
 };
 
@@ -45,6 +51,8 @@ export const borradorVacio: BorradorPerfil = {
   modalidad: "presencial",
   tarifas: {},
   orientacion: false,
+  ingresos: "",
+  hogar: "",
   visibilidad: "reservado",
   autorizo: false,
 };
@@ -108,6 +116,8 @@ export function validarPerfil(b: BorradorPerfil): { ok: true; perfil: PerfilVali
       modalidad: b.modalidad as Modalidad,
       tarifas,
       orientacion: b.orientacion,
+      ingresos: b.ingresos || null,
+      hogar: b.ingresos === "colombia_mayor" && b.hogar ? b.hogar : null,
       visibilidad: b.visibilidad as "reservado" | "visible",
     },
   };
@@ -136,6 +146,8 @@ export function leerBorrador(crudo: unknown): BorradorPerfil {
     modalidad: s(datos.modalidad),
     tarifas,
     orientacion: datos.orientacion === true,
+    ingresos: esSituacion(datos.ingresos) ? datos.ingresos : "",
+    hogar: esHogar(datos.hogar) ? datos.hogar : "",
     visibilidad: s(datos.visibilidad),
     autorizo: datos.autorizo === true,
   };

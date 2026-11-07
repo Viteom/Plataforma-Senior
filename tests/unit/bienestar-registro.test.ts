@@ -40,6 +40,8 @@ it("no acepta registro empresarial sin responsable, contacto y compromiso", () =
   }).forEach(([k, v]) => d.set(k, v));
   expect(leerEmpresa(d)).toHaveProperty("error");
   d.set("sitio_web", "https://empresa.com");
+  expect(leerEmpresa(d)).toMatchObject({ error: expect.stringMatching(/pública o privada/) });
+  d.set("naturaleza", "privada");
   expect(leerEmpresa(d)).toHaveProperty("datos");
 });
 

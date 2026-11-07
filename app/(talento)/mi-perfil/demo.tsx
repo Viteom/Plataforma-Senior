@@ -7,6 +7,8 @@ import { FotoDemo } from "@/components/perfil/foto-demo";
 import { Button } from "@/components/ui/button";
 import { Etiqueta } from "@/components/ui/etiqueta";
 
+import { SeccionIngresos } from "./secciones";
+
 // Versión de ejemplo para el modo demostración (sin Supabase).
 export function MiPerfilDemo() {
   return (
@@ -53,6 +55,8 @@ export function MiPerfilDemo() {
       <Seccion titulo="Cómo me pueden contratar">
         <p className="text-text-muted">Aún no has elegido formas de trabajar.</p>
       </Seccion>
+
+      <SeccionIngresos situacion={null} hogar={null} />
 
       <Seccion titulo="Empresas que me buscaron">
         <p className="text-text-muted">Todavía ninguna.</p>

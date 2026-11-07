@@ -32,7 +32,7 @@ export default async function MiEmpresa() {
         await (await crearClienteServidor())
           .from("companies")
           .select(
-            "sector, ciudad, contacto, cargo_contacto, correo_contacto, telefono_contacto, descripcion, sitio_web, brandbook_url",
+            "naturaleza, sector, ciudad, contacto, cargo_contacto, correo_contacto, telefono_contacto, descripcion, sitio_web, brandbook_url",
           )
           .eq("id", empresa.id)
           .single()
@@ -71,6 +71,7 @@ export default async function MiEmpresa() {
                     {
                       (
                         {
+                          naturaleza: "Tipo de organización",
                           sector: "Sector",
                           ciudad: "Ciudad",
                           contacto: "Contacto",
@@ -84,7 +85,9 @@ export default async function MiEmpresa() {
                       )[k]
                     }
                   </dt>
-                  <dd className="break-words">{String(v)}</dd>
+                  <dd className="break-words">
+                    {k === "naturaleza" ? (v === "publica" ? "Pública" : "Privada") : String(v)}
+                  </dd>
                 </div>
               ))}
           </dl>

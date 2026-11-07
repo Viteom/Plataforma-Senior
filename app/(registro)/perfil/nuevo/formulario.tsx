@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Campo, Input } from "@/components/ui/campo";
 import { Opcion } from "@/components/ui/opcion";
 import { Tarifas } from "@/components/perfil/tarifas";
+import { PreguntaIngresos } from "@/components/talento/pregunta-ingresos";
 import { formasContratar, modalidades, type FormaContratar, type GuiaTarifa } from "@/lib/formas";
 import { MARCA } from "@/lib/marca";
 import { borradorVacio, erroresDelPaso, type BorradorPerfil, type Errores } from "@/lib/perfil/validar";
@@ -249,6 +250,12 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 />
               ))}
             </fieldset>
+            <PreguntaIngresos
+              situacion={b.ingresos}
+              hogar={b.hogar}
+              onSituacion={(v) => cambiar("ingresos", v)}
+              onHogar={(v) => cambiar("hogar", v)}
+            />
           </>
         )}
 

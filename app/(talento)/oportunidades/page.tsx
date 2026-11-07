@@ -1,4 +1,4 @@
-import { BadgeCheck, Briefcase, Flag, Handshake, MapPin, Phone, ShieldAlert } from "lucide-react";
+import { BadgeCheck, Briefcase, Flag, Handshake, Info, MapPin, Phone, ShieldAlert } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -16,6 +16,7 @@ import { listarOportunidades } from "@/lib/datos/consultas";
 import type { Oportunidad } from "@/lib/datos/tipos";
 import { MODO_DEMO } from "@/lib/demo";
 import { etiquetaForma, modalidades } from "@/lib/formas";
+import { avisoDemo, leerAvisos, textoAviso, type AvisoIngresos } from "@/lib/ingresos";
 import { fechaLarga, situacion, type Situacion } from "@/lib/procesos";
 
 import {
@@ -39,16 +40,19 @@ export default async function Oportunidades() {
   const filas = await listarOportunidades();
   const supabase = MODO_DEMO ? null : await crearClienteServidor();
   const cargas = new Map<string, CargaAcuerdo>();
+  // Avisos por pensión o subsidio: los calcula la base con lo que la persona contó en privado.
+  const avisos = new Map<string, AvisoIngresos[]>();
   if (supabase)
     await Promise.all(
       filas
         .filter((o) => o.estado === "acuerdo")
         .map(async (o) => {
-          const { data, error } = await supabase.rpc("previsualizar_carga", {
-            conexion: o.id,
-            version: o.acuerdo_version,
-          });
-          if (!error && data) cargas.set(o.id, data as CargaAcuerdo);
+          const [carga, ingresos] = await Promise.all([
+            supabase.rpc("previsualizar_carga", { conexion: o.id, version: o.acuerdo_version }),
+            supabase.rpc("avisos_ingresos", { conexion: o.id }),
+          ]);
+          if (!carga.error && carga.data) cargas.set(o.id, carga.data as CargaAcuerdo);
+          if (!ingresos.error) avisos.set(o.id, leerAvisos(ingresos.data));
         }),
     );
   if (MODO_DEMO)
@@ -73,6 +77,9 @@ export default async function Oportunidades() {
         token: "demo",
       });
     }
+  if (MODO_DEMO)
+    for (const o of filas.filter((o) => o.estado === "acuerdo"))
+      avisos.set(o.id, avisoDemo(o.acuerdo_valor ?? null, o.acuerdo_unidad ?? null, o.acuerdo_horas_semana ?? null));
   const oportunidades = filas.map((o) => ({
     o,
     s: situacion({ ...o, evaluacion_propia: o.evaluacion_talento }, "talento"),
@@ -114,7 +121,7 @@ export default async function Oportunidades() {
           <ul className="flex flex-col gap-5">
             {turno.map(({ o, s }) => (
               <li key={o.id}>
-                <TarjetaProceso o={o} s={s} carga={cargas.get(o.id)} />
+                <TarjetaProceso o={o} s={s} carga={cargas.get(o.id)} avisos={avisos.get(o.id)} />
               </li>
             ))}
           </ul>
@@ -129,7 +136,7 @@ export default async function Oportunidades() {
           <ul className="flex flex-col gap-5">
             {proceso.map(({ o, s }) => (
               <li key={o.id}>
-                <TarjetaProceso o={o} s={s} carga={cargas.get(o.id)} />
+                <TarjetaProceso o={o} s={s} carga={cargas.get(o.id)} avisos={avisos.get(o.id)} />
               </li>
             ))}
           </ul>
@@ -157,7 +164,17 @@ export default async function Oportunidades() {
   );
 }
 
-function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?: CargaAcuerdo }) {
+function TarjetaProceso({
+  o,
+  s,
+  carga,
+  avisos = [],
+}: {
+  o: Oportunidad;
+  s: Situacion;
+  carga?: CargaAcuerdo;
+  avisos?: AvisoIngresos[];
+}) {
   const campos = { conexion: o.id };
   // La persona responde a la fecha y al acuerdo que está viendo (ver la migración de revisión).
   const conFecha = { ...campos, version: String(o.conversacion_version ?? 0) };
@@ -255,6 +272,7 @@ function TarjetaProceso({ o, s, carga }: { o: Oportunidad; s: Situacion; carga?:
       )}
       {o.estado === "acuerdo" && (
         <>
+          <AvisosIngresos avisos={avisos} />
           {MODO_DEMO || (o.acuerdo_revisado_en && carga) ? (
             <BotonAccion accion={aceptarAcuerdo} campos={conAcuerdo} texto="Acepto el acuerdo" ancho="completo">
               {carga && (
@@ -378,5 +396,42 @@ function Dato({ icono: Icono, titulo, nota }: { icono: typeof MapPin; titulo: st
         <span className="font-web text-xl font-semibold tracking-tight">{titulo}</span>
       </span>
     </li>
+  );
+}
+
+// Avisos por pensión o subsidio antes de aceptar. Los importantes van con borde y el ícono de alerta
+// (no solo con color) y llevan a hablar con el equipo.
+function AvisosIngresos({ avisos }: { avisos: AvisoIngresos[] }) {
+  if (!avisos.length) return null;
+  const textos = avisos.map(textoAviso);
+  return (
+    <div className="flex flex-col gap-3">
+      {textos.map((t) => (
+        <div
+          key={t.titulo}
+          role={t.importante ? "alert" : undefined}
+          className={`flex gap-3 rounded-md p-4 ${t.importante ? "border-2 border-danger bg-raised" : "bg-surface"}`}
+        >
+          {t.importante ? (
+            <ShieldAlert aria-hidden className="mt-1 size-6 shrink-0 text-danger" />
+          ) : (
+            <Info aria-hidden className="mt-1 size-6 shrink-0" />
+          )}
+          <div className="flex flex-col gap-1">
+            <p className="font-bold">{t.titulo}</p>
+            <p>{t.texto}</p>
+          </div>
+        </div>
+      ))}
+      {textos.some((t) => t.importante) && (
+        <Link href="/ayuda#llameme" className={`${enlace} self-start`}>
+          <Phone aria-hidden className="size-5" />
+          Hablar con el equipo antes de aceptar
+        </Link>
+      )}
+      <p className="text-base text-text-muted">
+        Lo calculamos con lo que contaste en Mi perfil. La organización no lo ve.
+      </p>
+    </div>
   );
 }
