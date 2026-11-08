@@ -1,8 +1,9 @@
-import { Download, EyeOff, Pencil, Trash2 } from "lucide-react";
+import { EyeOff, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 
 import { Pantalla } from "@/components/layout/pantalla";
 import { BotonSalir } from "@/components/layout/boton-salir";
+import { DescargarDemo } from "@/components/perfil/descargar-demo";
 import { FotoDemo } from "@/components/perfil/foto-demo";
 import { Button } from "@/components/ui/button";
 import { Etiqueta } from "@/components/ui/etiqueta";
@@ -64,10 +65,7 @@ export function MiPerfilDemo() {
 
       <Seccion titulo="Mis datos">
         <div className="flex flex-col gap-2">
-          <Button variant="suave" size="normal" className="justify-start">
-            <Download aria-hidden />
-            Descargar mis datos
-          </Button>
+          <DescargarDemo />
           <Button variant="suave" size="normal" className="justify-start">
             <Trash2 aria-hidden />
             Borrar mi cuenta

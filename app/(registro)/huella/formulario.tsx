@@ -11,7 +11,7 @@ import { Pantalla } from "@/components/layout/pantalla";
 import { EscucharPantalla, FraseConVoz, TarjetaVideo } from "@/components/talento/voz";
 import { Button } from "@/components/ui/button";
 import { Campo, Textarea } from "@/components/ui/campo";
-import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre } from "@/lib/capas";
+import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre, separarEtiquetas } from "@/lib/capas";
 import { prepararHistoria } from "@/lib/ia/preparar";
 import { EJEMPLO_HISTORIA, PREGUNTAS_GUIA, video } from "@/lib/talento/videos";
 import type { Capa } from "@/lib/ia/tipos";
@@ -382,18 +382,25 @@ function EscribirOtra({
   const id = `otra-${capa}`;
 
   const agregar = () => {
-    const limpio = texto.replace(/\s+/g, " ").trim();
+    const partes = separarEtiquetas(texto);
     // Agregar sin haber escrito nada no es un error: solo lleva al campo.
-    if (!limpio) {
+    if (!partes.length) {
       setError(null);
       document.getElementById(id)?.focus();
       return;
     }
-    const problema = problemaEtiquetaLibre(limpio);
+    // Las que están bien se agregan; las que tienen un problema se quedan en el campo para corregir.
+    const malas: string[] = [];
+    let problema: string | null = null;
+    for (const parte of partes) {
+      const p = problemaEtiquetaLibre(parte);
+      if (p) {
+        problema ??= `«${parte}»: ${p}`;
+        malas.push(parte);
+      } else onAgregar(parte);
+    }
     setError(problema);
-    if (problema) return;
-    onAgregar(limpio);
-    setTexto("");
+    setTexto(malas.join(", "));
   };
 
   return (
@@ -405,10 +412,10 @@ function EscribirOtra({
         <input
           id={id}
           value={texto}
-          maxLength={MAX_ETIQUETA_LIBRE}
+          maxLength={MAX_ETIQUETA_LIBRE * 6}
           autoComplete="off"
+          aria-describedby={error ? `${id}-error` : `${id}-ayuda`}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? `${id}-error` : undefined}
           onChange={(e) => {
             setTexto(e.target.value);
             if (error) setError(null);
@@ -426,6 +433,9 @@ function EscribirOtra({
           Agregar
         </Button>
       </div>
+      <p id={`${id}-ayuda`} className="text-base text-text-muted">
+        Si son varias, sepáralas con comas.
+      </p>
       {error && (
         <p id={`${id}-error`} role="alert" className="font-bold text-danger">
           {error}

@@ -15,10 +15,6 @@ export function Oficios() {
       <div className="mx-auto grid max-w-web items-center gap-10 px-4 md:px-8 lg:grid-cols-2 lg:gap-14">
         <div className="relative aspect-[4/4.4] overflow-hidden rounded-lg bg-neutro-2 lg:aspect-[4/5]">
           <Image key={o.foto.src} src={o.foto.src} alt={o.foto.alt} fill sizes="(min-width: 1024px) 45vw, 100vw" className="object-cover object-[center_22%]" />
-          <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2.5 text-base font-semibold backdrop-blur">
-            <span aria-hidden className="size-2 rounded-full bg-accent ring-3 ring-accent/35" />
-            {o.pie}
-          </span>
         </div>
         <div className="flex flex-col items-center gap-3 text-center">
           <h2 id="titulo-oficios" className="mb-2 text-2xl font-medium tracking-tight">

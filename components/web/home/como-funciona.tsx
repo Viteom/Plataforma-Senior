@@ -1,8 +1,9 @@
 "use client";
 
-import { CalendarDays, Check, ClipboardList, Handshake, HeartPulse, Mic, UserRound } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Check, ClipboardList, Handshake, HeartPulse, Mic, UserRound } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import Link from "next/link";
+import { useRef, useState } from "react";
 
 import { PASOS_EMPRESA, PASOS_TALENTO } from "@/lib/web/home";
 
@@ -95,9 +96,34 @@ const PIEZAS_TALENTO = [
 ];
 
 export function ComoFunciona() {
-  const [ver, setVer] = useState<"empresa" | "talento">("empresa");
+  // Por defecto, el recorrido del talento: es quien más llega al home y quien más se perdía.
+  const [ver, setVer] = useState<"talento" | "empresa">("talento");
+  const [actual, setActual] = useState(0);
+  const pista = useRef<HTMLOListElement>(null);
   const pasos = ver === "empresa" ? PASOS_EMPRESA : PASOS_TALENTO;
   const piezas = ver === "empresa" ? PIEZAS_EMPRESA : PIEZAS_TALENTO;
+  const cta = ver === "empresa" ? { href: "/entrar?para=empresa", texto: "Contar mi reto" } : { href: "/entrar", texto: "Crear mi perfil" };
+
+  // El paso visible se calcula por la posición de la pista: sirve igual con el dedo o con los botones.
+  const alDeslizar = () => {
+    const el = pista.current;
+    if (!el?.firstElementChild) return;
+    const ancho = (el.firstElementChild as HTMLElement).offsetWidth + 16;
+    setActual(Math.min(pasos.length - 1, Math.round(el.scrollLeft / ancho)));
+  };
+  const ir = (i: number) => {
+    const el = pista.current;
+    const destino = el?.children[i] as HTMLElement | undefined;
+    if (!el || !destino) return;
+    const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({ left: destino.offsetLeft - el.offsetLeft, behavior: reducido ? "auto" : "smooth" });
+    setActual(i);
+  };
+  const cambiar = (v: "talento" | "empresa") => {
+    setVer(v);
+    setActual(0);
+    pista.current?.scrollTo({ left: 0 });
+  };
 
   return (
     <section id="como-funciona" aria-labelledby="titulo-como" className="scroll-mt-20 bg-neutro py-20 font-web text-tinta lg:py-32">
@@ -107,12 +133,12 @@ export function ComoFunciona() {
             Cómo funciona <span className="block text-tinta-suave">en <span className="resaltado">cinco pasos</span>.</span>
           </h2>
           <div role="group" aria-label="Ver el recorrido para" className="inline-flex gap-1 rounded-full bg-raised p-1">
-            {(["empresa", "talento"] as const).map((v) => (
+            {(["talento", "empresa"] as const).map((v) => (
               <button
                 key={v}
                 type="button"
                 aria-pressed={ver === v}
-                onClick={() => setVer(v)}
+                onClick={() => cambiar(v)}
                 className="min-h-12 rounded-full px-5 text-base font-semibold text-tinta-suave transition-colors aria-pressed:bg-tinta aria-pressed:text-white"
               >
                 {v === "empresa" ? "Para empresas" : "Para talento"}
@@ -121,19 +147,65 @@ export function ComoFunciona() {
           </div>
         </div>
 
-        <ol className="mt-12 grid gap-4 md:mt-16 md:gap-5">
+        {/* Tarjetas que se corren de lado: cinco pasos sin un scroll eterno hacia abajo. */}
+        <ol
+          ref={pista}
+          onScroll={alDeslizar}
+          aria-label={`Los cinco pasos ${ver === "empresa" ? "para empresas" : "para talento"}`}
+          className="-mx-4 mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-4 px-4 pb-4 md:-mx-8 md:mt-16 md:scroll-px-8 md:px-8"
+        >
           {pasos.map((p, i) => (
-            <li key={p.titulo} className="grid items-center gap-5 rounded-lg bg-raised p-5 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] md:gap-10 md:p-6 md:pl-10">
+            <li
+              key={p.titulo}
+              aria-label={`Paso ${i + 1} de ${pasos.length}`}
+              className="flex w-[min(86vw,30rem)] shrink-0 snap-start flex-col gap-5 rounded-lg bg-raised p-5 md:p-7"
+            >
               <div>
-                <h3 className="text-2xl font-medium tracking-tight md:text-3xl">{p.titulo}</h3>
-                <p className="mt-2 max-w-[38ch] text-base text-text-muted md:text-lg">{p.texto}</p>
+                <p className="text-base font-semibold text-tinta-suave">
+                  Paso {i + 1} de {pasos.length}
+                </p>
+                <h3 className="mt-1 text-2xl font-medium tracking-tight md:text-3xl">{p.titulo}</h3>
+                <p className="mt-2 text-base text-text-muted md:text-lg">{p.texto}</p>
               </div>
-              <div data-ui className="flex min-h-32 items-center rounded-md bg-neutro-2 p-4 md:min-h-40 md:p-8">
+              <div data-ui className="mt-auto flex min-h-40 items-center rounded-md bg-neutro-2 p-4 md:p-6">
                 {piezas[i]}
               </div>
             </li>
           ))}
         </ol>
+
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => ir(Math.max(0, actual - 1))}
+              disabled={actual === 0}
+              className="inline-flex min-h-action items-center gap-2 rounded-full bg-raised px-5 text-lg font-semibold disabled:opacity-40"
+            >
+              <ArrowLeft aria-hidden className="size-5" />
+              Anterior
+            </button>
+            <button
+              type="button"
+              onClick={() => ir(Math.min(pasos.length - 1, actual + 1))}
+              disabled={actual === pasos.length - 1}
+              className="inline-flex min-h-action items-center gap-2 rounded-full bg-raised px-5 text-lg font-semibold disabled:opacity-40"
+            >
+              Siguiente
+              <ArrowRight aria-hidden className="size-5" />
+            </button>
+          </div>
+          <Link
+            href={cta.href}
+            className="inline-flex min-h-action items-center gap-2 rounded-full bg-primary px-7 text-lg font-semibold text-on-primary active:scale-[0.97]"
+          >
+            {cta.texto}
+            <ArrowRight aria-hidden className="size-5" />
+          </Link>
+        </div>
+        <p aria-live="polite" className="sr-only">
+          Paso {actual + 1} de {pasos.length}: {pasos[actual]?.titulo}
+        </p>
       </div>
     </section>
   );

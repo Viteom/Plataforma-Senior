@@ -12,8 +12,9 @@ export function Banner() {
   return (
     <section aria-labelledby="titulo-banner" className="relative h-svh min-h-[640px] overflow-hidden bg-tinta text-white">
       <div aria-hidden className="absolute inset-0 grid grid-cols-4 gap-[3px] md:grid-cols-6 xl:grid-cols-9">
-        {FRANJA.map(({ foto, oficio, lugar }, i) => (
-          <figure key={oficio} className={`relative m-0 overflow-hidden ${i >= 6 ? "hidden xl:block" : i >= 4 ? "hidden md:block" : ""}`}>
+        {/* Sin oficio ni ciudad encima: en las pruebas se leían como «lo que Kánna está buscando». */}
+        {FRANJA.map(({ foto, oficio }, i) => (
+          <div key={oficio} className={`relative overflow-hidden ${i >= 6 ? "hidden xl:block" : i >= 4 ? "hidden md:block" : ""}`}>
             <Image
               src={foto.src}
               alt=""
@@ -23,11 +24,7 @@ export function Banner() {
               className="respira object-cover object-[center_22%]"
               style={{ animationDelay: `${-(i % 3) * 5}s` }}
             />
-            <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-tinta/85 to-transparent px-3 pt-16 pb-5 text-sm leading-tight sm:px-5 sm:pb-6">
-              <b className="block font-semibold sm:text-base">{oficio}</b>
-              <span className="opacity-80">{lugar}</span>
-            </figcaption>
-          </figure>
+          </div>
         ))}
       </div>
       <div aria-hidden className="velo-banner pointer-events-none absolute inset-0" />
@@ -45,19 +42,22 @@ export function Banner() {
           <p className="mx-auto mt-6 max-w-[40ch] text-lg opacity-95 sm:text-xl">
             Para personas de 45 años o más y talento del campo colombiano. Oficios y profesiones, al mismo nivel.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
+          {/* Una talento de 60 años tocó «Buscar talento» creyendo que era para ella: la pregunta va
+              explícita y cada botón dice quién es la persona, no qué busca la plataforma. */}
+          <p className="mt-8 text-xl font-semibold">¿Buscas trabajo o buscas talento?</p>
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
             <Link
               href="/entrar"
               className="inline-flex min-h-action items-center gap-2 rounded-full bg-accent px-7 text-lg font-semibold text-on-accent transition-colors hover:bg-accent-hover active:scale-[0.97]"
             >
-              Crear mi perfil
+              Busco trabajo: crear mi perfil
               <ArrowRight aria-hidden className="size-5" />
             </Link>
             <Link
               href="/organizaciones"
               className="inline-flex min-h-action items-center rounded-full bg-white px-7 text-lg font-semibold text-tinta active:scale-[0.97]"
             >
-              Buscar talento
+              Busco talento para mi organización
             </Link>
           </div>
           <Escuchar />

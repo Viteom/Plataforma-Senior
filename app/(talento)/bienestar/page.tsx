@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Pantalla } from "@/components/layout/pantalla";
+import { EscucharPantalla } from "@/components/talento/voz";
 import { FormularioMetas, FormularioSeguimiento } from "@/components/bienestar/formularios";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -48,6 +49,7 @@ export default async function Bienestar() {
     registros = seguimientos.data ?? [];
     errorDatos = Boolean(metas.error || seguimientos.error || casos.error);
   }
+  const enCurso = procesos.filter((p) => p.estado === "en_curso");
   const carga = preferencias ? resumenCarga(preferencias.horas_meta, procesos) : null;
   const ingresoSemanal = acuerdosActuales(procesos)
     .filter((p) => p.estado === "en_curso" && p.acuerdo_unidad === "hora" && p.acuerdo_horas_semana != null)
@@ -57,6 +59,7 @@ export default async function Bienestar() {
       titulo="Mi ritmo y bienestar"
       intro="Tu bienestar va primero. Tú eliges cuánto quieres trabajar y puedes pedir acompañamiento antes, durante y después de un trabajo."
     >
+      <EscucharPantalla className="-mt-4" />
       {errorDatos && (
         <p role="alert">El seguimiento todavía no está disponible. Puedes contactar al equipo desde Ayuda.</p>
       )}
@@ -103,15 +106,15 @@ export default async function Bienestar() {
         <h2 className="text-xl">Mis metas, a mi ritmo</h2>
         <FormularioMetas horas={preferencias?.horas_meta} ingreso={preferencias?.ingreso_meta} tarifaHora={tarifaHora} />
       </section>
-      <section className="flex flex-col gap-4">
-        <h2 className="text-xl">¿Cómo vas con tu trabajo?</h2>
-        <p>Estas preguntas ayudan a acompañarte. No son una valoración médica ni calculan tu longevidad.</p>
-        <FormularioSeguimiento
-          procesos={procesos.filter((p) =>
-            ["abierta", "conversacion", "acuerdo", "en_curso", "cerrada"].includes(p.estado),
-          )}
-        />
-      </section>
+      {/* Solo con un trabajo en curso: preguntar «¿cómo vas con tu trabajo?» a quien todavía no
+          tiene uno confundía y dolía. */}
+      {enCurso.length > 0 && (
+        <section className="flex flex-col gap-4">
+          <h2 className="text-xl">¿Cómo vas con tu trabajo?</h2>
+          <p>Estas preguntas ayudan a acompañarte. No son una valoración médica ni calculan tu longevidad.</p>
+          <FormularioSeguimiento procesos={enCurso} />
+        </section>
+      )}
       <section className="flex flex-col gap-3">
         <h2 className="text-xl">Mi seguimiento en el tiempo</h2>
         {registros.length ? (

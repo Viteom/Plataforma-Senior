@@ -3,6 +3,7 @@
 import { Camera, Download, Eye, EyeOff, FileText, Pencil, Phone, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
+import { CampoFoto } from "@/components/perfil/campo-foto";
 import { Tarifas } from "@/components/perfil/tarifas";
 import { PreguntaIngresos } from "@/components/talento/pregunta-ingresos";
 import { Button } from "@/components/ui/button";
@@ -200,21 +201,11 @@ export function SeccionFoto({ fotoUrl, reservado }: { fotoUrl: string | null; re
       {!cambiando && <Mensaje estado={estado} />}
       {cambiando && (
         <form action={enviar} onSubmit={alEnviar} className="flex flex-col gap-5 rounded-lg bg-surface p-5">
-          <Campo
-            id="foto"
-            etiqueta="Foto (JPG o PNG, hasta 5 MB)"
-            ayuda="Puedes tomarla con el celular en este momento."
-          >
-            {(p) => (
-              <input
-                {...p}
-                name="foto"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className={`${p.className} min-h-action py-3 file:mr-3 file:min-h-tap file:rounded-sm file:border-0 file:bg-surface-strong file:px-3 file:font-bold`}
-              />
-            )}
-          </Campo>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="mb-1 text-lg font-bold">Tu foto</legend>
+            <p className="text-text-muted">Tómala ahora con la cámara o elige una que ya tengas (JPG o PNG, hasta 5 MB).</p>
+            <CampoFoto />
+          </fieldset>
           <Mensaje estado={estado} />
           <div className="flex flex-wrap gap-3">
             <Button type="submit" disabled={pendiente}>
@@ -612,11 +603,13 @@ export function SeccionMisDatos() {
   async function descargar() {
     setDescargando(true);
     try {
-      const json = await descargarDatos();
-      const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+      // Un PDF que se puede leer e imprimir, con la nota de protección de datos; se arma aquí mismo.
+      const { pdfDatos } = await import("@/lib/perfil/pdf-datos");
+      const pdf = await pdfDatos(JSON.parse(await descargarDatos()));
+      const url = URL.createObjectURL(new Blob([pdf as BlobPart], { type: "application/pdf" }));
       const enlace = document.createElement("a");
       enlace.href = url;
-      enlace.download = "mis-datos.json";
+      enlace.download = "mis-datos-kanna.pdf";
       enlace.click();
       URL.revokeObjectURL(url);
     } finally {
@@ -629,7 +622,7 @@ export function SeccionMisDatos() {
       <div className="flex flex-col gap-2">
         <Button variant="suave" size="normal" className="justify-start" onClick={descargar} disabled={descargando}>
           <Download aria-hidden />
-          {descargando ? "Preparando…" : "Descargar mis datos"}
+          {descargando ? "Preparando…" : "Descargar mis datos (PDF)"}
         </Button>
         {!confirmando ? (
           <Button variant="suave" size="normal" className="justify-start" onClick={() => setConfirmando(true)}>

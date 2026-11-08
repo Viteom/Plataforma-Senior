@@ -1,11 +1,13 @@
-import { ExternalLink, Lightbulb } from "lucide-react";
+import { ArrowLeft, ArrowRight, CircleCheck, ExternalLink, Lightbulb } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Pantalla } from "@/components/layout/pantalla";
+import { buttonVariants } from "@/components/ui/button";
 import { EscucharPantalla, TarjetaVideo } from "@/components/talento/voz";
 import { Tarjeta } from "@/components/ui/tarjeta";
 import { listarCursos, TEMAS } from "@/lib/datos/aprende";
+import { miEmprendimiento, misCursosVistos } from "@/lib/datos/emprende";
 import { VIDEOS_TALENTO } from "@/lib/talento/videos";
 import type { TemaCurso } from "@/lib/emprende/ruta";
 import { cn } from "@/lib/utils";
@@ -17,11 +19,17 @@ const MODALIDAD = { virtual: "Por internet", presencial: "Presencial", mixta: "M
 export default async function Aprende({ searchParams }: { searchParams: Promise<{ tema?: string }> }) {
   const { tema: crudo } = await searchParams;
   const tema = TEMAS.some((t) => t.valor === crudo) ? (crudo as TemaCurso) : undefined;
-  const cursos = await listarCursos(tema);
+  const [cursos, vistos, ruta] = await Promise.all([listarCursos(tema), misCursosVistos(), miEmprendimiento()]);
 
   return (
     <Pantalla titulo="Aprende">
       <EscucharPantalla className="-mt-4" />
+      {ruta && (
+        <Link href="/emprende" className={buttonVariants({ variant: "secundario", size: "normal", className: "self-start" })}>
+          <ArrowLeft aria-hidden />
+          Volver a mi ruta de Emprende
+        </Link>
+      )}
 
       <section aria-labelledby="videos" className="flex flex-col gap-3">
         <h2 id="videos" className="text-2xl">
@@ -72,12 +80,19 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
                   {c.gratuito && " · Gratis"}
                 </p>
                 <h2 className="text-xl">{c.titulo}</h2>
+                {vistos.has(c.id) && (
+                  <p className="inline-flex items-center gap-2 self-start rounded-full bg-exito-fondo px-3 py-1 text-base font-bold text-exito-texto">
+                    <CircleCheck aria-hidden className="size-5" />
+                    Ya lo abriste
+                  </p>
+                )}
                 {c.descripcion && <p>{c.descripcion}</p>}
-                <a href={c.url} target="_blank" rel="noreferrer" className="inline-flex min-h-tap items-center gap-2 self-start font-bold underline underline-offset-4">
+                <a href={`/aprende/ir/${c.id}`} target="_blank" rel="noreferrer" className={buttonVariants({ variant: "secundario", size: "normal", className: "self-start" })}>
                   Ir al curso
-                  <ExternalLink aria-hidden className="size-5" />
-                  <span className="sr-only">(se abre en otra página)</span>
+                  <ExternalLink aria-hidden />
+                  <span className="sr-only">(se abre en otra pestaña)</span>
                 </a>
+                <p className="text-base text-text-muted">Se abre en otra pestaña. Kánna sigue abierta en esta: vuelve cuando quieras.</p>
               </Tarjeta>
             </li>
           ))}
@@ -90,8 +105,9 @@ export default async function Aprende({ searchParams }: { searchParams: Promise<
         <Lightbulb aria-hidden className="size-8" />
         <h2 className="text-xl">¿Quieres emprender?</h2>
         <p>Responde unas preguntas y te sugerimos una ruta según la etapa de tu idea.</p>
-        <Link href="/emprende" className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4">
+        <Link href="/emprende" className={buttonVariants({ variant: "secundario", size: "normal", className: "self-start" })}>
           Ir a Emprende
+          <ArrowRight aria-hidden />
         </Link>
       </Tarjeta>
     </Pantalla>

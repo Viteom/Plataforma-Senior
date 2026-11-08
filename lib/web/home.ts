@@ -24,7 +24,7 @@ export const FRANJA = [
   { foto: foto("docente", 640, 960, ""), oficio: "Docente", lugar: "Manizales" },
 ];
 
-// Retratos de «Lo vivido vale más»: tarjetas altas que se deslizan despacio, cada una con su oficio.
+// Retratos de «Tu experiencia vale más»: tarjetas altas que se deslizan despacio, cada una con su oficio.
 export const RETRATOS = [
   { foto: "disenador", oficio: "Diseñador", lugar: "Medellín" },
   { foto: "abogada", oficio: "Abogada", lugar: "Bogotá" },
@@ -49,8 +49,8 @@ export const PASOS_EMPRESA: Paso[] = [
 ];
 
 export const PASOS_TALENTO: Paso[] = [
-  { titulo: "Cuentas tu historia", texto: "Hablando o escribiendo, como te quede más fácil. Sin hoja de vida y sin contraseñas." },
-  { titulo: "Armamos tu huella", texto: "Ordenamos lo que sabes hacer en capacidades. Tú confirmas cada una antes de que alguien la vea." },
+  { titulo: "Cuéntanos tu historia", texto: "Hablando o escribiendo, como te quede más fácil. Sin hoja de vida y sin contraseñas." },
+  { titulo: "Armemos tu huella", texto: "Ordenamos lo que sabes hacer en capacidades. Tú confirmas cada una antes de que alguien la vea." },
   { titulo: "Te llega una oportunidad", texto: "Por SMS y en la app. Nadie de Kánna ni de una organización te va a pedir dinero." },
   { titulo: "Tú decides", texto: "Si te interesa, se conocen. Si no, no pasa nada: tu perfil sigue ahí." },
   { titulo: "Trabajas acompañado", texto: "Tú pones el ritmo. Te preguntamos cómo vas y siempre hay una persona para ayudarte." },

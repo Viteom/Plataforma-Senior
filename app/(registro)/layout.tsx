@@ -4,7 +4,7 @@ import { Encabezado } from "@/components/layout/encabezado";
 export default function LayoutRegistro({ children }: { children: React.ReactNode }) {
   return (
     <div className="talento min-h-dvh">
-      <Encabezado inicioHref="/inicio" tono="lleno" />
+      <Encabezado inicioHref="/inicio" tono="lleno" salir inicioVisible />
       <main id="contenido" className="mx-auto w-full max-w-xl px-4 pt-4 pb-12">
         {children}
       </main>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { FormularioSalida } from "./formulario-salida";
 
 // Cerrar sesión. En modo demostración no hay sesión, así que no se muestra.
-export function BotonSalir({ className }: { className?: string }) {
+export function BotonSalir({ className, texto = "Cerrar sesión" }: { className?: string; texto?: string }) {
   if (MODO_DEMO) return null;
   return (
     <FormularioSalida accion={salir} className={className}>
@@ -17,7 +17,10 @@ export function BotonSalir({ className }: { className?: string }) {
         )}
       >
         <LogOut aria-hidden className="size-5" />
-        Salir
+        <span>
+          {texto}
+          {texto !== "Cerrar sesión" && <span className="sr-only"> (cerrar sesión)</span>}
+        </span>
       </button>
     </FormularioSalida>
   );

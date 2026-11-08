@@ -1,4 +1,4 @@
-import { BookOpen, Lightbulb, UserRound, Wallet } from "lucide-react";
+import { BookOpen, ChevronRight, Lightbulb, UserRound, Wallet } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -80,7 +80,10 @@ export default async function Inicio() {
             <span className="grid size-11 place-items-center rounded-md bg-neutro-2">
               <Icono aria-hidden className="size-6" />
             </span>
-            <span className="font-bold leading-tight">{etiqueta}</span>
+            <span className="flex items-center justify-between gap-2 font-bold leading-tight">
+              {etiqueta}
+              <ChevronRight aria-hidden className="size-6 shrink-0" />
+            </span>
           </Link>
         ))}
       </nav>

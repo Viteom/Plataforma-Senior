@@ -35,6 +35,21 @@ export const ORDEN_CAPAS: Capa[] = ["oficio", "situaciones", "contexto", "escala
 
 export const MAX_ETIQUETA_LIBRE = 60;
 
+// Si escriben varias en una línea («cocina, aseo; cuidado de niños»), cada una queda aparte. No se
+// corta por «y»: «corte y confección» es un solo oficio.
+export function separarEtiquetas(texto: string): string[] {
+  const vistas = new Set<string>();
+  return texto
+    .split(/[,;\n·•]+|\.\s+|\.$/)
+    .map((t) => t.replace(/\s+/g, " ").trim())
+    .filter((t) => {
+      const clave = t.toLowerCase();
+      if (!t || vistas.has(clave)) return false;
+      vistas.add(clave);
+      return true;
+    });
+}
+
 // Una etiqueta libre la ven las empresas (cuando el equipo la aprueba): sin contacto ni edad.
 export function problemaEtiquetaLibre(texto: string): string | null {
   if (texto.length < 3) return "Escribe al menos una palabra completa.";
