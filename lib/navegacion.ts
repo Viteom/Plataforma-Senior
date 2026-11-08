@@ -7,6 +7,7 @@ import {
   Compass,
   FileCheck,
   Handshake,
+  HardHat,
   Heart,
   House,
   Inbox,
@@ -98,6 +99,7 @@ export const gruposEquipo: { titulo: string; items: ItemNav[] }[] = [
       { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
       { href: "/equipo/experiencias", etiqueta: "Talento del campo", icono: Sprout },
       { href: "/equipo/emprendedores", etiqueta: "Emprendedores", icono: Lightbulb },
+      { href: "/equipo/oficios-presenciales", etiqueta: "Oficios presenciales", icono: HardHat },
       // ?desde=equipo: en la demostración muestra el enlace de vuelta al panel.
       { href: "/gestor/registrar?desde=equipo", etiqueta: "Registro asistido", icono: UserRoundPlus },
     ],

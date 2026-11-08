@@ -116,7 +116,7 @@ describe("una empresa no lee datos de talento", () => {
 });
 
 describe("vista anónima para empresas", () => {
-  const COLUMNAS_PROHIBIDAS = /nacimiento|edad|birth|pension|graduaci|tarifa/i;
+  const COLUMNAS_PROHIBIDAS = /nacimiento|edad|birth|pension|graduaci|tarifa|cedula|sexo|pais|ciudad_trabajo|postura|movilidad/i;
 
   it("no tiene columnas de edad, pensión ni tarifa exacta", async () => {
     const r = await db.query<{ column_name: string }>(

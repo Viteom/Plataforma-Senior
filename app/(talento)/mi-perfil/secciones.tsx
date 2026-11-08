@@ -395,7 +395,7 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
               defaultValue={primera?.horas_semana ?? ""}
               inputMode="numeric"
               maxLength={2}
-              className={`${p.className} max-w-40`}
+              className={`${p.className} w-32 text-center text-xl`}
             />
           )}
         </Campo>

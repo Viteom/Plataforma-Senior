@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff, House, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 
@@ -14,19 +14,33 @@ import { Tarifas } from "@/components/perfil/tarifas";
 import { PreguntaIngresos } from "@/components/talento/pregunta-ingresos";
 import { formasContratar, modalidades, type FormaContratar, type GuiaTarifa } from "@/lib/formas";
 import { MARCA } from "@/lib/marca";
-import { borradorVacio, erroresDelPaso, type BorradorPerfil, type Errores } from "@/lib/perfil/validar";
+import { esOficioPresencial, FORMAS_A_DISTANCIA } from "@/lib/oficios-presenciales";
+import {
+  borradorVacio,
+  erroresDelPaso,
+  HORAS_RAPIDAS,
+  MOVILIDADES,
+  PAISES,
+  POSTURAS,
+  SEXOS,
+  type BorradorPerfil,
+  type Errores,
+} from "@/lib/perfil/validar";
+import { cn } from "@/lib/utils";
 
 import { guardarPerfil, type EstadoPerfil } from "./acciones";
 
 const titulos = ["Tus datos", "Cómo quieres trabajar", "Quién ve tu perfil"];
 
-export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
+export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[]; presenciales: string[] }) {
   const tituloRef = useRef<HTMLHeadingElement>(null);
   const [paso, setPaso] = useState<1 | 2 | 3>(1);
   const [b, setB] = useState<BorradorPerfil>(borradorVacio);
   const [historiaCv, setHistoriaCv] = useState("");
   const [zona, setZona] = useState("");
   const [errores, setErrores] = useState<Errores>({});
+  // Horas: una de las respuestas rápidas, «otro número» (abre el campo) o «todavía no sé».
+  const [eleccionHoras, setEleccionHoras] = useState("");
   const [estado, guardar, guardando] = useActionState<EstadoPerfil, FormData>(guardarPerfil, {});
 
   const cambiar = <K extends keyof BorradorPerfil>(campo: K, valor: BorradorPerfil[K]) =>
@@ -77,6 +91,16 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
   }
 
   const noCumple = paso === 1 && b.requisito === "ninguno";
+  // Cuidado, aseo, cocina, obra, campo, conducción, taller…: siempre en persona.
+  const presencial = esOficioPresencial(b.oficio, presenciales);
+  const daMentoriaOTaller = b.formas.some((f) => FORMAS_A_DISTANCIA.includes(f as FormaContratar));
+  const sale = presencial || b.modalidad !== "remoto";
+
+  function elegirHoras(valor: string) {
+    setEleccionHoras(valor);
+    if (valor === "otro") cambiar("horas", HORAS_RAPIDAS.some((h) => h.valor === b.horas) ? "" : b.horas);
+    else cambiar("horas", valor === "nose" ? "" : valor);
+  }
 
   return (
     <Pantalla
@@ -139,7 +163,34 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 />
               )}
             </Campo>
-            <CampoUbicacion value={b.ubicacion} onChange={(v) => cambiar("ubicacion", v)} onSectorChange={setZona} />
+            <Campo id="pais" etiqueta="País donde vives" error={errores.pais}>
+              {(p) => (
+                <select
+                  {...p}
+                  value={b.pais}
+                  onChange={(e) => cambiar("pais", e.target.value)}
+                  className={`${p.className} min-h-action`}
+                >
+                  {PAISES.map((pais) => (
+                    <option key={pais} value={pais}>
+                      {pais}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </Campo>
+            {b.pais === "Colombia" ? (
+              <CampoUbicacion
+                inicial={b.ubicacion}
+                value={b.ubicacion}
+                onChange={(v) => cambiar("ubicacion", v)}
+                onSectorChange={setZona}
+              />
+            ) : (
+              <Campo id="ubicacion" etiqueta="Ciudad donde vives" error={errores.ubicacion}>
+                {(p) => <Input {...p} value={b.ubicacion} onChange={(e) => cambiar("ubicacion", e.target.value)} />}
+              </Campo>
+            )}
             <Campo
               id="oficio"
               etiqueta="¿A qué te has dedicado?"
@@ -191,9 +242,33 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
 
         {paso === 2 && (
           <>
-            <fieldset className="flex flex-col gap-3">
-              <legend className="mb-1 text-lg font-bold">¿Cómo te gustaría trabajar?</legend>
-              <p className="mb-2 text-text-muted">Puedes elegir varias.</p>
+            <Pregunta numero={1} titulo="¿Cuántas horas a la semana puedes trabajar?">
+              <Chips
+                nombre="horas_rapidas"
+                opciones={[...HORAS_RAPIDAS, { valor: "otro", etiqueta: "Otro número" }, { valor: "nose", etiqueta: "Todavía no sé" }]}
+                elegida={eleccionHoras}
+                onElegir={elegirHoras}
+              />
+              {eleccionHoras === "otro" && (
+                <Campo id="horas" etiqueta="¿Cuántas horas?" ayuda="Entre 1 y 48 horas a la semana." error={errores.horas}>
+                  {(p) => (
+                    <div className="flex items-center gap-3">
+                      <Input
+                        {...p}
+                        value={b.horas}
+                        onChange={(e) => cambiar("horas", e.target.value.replace(/\D/g, "").slice(0, 2))}
+                        inputMode="numeric"
+                        autoComplete="off"
+                        className={`${p.className} w-32 text-center text-xl`}
+                      />
+                      <span className="text-lg">horas a la semana</span>
+                    </div>
+                  )}
+                </Campo>
+              )}
+            </Pregunta>
+
+            <Pregunta numero={2} titulo="¿De qué forma te gustaría trabajar?" ayuda="Puedes elegir varias.">
               {formasContratar.map(({ valor, etiqueta, descripcion }) => (
                 <Opcion
                   key={valor}
@@ -211,51 +286,85 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                   {errores.formas}
                 </p>
               )}
-            </fieldset>
-
-            {b.formas.length > 0 && (
-              <Tarifas
-                formas={b.formas as FormaContratar[]}
-                guias={guias}
-                tarifas={b.tarifas}
-                onTarifa={(f, v) => cambiar("tarifas", { ...b.tarifas, [f]: v })}
-                orientacion={b.orientacion}
-                onOrientacion={(v) => cambiar("orientacion", v)}
-                error={errores.tarifas}
-              />
-            )}
-
-            <Campo id="horas" etiqueta="¿Cuántas horas a la semana? (opcional)" error={errores.horas}>
-              {(p) => (
-                <Input
-                  {...p}
-                  value={b.horas}
-                  onChange={(e) => cambiar("horas", e.target.value.replace(/\D/g, ""))}
-                  inputMode="numeric"
-                  maxLength={2}
-                  className={`${p.className} max-w-40`}
+              {b.formas.length > 0 && (
+                <Tarifas
+                  formas={b.formas as FormaContratar[]}
+                  guias={guias}
+                  tarifas={b.tarifas}
+                  onTarifa={(f, v) => cambiar("tarifas", { ...b.tarifas, [f]: v })}
+                  orientacion={b.orientacion}
+                  onOrientacion={(v) => cambiar("orientacion", v)}
+                  error={errores.tarifas}
                 />
               )}
-            </Campo>
-            <fieldset className="flex flex-col gap-3">
-              <legend className="mb-3 text-lg font-bold">¿Dónde?</legend>
-              {modalidades.map(({ valor, etiqueta }) => (
-                <Opcion
-                  key={valor}
-                  name="modalidad"
-                  value={valor}
-                  checked={b.modalidad === valor}
-                  onChange={() => cambiar("modalidad", valor)}
-                  titulo={etiqueta}
+            </Pregunta>
+
+            <Pregunta numero={3} titulo="¿Dónde quieres trabajar?">
+              {presencial ? (
+                <div className="flex flex-col gap-3">
+                  <p className="flex items-start gap-3 rounded-md bg-surface p-4">
+                    <House aria-hidden className="mt-0.5 size-6 shrink-0" />
+                    <span>
+                      Tu oficio se hace en persona, así que te mostraremos trabajos presenciales.
+                      {daMentoriaOTaller ? "" : " Si das mentorías o talleres, esos sí pueden ser desde tu casa."}
+                    </span>
+                  </p>
+                  {daMentoriaOTaller && (
+                    <Opcion
+                      tipo="checkbox"
+                      name="distancia"
+                      value="si"
+                      checked={b.distancia}
+                      onChange={() => cambiar("distancia", !b.distancia)}
+                      titulo="Las mentorías y los talleres también los puedo dar desde mi casa"
+                    />
+                  )}
+                </div>
+              ) : (
+                modalidades.map(({ valor, etiqueta }) => (
+                  <Opcion
+                    key={valor}
+                    name="modalidad"
+                    value={valor}
+                    checked={b.modalidad === valor}
+                    onChange={() => cambiar("modalidad", valor)}
+                    titulo={etiqueta}
+                  />
+                ))
+              )}
+              {sale && (
+                <>
+                  <Campo
+                    id="ciudad-trabajo"
+                    etiqueta="¿En qué ciudad o municipio? (opcional)"
+                    ayuda={b.ubicacion ? `Si lo dejas en blanco, buscamos cerca de ${b.ubicacion}.` : undefined}
+                    error={errores.ciudadTrabajo}
+                  >
+                    {(p) => (
+                      <Input {...p} value={b.ciudadTrabajo} onChange={(e) => cambiar("ciudadTrabajo", e.target.value)} />
+                    )}
+                  </Campo>
+                  <fieldset className="flex flex-col gap-3">
+                    <legend className="mb-1 text-lg font-bold">¿Hasta dónde te puedes mover? (opcional)</legend>
+                    <Chips
+                      nombre="movilidad"
+                      opciones={MOVILIDADES}
+                      elegida={b.movilidad}
+                      onElegir={(v) => cambiar("movilidad", b.movilidad === v ? "" : (v as BorradorPerfil["movilidad"]))}
+                    />
+                  </fieldset>
+                </>
+              )}
+              <fieldset className="flex flex-col gap-3">
+                <legend className="mb-1 text-lg font-bold">¿Cómo te gusta trabajar? (opcional)</legend>
+                <Chips
+                  nombre="postura"
+                  opciones={POSTURAS}
+                  elegida={b.postura}
+                  onElegir={(v) => cambiar("postura", b.postura === v ? "" : (v as BorradorPerfil["postura"]))}
                 />
-              ))}
-            </fieldset>
-            <PreguntaIngresos
-              situacion={b.ingresos}
-              hogar={b.hogar}
-              onSituacion={(v) => cambiar("ingresos", v)}
-              onHogar={(v) => cambiar("hogar", v)}
-            />
+              </fieldset>
+            </Pregunta>
           </>
         )}
 
@@ -283,6 +392,49 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
                 descripcion="Las empresas ven tu nombre, tu foto y tu historia."
               />
             </fieldset>
+
+            <section aria-labelledby="privados" className="flex flex-col gap-5 rounded-lg bg-surface p-5">
+              <div className="flex flex-col gap-2">
+                <h3 id="privados" className="flex items-center gap-2 text-lg">
+                  <ShieldCheck aria-hidden className="size-6 shrink-0" />
+                  Datos privados (opcionales)
+                </h3>
+                <p className="text-base">
+                  Ninguna empresa los ve y no cambian qué oportunidades te llegan. Puedes dejarlos en blanco.
+                </p>
+              </div>
+              <Campo
+                id="cedula"
+                etiqueta="Número de cédula"
+                ayuda="La necesitas para firmar un acuerdo. Escríbela como quieras, con o sin puntos."
+                error={errores.cedula}
+              >
+                {(p) => (
+                  <Input
+                    {...p}
+                    value={b.cedula}
+                    onChange={(e) => cambiar("cedula", e.target.value.slice(0, 20))}
+                    autoComplete="off"
+                    className={`${p.className} bg-raised`}
+                  />
+                )}
+              </Campo>
+              <fieldset className="flex flex-col gap-3">
+                <legend className="mb-1 text-lg font-bold">Sexo</legend>
+                <Chips
+                  nombre="sexo"
+                  opciones={SEXOS}
+                  elegida={b.sexo}
+                  onElegir={(v) => cambiar("sexo", b.sexo === v ? "" : (v as BorradorPerfil["sexo"]))}
+                />
+              </fieldset>
+              <PreguntaIngresos
+                situacion={b.ingresos}
+                hogar={b.hogar}
+                onSituacion={(v) => cambiar("ingresos", v)}
+                onHogar={(v) => cambiar("hogar", v)}
+              />
+            </section>
 
             <div className="flex flex-col gap-2">
               <Opcion
@@ -321,5 +473,61 @@ export function FormularioPerfil({ guias }: { guias: GuiaTarifa[] }) {
         </div>
       </form>
     </Pantalla>
+  );
+}
+
+// Una de las tres preguntas del paso 2, con su número para que se sienta corto.
+function Pregunta({ numero, titulo, ayuda, children }: { numero: number; titulo: string; ayuda?: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="mb-1 flex items-baseline gap-2 text-lg font-bold">
+        <span className="text-text-muted">{numero} de 3 ·</span> {titulo}
+      </legend>
+      {ayuda && <p className="mb-2 text-text-muted">{ayuda}</p>}
+      {children}
+    </fieldset>
+  );
+}
+
+// Respuestas cortas en botones grandes. Es un grupo de radios de verdad: se ve elegido con borde,
+// negrita y una marca, no solo con color. Tocar de nuevo la elegida la quita (las opcionales).
+function Chips({
+  nombre,
+  opciones,
+  elegida,
+  onElegir,
+}: {
+  nombre: string;
+  opciones: { valor: string; etiqueta: string }[];
+  elegida: string;
+  onElegir: (valor: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {opciones.map((o) => {
+        const activa = elegida === o.valor;
+        return (
+          <label
+            key={o.valor}
+            className={cn(
+              "inline-flex min-h-action cursor-pointer items-center gap-2 rounded-full border-2 px-5 text-lg transition-[background-color,transform] duration-100 active:scale-[0.98] has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-focus",
+              activa ? "border-text bg-surface-strong font-bold" : "border-border bg-bg hover:bg-surface",
+            )}
+          >
+            <input
+              type="radio"
+              name={nombre}
+              value={o.valor}
+              checked={activa}
+              onChange={() => onElegir(o.valor)}
+              onClick={() => activa && onElegir(o.valor)}
+              className="sr-only"
+            />
+            {activa && <Check aria-hidden className="size-5 shrink-0" />}
+            {o.etiqueta}
+          </label>
+        );
+      })}
+    </div>
   );
 }

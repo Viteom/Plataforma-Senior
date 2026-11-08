@@ -7,6 +7,7 @@ import { MODO_DEMO } from "@/lib/demo";
 import { esForma } from "@/lib/formas";
 import type { Capa } from "@/lib/ia/tipos";
 import { aCandidato, COLUMNAS_CANDIDATOS } from "@/lib/matching/cargar";
+import { palabraValida } from "@/lib/oficios-presenciales";
 import { PESOS_BRIEF, proponer, type Necesidad, type Pesos } from "@/lib/matching/puntaje";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
@@ -640,4 +641,29 @@ export async function verContactosComunidad(_p: EstadoContactos, datos: FormData
   const { data, error } = await supabase.rpc("contactos_comunidad", { cat, motivo });
   if (error) return { error: "No pudimos traer los contactos. Revisa que tengas permiso." };
   return { contactos: (data ?? []) as { nombre: string; celular: string }[] };
+}
+
+// ── Oficios presenciales ────────────────────────────────────────────────────
+
+// Con uno de estos oficios, el registro no ofrece trabajo desde la casa (salvo mentorías y talleres).
+export async function agregarOficioPresencial(_p: Estado, datos: FormData): Promise<Estado> {
+  const palabra = palabraValida(String(datos.get("palabra") ?? ""));
+  if (!palabra) return { error: "Escribe una palabra de 3 a 40 letras, sin números." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase, user } = await equipo();
+  const { error } = await supabase.from("oficios_presenciales").insert({ palabra, creado_por: user.id });
+  if (error) return { error: error.code === "23505" ? "Esa palabra ya está en la lista." : "No pudimos guardarla. Revisa que tengas permiso." };
+  revalidatePath("/equipo/oficios-presenciales");
+  return { aviso: `Guardada: «${palabra}».` };
+}
+
+export async function quitarOficioPresencial(_p: Estado, datos: FormData): Promise<Estado> {
+  const id = Number(datos.get("id"));
+  if (!Number.isInteger(id) || id < 1) return { error: "Palabra no válida." };
+  if (MODO_DEMO) return DEMO;
+  const { supabase } = await equipo();
+  const { data, error } = await supabase.from("oficios_presenciales").delete().eq("id", id).select("id");
+  if (error || !data?.length) return { error: "No pudimos quitarla. Revisa que tengas permiso." };
+  revalidatePath("/equipo/oficios-presenciales");
+  return { aviso: "Quitada de la lista." };
 }

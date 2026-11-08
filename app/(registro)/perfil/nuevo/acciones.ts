@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { MODO_DEMO } from "@/lib/demo";
+import { esOficioPresencial, modalidadDeLaForma, OFICIOS_PRESENCIALES_BASE } from "@/lib/oficios-presenciales";
 import { experienciaHojaVida } from "@/lib/perfil/hoja-vida";
 import { leerBorrador, validarPerfil, VERSION_AUTORIZACION, type Errores } from "@/lib/perfil/validar";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -59,6 +60,14 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
         .single();
   if (error || !perfil) return general;
 
+  // Con un oficio que siempre es presencial no se ofrece trabajo desde la casa (salvo mentorías y
+  // talleres, si la persona lo activó). La lista la mantiene el equipo; si no responde, la base.
+  const { data: palabras } = await supabase.from("oficios_presenciales").select("palabra");
+  const presencial = esOficioPresencial(
+    p.oficio,
+    palabras?.length ? palabras.map((x) => x.palabra as string) : OFICIOS_PRESENCIALES_BASE,
+  );
+
   // Formas de contratar: se reemplazan completas.
   await supabase.from("talent_offers").delete().eq("talent_id", perfil.id);
   const { error: errorOfertas } = await supabase.from("talent_offers").insert(
@@ -66,7 +75,7 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
       talent_id: perfil.id,
       tipo,
       horas_semana: p.horas,
-      modalidad: p.modalidad,
+      modalidad: modalidadDeLaForma(tipo, p.modalidad, presencial, p.distancia),
       tarifa_esperada: p.tarifas[tipo] ?? null,
       quiere_orientacion: p.orientacion,
     })),
@@ -82,6 +91,18 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
     requisito_entrada: p.requisito,
   });
   if (errorPrivado) return general;
+
+  // Cédula, país, ciudad donde quiere trabajar, sexo y cómo le gusta trabajar: privados. Si no se
+  // guardan (por ejemplo, la base aún no tiene la función), el perfil sigue y se completan después.
+  const { error: errorRegistro } = await supabase.rpc("guardar_datos_registro", {
+    cedula: p.cedula,
+    pais: p.pais,
+    ciudad_trabajo: p.ciudadTrabajo,
+    sexo: p.sexo,
+    postura: p.postura,
+    movilidad: p.movilidad,
+  });
+  if (errorRegistro) console.error("guardar_datos_registro", errorRegistro.code, errorRegistro.message);
 
   // Pensión o subsidio (opcional): solo para avisarle antes de aceptar un acuerdo. Si no se
   // guarda, el perfil sigue: la persona puede contarlo después en Mi perfil.

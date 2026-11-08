@@ -5,7 +5,8 @@ import { redirect } from "next/navigation";
 
 import { normalizarCelular } from "@/lib/auth/destino";
 import { MODO_DEMO } from "@/lib/demo";
-import { esForma, type FormaContratar } from "@/lib/formas";
+import { esOficioPresencial, modalidadDeLaForma, OFICIOS_PRESENCIALES_BASE } from "@/lib/oficios-presenciales";
+import { esForma, type FormaContratar, type Modalidad } from "@/lib/formas";
 import { esHogar, esSituacion } from "@/lib/ingresos";
 import { borrarArchivosPerfil } from "@/lib/privacidad/borrar-archivos";
 import { crearClienteAdmin } from "@/lib/supabase/admin";
@@ -28,11 +29,11 @@ async function sesion() {
   if (!user) redirect("/entrar");
   const { data: perfil } = await supabase
     .from("talent_profiles")
-    .select("id, estado")
+    .select("id, estado, oficio")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!perfil) redirect("/perfil/nuevo");
-  return { supabase, user, perfil: perfil as { id: string; estado: string } };
+  return { supabase, user, perfil: perfil as { id: string; estado: string; oficio: string | null } };
 }
 
 const texto = (v: FormDataEntryValue | null, max: number) =>
@@ -113,6 +114,12 @@ export async function actualizarFormas(_p: Estado, datos: FormData): Promise<Est
   const orientacion = datos.get("orientacion") === "si";
 
   const { supabase, user, perfil } = await sesion();
+  // Oficio presencial: solo las mentorías y los talleres pueden ser desde la casa.
+  const { data: palabras } = await supabase.from("oficios_presenciales").select("palabra");
+  const presencial = esOficioPresencial(
+    perfil.oficio ?? "",
+    palabras?.length ? palabras.map((x) => x.palabra as string) : OFICIOS_PRESENCIALES_BASE,
+  );
   await supabase.from("talent_offers").delete().eq("talent_id", perfil.id);
   const { error } = await supabase.from("talent_offers").insert(
     formas.map((tipo) => {
@@ -121,7 +128,7 @@ export async function actualizarFormas(_p: Estado, datos: FormData): Promise<Est
         talent_id: perfil.id,
         tipo,
         horas_semana: horas,
-        modalidad,
+        modalidad: modalidadDeLaForma(tipo, modalidad as Modalidad, presencial, modalidad !== "presencial"),
         tarifa_esperada: tarifa > 0 ? tarifa : null,
         quiere_orientacion: orientacion,
       };

@@ -9,7 +9,9 @@ import { CAMPOS_TALENTO, proponer, puntuar, type Necesidad, type TalentoParaMatc
 // Regla 1 del CLAUDE.md: la edad nunca entra al matching. Fecha de nacimiento, foto, año de
 // graduación y estado de pensión no son entradas del cálculo; esta prueba falla si aparecen.
 
-const PROHIBIDOS = /nacimiento|\bedad\b|\bage\b|birth|foto|photo|graduaci|graduation|pension|jubila|retir/i;
+// Tampoco los datos privados del registro: cédula, sexo, país, ciudad de trabajo, postura y movilidad.
+const PROHIBIDOS =
+  /nacimiento|\bedad\b|\bage\b|birth|foto|photo|graduaci|graduation|pension|jubila|retir|cedula|\bsexo\b|\bpais\b|ciudad_?trabajo|ciudadTrabajo|postura|movilidad/i;
 const CARPETA = join(__dirname, "..", "..", "lib", "matching");
 
 const talento = (sobre: Partial<TalentoParaMatching> = {}): TalentoParaMatching => ({

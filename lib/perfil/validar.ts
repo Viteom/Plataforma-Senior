@@ -20,9 +20,55 @@ export type BorradorPerfil = {
   // Opcional y privado: pensión o subsidio, solo para avisarle a la persona (nunca al matching).
   ingresos: SituacionIngresos | "";
   hogar: Hogar | "";
+  // Privados (talent_private): nunca los ve una organización ni entran al matching.
+  pais: string;
+  ciudadTrabajo: string;
+  postura: Postura | "";
+  movilidad: Movilidad | "";
+  cedula: string;
+  sexo: Sexo | "";
+  // Oficio presencial: las mentorías y los talleres también pueden ser desde la casa.
+  distancia: boolean;
   visibilidad: string;
   autorizo: boolean;
 };
+
+export type Postura = "de_pie" | "con_silla" | "igual";
+export type Movilidad = "toda_la_ciudad" | "cerca" | "sin_desplazarme";
+export type Sexo = "hombre" | "mujer" | "otro" | "no_dice";
+
+export const POSTURAS: { valor: Postura; etiqueta: string }[] = [
+  { valor: "de_pie", etiqueta: "De pie o caminando" },
+  { valor: "con_silla", etiqueta: "Con silla, la mayor parte del tiempo" },
+  { valor: "igual", etiqueta: "Me da igual" },
+];
+export const MOVILIDADES: { valor: Movilidad; etiqueta: string }[] = [
+  { valor: "toda_la_ciudad", etiqueta: "Me muevo por toda la ciudad" },
+  { valor: "cerca", etiqueta: "Prefiero cerca de mi casa" },
+  { valor: "sin_desplazarme", etiqueta: "Prefiero no desplazarme" },
+];
+export const SEXOS: { valor: Sexo; etiqueta: string }[] = [
+  { valor: "mujer", etiqueta: "Mujer" },
+  { valor: "hombre", etiqueta: "Hombre" },
+  { valor: "otro", etiqueta: "Otro" },
+  { valor: "no_dice", etiqueta: "Prefiero no decirlo" },
+];
+export const PAISES = ["Colombia", "Venezuela", "Ecuador", "Perú", "Panamá", "Estados Unidos", "España", "Otro país"];
+
+// Horas a la semana en tres respuestas sencillas; «otro número» abre el campo.
+export const HORAS_RAPIDAS: { valor: string; etiqueta: string }[] = [
+  { valor: "10", etiqueta: "Unas pocas (hasta 10)" },
+  { valor: "20", etiqueta: "Medio tiempo (unas 20)" },
+  { valor: "40", etiqueta: "Casi todo el día (unas 40)" },
+];
+
+const esPostura = (v: unknown): v is Postura => POSTURAS.some((x) => x.valor === v);
+const esMovilidad = (v: unknown): v is Movilidad => MOVILIDADES.some((x) => x.valor === v);
+const esSexo = (v: unknown): v is Sexo => SEXOS.some((x) => x.valor === v);
+
+// La cédula se escribe como sea («1.023.456-7», con espacios); se guarda solo con letras y números.
+export const limpiarCedula = (v: string) => v.replace(/[\s.\-]/g, "");
+const cedulaValida = (v: string) => /^[A-Za-z0-9]{4,15}$/.test(v);
 
 export type PerfilValido = {
   nombre: string;
@@ -36,6 +82,13 @@ export type PerfilValido = {
   orientacion: boolean;
   ingresos: SituacionIngresos | null;
   hogar: Hogar | null;
+  pais: string;
+  ciudadTrabajo: string | null;
+  postura: Postura | null;
+  movilidad: Movilidad | null;
+  cedula: string | null;
+  sexo: Sexo | null;
+  distancia: boolean;
   visibilidad: "reservado" | "visible";
 };
 
@@ -53,6 +106,13 @@ export const borradorVacio: BorradorPerfil = {
   orientacion: false,
   ingresos: "",
   hogar: "",
+  pais: "Colombia",
+  ciudadTrabajo: "",
+  postura: "",
+  movilidad: "",
+  cedula: "",
+  sexo: "",
+  distancia: false,
   visibilidad: "reservado",
   autorizo: false,
 };
@@ -68,6 +128,7 @@ export function erroresDelPaso(b: BorradorPerfil, paso: 1 | 2 | 3): Errores {
   if (paso === 1) {
     if (!texto(b.nombre, 2, 80)) e.nombre = "Escribe tu nombre.";
     if (!texto(b.ubicacion, 2, 80)) e.ubicacion = "Escribe la ciudad o vereda donde vives.";
+    if (!texto(b.pais, 2, 60)) e.pais = "Elige el país donde vives.";
     if (!texto(b.oficio, 2, 120)) e.oficio = "Cuéntanos en pocas palabras a qué te has dedicado.";
     if (b.requisito !== "edad" && b.requisito !== "experiencia") {
       e.requisito = b.requisito === "ninguno" ? "Por ahora no podemos seguir." : "Elige una opción.";
@@ -80,6 +141,7 @@ export function erroresDelPaso(b: BorradorPerfil, paso: 1 | 2 | 3): Errores {
       if (!Number.isInteger(h) || h < 1 || h > 48) e.horas = "Escribe un número de horas entre 1 y 48.";
     }
     if (!["presencial", "remoto", "mixto"].includes(b.modalidad)) e.modalidad = "Elige una opción.";
+    if (b.ciudadTrabajo.trim() && !texto(b.ciudadTrabajo, 2, 80)) e.ciudadTrabajo = "Escribe la ciudad o el municipio.";
     for (const [forma, valor] of Object.entries(b.tarifas)) {
       if (!b.formas.includes(forma) || !valor.trim()) continue;
       const n = Number(valor.replace(/[^\d]/g, ""));
@@ -88,6 +150,8 @@ export function erroresDelPaso(b: BorradorPerfil, paso: 1 | 2 | 3): Errores {
   }
   if (paso === 3) {
     if (b.visibilidad !== "reservado" && b.visibilidad !== "visible") e.visibilidad = "Elige una opción.";
+    const cedula = limpiarCedula(b.cedula);
+    if (cedula && !cedulaValida(cedula)) e.cedula = "Revisa el número: solo números (y letras si es un documento de otro país).";
     if (!b.autorizo) e.autorizo = "Para crear tu perfil necesitamos tu autorización.";
   }
   return e;
@@ -118,6 +182,13 @@ export function validarPerfil(b: BorradorPerfil): { ok: true; perfil: PerfilVali
       orientacion: b.orientacion,
       ingresos: b.ingresos || null,
       hogar: b.ingresos === "colombia_mayor" && b.hogar ? b.hogar : null,
+      pais: texto(b.pais, 2, 60)!,
+      ciudadTrabajo: texto(b.ciudadTrabajo, 2, 80),
+      postura: b.postura || null,
+      movilidad: b.movilidad || null,
+      cedula: limpiarCedula(b.cedula) || null,
+      sexo: b.sexo || null,
+      distancia: b.distancia,
       visibilidad: b.visibilidad as "reservado" | "visible",
     },
   };
@@ -148,6 +219,14 @@ export function leerBorrador(crudo: unknown): BorradorPerfil {
     orientacion: datos.orientacion === true,
     ingresos: esSituacion(datos.ingresos) ? datos.ingresos : "",
     hogar: esHogar(datos.hogar) ? datos.hogar : "",
+    // Sin país (borradores de antes) se asume Colombia.
+    pais: s(datos.pais) || "Colombia",
+    ciudadTrabajo: s(datos.ciudadTrabajo),
+    postura: esPostura(datos.postura) ? datos.postura : "",
+    movilidad: esMovilidad(datos.movilidad) ? datos.movilidad : "",
+    cedula: s(datos.cedula),
+    sexo: esSexo(datos.sexo) ? datos.sexo : "",
+    distancia: datos.distancia === true,
     visibilidad: s(datos.visibilidad),
     autorizo: datos.autorizo === true,
   };

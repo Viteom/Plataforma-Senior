@@ -6,6 +6,7 @@ import { MODO_DEMO } from "@/lib/demo";
 import { obtenerProveedor } from "@/lib/ia/entorno";
 import { extraerHuella } from "@/lib/ia/extraer";
 import { sugerirPorPalabras, type EntradaTaxonomia } from "@/lib/ia/huella";
+import { normalizarFrase, traducirFrases } from "@/lib/huella/diccionario";
 import { MAX_ETIQUETA_LIBRE, problemaEtiquetaLibre } from "@/lib/capas";
 import { CAPAS, type Capa } from "@/lib/ia/tipos";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -20,6 +21,8 @@ export type EtiquetaParaConfirmar = {
   nueva: boolean; // fuera de la taxonomía: el equipo la revisa
   /** Propuesta del catálogo por palabras de la historia (sin IA): el id es el de la taxonomía. */
   catalogo?: boolean;
+  /** Propuesta del diccionario de frases que aún no está en la taxonomía: se guarda como etiqueta escrita. */
+  libre?: boolean;
 };
 
 export type EstadoHuella = {
@@ -33,6 +36,7 @@ export type EstadoHuella = {
 
 const MIN = 40;
 const MAX = 6000;
+const MAX_TALENTO = 300;
 
 // Los ids llegan del formulario y terminan en un filtro de PostgREST: solo UUID válidos.
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -41,6 +45,9 @@ const soloUuid = (valores: FormDataEntryValue[]) => valores.map(String).filter((
 export async function guardarHistoria(_previo: EstadoHuella, datos: FormData): Promise<EstadoHuella> {
   const historia = String(datos.get("historia") ?? "").trim();
   const origen = datos.get("origen") === "dictado" ? "dictado" : "escrito";
+  // «Mi experiencia» es la historia; «mi talento» (lo que le sale bien) va aparte y es opcional.
+  const talento = String(datos.get("talento") ?? "").replace(/\s+/g, " ").trim();
+  if (talento.length > MAX_TALENTO) return { error: `Tu talento cuéntalo en máximo ${MAX_TALENTO} letras.` };
   if (historia.length < MIN) {
     return { error: "Cuéntanos un poco más: qué pasó, qué hiciste y cómo terminó." };
   }
@@ -73,18 +80,27 @@ export async function guardarHistoria(_previo: EstadoHuella, datos: FormData): P
   if (!perfil) redirect("/perfil/nuevo");
 
   // La historia original queda guardada para la persona y el equipo; a la IA va la versión preparada.
-  const { data: guardada, error } = await supabase
+  const fila: Record<string, string> = { talent_id: perfil.id as string, texto: historia, origen };
+  let { data: guardada, error } = await supabase
     .from("stories")
-    .insert({ talent_id: perfil.id, texto: historia, origen })
+    .insert(talento ? { ...fila, talento } : fila)
     .select("id")
     .single();
+  // Si la base todavía no tiene la columna «talento», la historia se guarda igual.
+  if (error && talento) {
+    console.error("stories.talento", error.code, error.message);
+    ({ data: guardada, error } = await supabase.from("stories").insert(fila).select("id").single());
+  }
   if (error || !guardada) return { error: "No pudimos guardar tu historia. Intenta de nuevo o pide ayuda." };
 
   const { data: tax } = await supabase.from("taxonomy").select("id, capa, etiqueta, sinonimos");
   const taxonomia = (tax ?? []) as EntradaTaxonomia[];
 
+  // Para proponer etiquetas se leen las dos partes juntas.
+  const texto = talento ? `${historia}\n\nMi talento: ${talento}` : historia;
+
   const resultado = await extraerHuella({
-    historia,
+    historia: texto,
     nombrePersona: perfil.nombre,
     taxonomia,
     proveedor: obtenerProveedor(),
@@ -101,13 +117,23 @@ export async function guardarHistoria(_previo: EstadoHuella, datos: FormData): P
 
   if (resultado.estado === "manual") {
     // Sin asistente: se proponen las palabras del catálogo que aparecen en la historia.
-    const sugeridas = sugerirPorPalabras(historia, taxonomia).map((t) => ({
+    const sugeridas: EtiquetaParaConfirmar[] = sugerirPorPalabras(texto, taxonomia).map((t) => ({
       id: t.id,
       capa: t.capa,
       etiqueta: t.etiqueta,
       nueva: false,
       catalogo: true,
     }));
+    // Y el diccionario de frases de todos los días («hago visitas» → Ventas).
+    traducirFrases(texto).forEach((d, i) => {
+      const enLista = taxonomia.find((t) => t.capa === d.capa && normalizarFrase(t.etiqueta) === normalizarFrase(d.etiqueta));
+      if (enLista) {
+        if (!sugeridas.some((s) => s.id === enLista.id))
+          sugeridas.push({ id: enLista.id, capa: enLista.capa, etiqueta: enLista.etiqueta, nueva: false, catalogo: true });
+      } else if (!sugeridas.some((s) => s.capa === d.capa && normalizarFrase(s.etiqueta) === normalizarFrase(d.etiqueta))) {
+        sugeridas.push({ id: `diccionario-${i}`, capa: d.capa, etiqueta: d.etiqueta, nueva: true, catalogo: true, libre: true });
+      }
+    });
     return { historiaId: guardada.id, modo: "manual", motivoManual: resultado.motivo, etiquetas: sugeridas };
   }
 

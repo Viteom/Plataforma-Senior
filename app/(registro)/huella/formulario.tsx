@@ -10,7 +10,7 @@ import { Dictado } from "@/components/huella/dictado";
 import { Pantalla } from "@/components/layout/pantalla";
 import { EscucharPantalla, FraseConVoz, TarjetaVideo } from "@/components/talento/voz";
 import { Button } from "@/components/ui/button";
-import { Campo, Textarea } from "@/components/ui/campo";
+import { Campo, Input, Textarea } from "@/components/ui/campo";
 import { ayudaCapa, MAX_ETIQUETA_LIBRE, nombreCapa, ORDEN_CAPAS, problemaEtiquetaLibre, separarEtiquetas } from "@/lib/capas";
 import { prepararHistoria } from "@/lib/ia/preparar";
 import { EJEMPLO_HISTORIA, PREGUNTAS_GUIA, video } from "@/lib/talento/videos";
@@ -57,6 +57,7 @@ function Contar({
 }) {
   const [modo, setModo] = useState<Modo>(historiaInicial ? "escribir" : "dictar");
   const [historia, setHistoria] = useState(historiaInicial ?? "");
+  const [talento, setTalento] = useState("");
 
   // Lo mismo que hará el servidor antes de enviarla al asistente: se lo contamos a la persona.
   const revision = useMemo(
@@ -124,8 +125,8 @@ function Contar({
         {verTexto && (
           <Campo
             id="historia"
-            etiqueta={modo === "dictar" ? "Lo que dijiste (puedes corregirlo)" : "Tu historia"}
-            ayuda="No importa la ortografía. Cuenta detalles: dónde era, con quién, qué hiciste."
+            etiqueta={modo === "dictar" ? "Tu experiencia: lo que dijiste (puedes corregirlo)" : "Tu experiencia"}
+            ayuda="Dónde trabajaste y qué hacías: con quién, qué resolviste. No importa la ortografía."
             error={estado.error}
           >
             {(p) => (
@@ -135,6 +136,24 @@ function Contar({
                 rows={8}
                 value={historia}
                 onChange={(e) => setHistoria(e.target.value)}
+                className={`${p.className} bg-raised`}
+              />
+            )}
+          </Campo>
+        )}
+        {verTexto && (
+          <Campo
+            id="talento"
+            etiqueta="Tu talento: lo que te sale bien (opcional)"
+            ayuda="Es distinto de tu experiencia. Por ejemplo: explicar con paciencia, arreglar lo que nadie sabe arreglar, que la gente confíe en ti."
+          >
+            {(p) => (
+              <Input
+                {...p}
+                name="talento"
+                maxLength={300}
+                value={talento}
+                onChange={(e) => setTalento(e.target.value)}
                 className={`${p.className} bg-raised`}
               />
             )}
@@ -249,15 +268,20 @@ function Confirmar({ estado }: { estado: EstadoHuella }) {
     >
       <form action={confirmar} className="flex flex-col gap-8">
         <input type="hidden" name="historiaId" value={estado.historiaId} />
-        {seleccionadas.map((id) => (
-          <input
-            key={id}
-            type="hidden"
-            // Las del catálogo todavía no existen en la huella: se agregan al confirmar.
-            name={propuestas.find((e) => e.id === id)?.catalogo ? "agregada" : "seleccionada"}
-            value={id}
-          />
-        ))}
+        {seleccionadas.map((id) => {
+          const e = propuestas.find((x) => x.id === id);
+          // Las del diccionario que no están en la lista se guardan como escritas por la persona.
+          if (e?.libre) return <input key={id} type="hidden" name="libre" value={`${e.capa}|${e.etiqueta}`} />;
+          return (
+            <input
+              key={id}
+              type="hidden"
+              // Las del catálogo todavía no existen en la huella: se agregan al confirmar.
+              name={e?.catalogo ? "agregada" : "seleccionada"}
+              value={id}
+            />
+          );
+        })}
         {libres.map((l) => (
           <input key={`${l.capa}:${l.texto}`} type="hidden" name="libre" value={`${l.capa}|${l.texto}`} />
         ))}

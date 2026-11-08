@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { MODO_DEMO } from "@/lib/demo";
 import type { GuiaTarifa } from "@/lib/formas";
+import { OFICIOS_PRESENCIALES_BASE } from "@/lib/oficios-presenciales";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 import { FormularioPerfil } from "./formulario";
@@ -10,7 +11,7 @@ import { FormularioPerfil } from "./formulario";
 export const metadata: Metadata = { title: "Crea tu perfil" };
 
 export default async function PerfilNuevo() {
-  if (MODO_DEMO) return <FormularioPerfil guias={[]} />;
+  if (MODO_DEMO) return <FormularioPerfil guias={[]} presenciales={OFICIOS_PRESENCIALES_BASE} />;
 
   const supabase = await crearClienteServidor();
   const {
@@ -22,6 +23,14 @@ export default async function PerfilNuevo() {
   const { data: perfil } = await supabase.from("talent_profiles").select("id").eq("user_id", user.id).maybeSingle();
   if (perfil) redirect("/mi-perfil");
 
-  const { data: guias } = await supabase.from("rate_guides").select("tipo, unidad, minimo, maximo");
-  return <FormularioPerfil guias={(guias ?? []) as GuiaTarifa[]} />;
+  const [{ data: guias }, { data: palabras }] = await Promise.all([
+    supabase.from("rate_guides").select("tipo, unidad, minimo, maximo"),
+    supabase.from("oficios_presenciales").select("palabra"),
+  ]);
+  return (
+    <FormularioPerfil
+      guias={(guias ?? []) as GuiaTarifa[]}
+      presenciales={palabras?.length ? palabras.map((x) => x.palabra as string) : OFICIOS_PRESENCIALES_BASE}
+    />
+  );
 }
