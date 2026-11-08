@@ -54,22 +54,22 @@ export function momentos(d: DatosMensaje): Momento[] {
     {
       id: "oportunidad_nueva",
       titulo: "Oportunidad nueva",
-      cuando: "Una organización verificada quiere conocer el perfil.",
+      cuando: "Una organización verificada quiere hablarle de un trabajo a la persona.",
       estado: "hoy",
       sms: `${n}: tienes una oportunidad nueva. Entra a ${d.enlace} con tu codigo. ${NADIE}`,
       whatsapp: {
-        texto: `Hola. Una organización verificada quiere conocer tu perfil en Kánna. Entra para ver de qué se trata y decir si te interesa.\n\n${NADIE}`,
+        texto: `Hola. Una organización verificada quiere hablarte de un trabajo en Kánna. Entra para ver de qué se trata y decir si te interesa.\n\n${NADIE}`,
         botones: ["Ver la oportunidad", "Quiero que me llamen"],
       },
     },
     {
       id: "conexion_abierta",
-      titulo: "La organización también quiere conocerte",
+      titulo: "La organización también quiere hablar contigo",
       cuando: "La organización acepta después del «Me interesa».",
       estado: "propuesta",
-      sms: `${n}: la organizacion tambien quiere conocerte. Te llamamos en las proximas 24 horas habiles para ponerlos en contacto.`,
+      sms: `${n}: la organizacion tambien quiere hablar contigo. Te llamamos en las proximas 24 horas habiles para ponerlos en contacto.`,
       whatsapp: {
-        texto: "¡Buenas noticias! La organización también quiere conocerte. En las próximas 24 horas hábiles te llamamos para ponerlos en contacto.",
+        texto: "¡Buenas noticias! La organización también quiere hablar contigo. En las próximas 24 horas hábiles te llamamos para ponerlos en contacto.",
         botones: ["Ver mi proceso"],
       },
     },

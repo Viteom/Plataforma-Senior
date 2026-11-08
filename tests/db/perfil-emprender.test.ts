@@ -72,6 +72,34 @@ describe("perfil de emprender", () => {
     await expect(comoConfirmado(otraPersona, (tx) => tx.query("select guardar_respuesta_paso('precio', 'hola')"))).rejects.toThrow(/sin ruta/);
   });
 
+  it("comunidad: solo el equipo la ve, y los celulares salen solo de quien aceptó, con registro", async () => {
+    const curador = await crearUsuario(db, "curador");
+    await db.query("update auth.users set phone = '573001112233' where id = $1", [talento]);
+    await db.query("update auth.users set phone = '573004445566' where id = $1", [otraPersona]);
+    const [luis] = await filas(db, "select id from talent_profiles where user_id = $1", [otraPersona]);
+    await comoConfirmado(otraPersona, (tx) =>
+      tx.query("insert into entrepreneurship_diagnostics (talent_id, etapa, categoria, quiere_oportunidades) values ($1, 'vendiendo', 'campo', true)", [luis.id]),
+    );
+    await comoConfirmado(talento, (tx) =>
+      tx.query("insert into entrepreneurship_diagnostics (talent_id, etapa, categoria, quiere_oportunidades) values ($1, 'idea', 'artesanias', false)", [perfil]),
+    );
+
+    await expect(como(db, talento, (tx) => tx.query("select * from comunidad_emprendedores()"))).rejects.toThrow(/sin permiso/);
+    const grupo = await como(db, curador, (tx) => filas(tx, "select nombre, categoria from comunidad_emprendedores() order by nombre"));
+    // Una fila por persona: el diagnóstico más reciente.
+    expect(grupo).toEqual([
+      { nombre: "Gloria", categoria: "artesanias" },
+      { nombre: "Luis", categoria: "campo" },
+    ]);
+
+    await expect(comoConfirmado(curador, (tx) => tx.query("select * from contactos_comunidad(null, ' ')"))).rejects.toThrow(/motivo/);
+    const contactos = await comoConfirmado(curador, (tx) => filas(tx, "select * from contactos_comunidad(null, 'Feria de Tunja')"));
+    expect(contactos).toEqual([{ nombre: "Luis", celular: "573004445566" }]);
+    const log = await filas(db, "select talent_id, motivo from private_access_log");
+    expect(log).toEqual([{ talent_id: luis.id, motivo: "Comunidad de emprendedores: Feria de Tunja" }]);
+    await expect(como(db, talento, (tx) => tx.query("select * from contactos_comunidad(null, 'Feria de Tunja')"))).rejects.toThrow(/sin permiso/);
+  });
+
   it("no deja marcar pasos con claves raras ni sin ruta", async () => {
     await expect(comoConfirmado(talento, (tx) => tx.query("select marcar_paso_emprender('x; drop', true)"))).rejects.toThrow(/paso no válido/);
     await expect(comoConfirmado(otraPersona, (tx) => tx.query("select marcar_paso_emprender('precio', true)"))).rejects.toThrow(/sin ruta/);

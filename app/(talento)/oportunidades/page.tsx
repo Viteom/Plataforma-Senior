@@ -212,8 +212,8 @@ function TarjetaProceso({
           id={`oportunidad-${o.id}`}
           titulo="Escucha de qué se trata"
           texto={[
-            `${o.empresa}${o.empresa_verificada ? ", una organización verificada por Kánna," : ""} quiere conocerte.`,
-            o.problema ? `Esto es lo que necesita: ${o.problema}` : "Vio tu perfil y quiere conocerte.",
+            `${o.empresa}${o.empresa_verificada ? ", una organización verificada por Kánna," : ""} quiere hablarte de un trabajo.`,
+            o.problema ? `Esto es lo que necesita: ${o.problema}` : "Vio tu perfil y quiere hablarte de un trabajo.",
             donde && `Es en ${donde}.`,
             como && `Busca a alguien para: ${como}.`,
             "Si te interesa, toca Me interesa. Si no, toca No me interesa: tu perfil sigue ahí.",
@@ -224,7 +224,7 @@ function TarjetaProceso({
         />
       )}
       {(nueva || o.problema) && (
-        <p className="text-lg">{o.problema ? `«${o.problema}»` : "Vio tu perfil y quiere conocerte."}</p>
+        <p className="text-lg">{o.problema ? `«${o.problema}»` : "Vio tu perfil y quiere hablarte de un trabajo."}</p>
       )}
       {nueva && (donde || como || o.sector) && (
         <ul className="flex flex-col gap-2.5">

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { MODO_DEMO } from "@/lib/demo";
-import { esClavePaso, esEtapa, esNecesidad, IDEA_MAX, RESPUESTA_MAX, rutaPara, type Paso } from "@/lib/emprende/ruta";
+import { esCategoria, esClavePaso, esEtapa, esNecesidad, IDEA_MAX, RESPUESTA_MAX, rutaPara, type Paso } from "@/lib/emprende/ruta";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type EstadoDiagnostico = { error?: string; ruta?: Paso[]; asesoria?: boolean; idea?: string };
@@ -13,6 +13,9 @@ export async function guardarDiagnostico(_p: EstadoDiagnostico, datos: FormData)
   const etapa = datos.get("etapa");
   const necesidades = datos.getAll("necesidades").filter(esNecesidad);
   const asesoria = datos.get("asesoria") === "si";
+  const crudo = datos.get("categoria");
+  const categoria = esCategoria(crudo) ? crudo : null;
+  const oportunidades = datos.get("oportunidades") === "si";
   const idea = String(datos.get("idea") ?? "").replace(/\s+/g, " ").trim().slice(0, IDEA_MAX) || null;
   if (!esEtapa(etapa)) return { error: "Elige en qué va tu negocio." };
   const ruta = rutaPara(etapa, necesidades);
@@ -44,7 +47,7 @@ export async function guardarDiagnostico(_p: EstadoDiagnostico, datos: FormData)
 
   const { error } = await supabase
     .from("entrepreneurship_diagnostics")
-    .insert({ talent_id: perfil.id, etapa, necesidades, quiere_asesoria: asesoria, idea, pasos_hechos: pasosHechos, respuestas_pasos: respuestasPasos });
+    .insert({ talent_id: perfil.id, etapa, necesidades, quiere_asesoria: asesoria, idea, categoria, quiere_oportunidades: oportunidades, pasos_hechos: pasosHechos, respuestas_pasos: respuestasPasos });
   if (error) return { error: "No pudimos guardar tu ruta. Intenta de nuevo o pide ayuda." };
   if (asesoria) {
     await supabase.from("help_requests").insert({

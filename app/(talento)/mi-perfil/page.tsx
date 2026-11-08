@@ -195,7 +195,7 @@ export default async function MiPerfil() {
             ))}
           </ul>
         ) : (
-          <p className="text-text-muted">Todavía ninguna. Aquí verás las empresas que quisieron conocerte.</p>
+          <p className="text-text-muted">Todavía ninguna. Aquí verás las organizaciones que quisieron hablarte de un trabajo.</p>
         )}
       </Seccion>
 

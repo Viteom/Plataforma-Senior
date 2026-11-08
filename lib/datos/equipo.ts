@@ -593,3 +593,33 @@ export async function etiquetasPorRevisar(): Promise<EtiquetaPorRevisar[]> {
     oficio: (t.talent_profiles as unknown as { oficio: string | null } | null)?.oficio ?? null,
   }));
 }
+
+// ── Comunidad de emprendedores ──────────────────────────────────────────────
+// El grupo interno: quien llenó Emprende, con su tipo de negocio. Sin celulares: esos salen solo
+// con un motivo y quedan registrados (contactos_comunidad).
+
+export type Emprendedor = {
+  talent_id: string;
+  nombre: string;
+  ubicacion: string | null;
+  categoria: string | null;
+  etapa: string;
+  idea: string | null;
+  quiere_asesoria: boolean;
+  quiere_oportunidades: boolean;
+  pasos_hechos: number;
+  actualizado_en: string;
+};
+
+export async function comunidadEmprendedores(): Promise<Emprendedor[]> {
+  if (MODO_DEMO) {
+    return [
+      { talent_id: "00000000-0000-4000-9700-000000000001", nombre: "Gloria Muñoz (ejemplo)", ubicacion: "Pasto, Nariño", categoria: "artesanias", etapa: "idea", idea: "Cerámica pintada a mano.", quiere_asesoria: false, quiere_oportunidades: true, pasos_hechos: 1, actualizado_en: "2026-11-05T15:00:00Z" },
+      { talent_id: "00000000-0000-4000-9700-000000000002", nombre: "Luis Ortega (ejemplo)", ubicacion: "Tunja, Boyacá", categoria: "campo", etapa: "vendiendo", idea: "Quesos y cuajada de finca.", quiere_asesoria: true, quiere_oportunidades: true, pasos_hechos: 2, actualizado_en: "2026-11-06T10:00:00Z" },
+      { talent_id: "00000000-0000-4000-9700-000000000003", nombre: "Marta Ríos (ejemplo)", ubicacion: "Cali, Valle del Cauca", categoria: "comida", etapa: "creciendo", idea: null, quiere_asesoria: false, quiere_oportunidades: false, pasos_hechos: 0, actualizado_en: "2026-11-04T09:00:00Z" },
+    ];
+  }
+  const supabase = await cliente();
+  const { data } = await supabase.rpc("comunidad_emprendedores");
+  return ((data ?? []) as Emprendedor[]).sort((a, b) => b.actualizado_en.localeCompare(a.actualizado_en));
+}

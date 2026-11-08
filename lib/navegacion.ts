@@ -11,6 +11,7 @@ import {
   House,
   Inbox,
   LayoutList,
+  Lightbulb,
   LifeBuoy,
   Search,
   SlidersHorizontal,
@@ -96,6 +97,7 @@ export const gruposEquipo: { titulo: string; items: ItemNav[] }[] = [
       { href: "/equipo/evidencias", etiqueta: "Evidencias y tarifas", icono: BadgeCheck },
       { href: "/equipo/etiquetas", etiqueta: "Etiquetas nuevas", icono: Tags },
       { href: "/equipo/experiencias", etiqueta: "Talento del campo", icono: Sprout },
+      { href: "/equipo/emprendedores", etiqueta: "Emprendedores", icono: Lightbulb },
       // ?desde=equipo: en la demostración muestra el enlace de vuelta al panel.
       { href: "/gestor/registrar?desde=equipo", etiqueta: "Registro asistido", icono: UserRoundPlus },
     ],

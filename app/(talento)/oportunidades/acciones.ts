@@ -38,7 +38,7 @@ async function actuar(datos: FormData, accion: "me_interesa" | "no_me_interesa")
       {},
       accion === "no_me_interesa"
         ? "Listo. No le compartimos nada a esa empresa."
-        : "¡Listo! Le contamos a la empresa. Si decide conocerte, alguien de nuestro equipo te llama.",
+        : "¡Listo! Le contamos a la empresa. Si decide seguir, alguien de nuestro equipo te llama para ponerlos en contacto.",
     );
   }
   const supabase = await crearClienteServidor();
@@ -60,7 +60,7 @@ async function actuar(datos: FormData, accion: "me_interesa" | "no_me_interesa")
     aviso:
       data === "abierta"
         ? "¡Listo! Alguien de nuestro equipo te llama para ponerte en contacto con la empresa."
-        : "¡Listo! Le contamos a la empresa. Si decide conocerte, alguien de nuestro equipo te llama.",
+        : "¡Listo! Le contamos a la empresa. Si decide seguir, alguien de nuestro equipo te llama para ponerlos en contacto.",
   };
 }
 

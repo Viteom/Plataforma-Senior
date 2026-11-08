@@ -53,8 +53,8 @@ export default async function Inicio() {
             {nuevas === 0
               ? "Cuéntanos qué sabes hacer"
               : nuevas === 1
-                ? "Una organización quiere conocerte"
-                : `${nuevas} organizaciones quieren conocerte`}
+                ? "Una organización quiere hablarte de un trabajo"
+                : `${nuevas} organizaciones quieren hablarte de un trabajo`}
           </h2>
           {nuevas === 0 && <p className="text-azul-claro">Hablando toma unos 5 minutos.</p>}
           <Button asChild variant="acento" ancho="completo" className="mt-1">

@@ -104,5 +104,5 @@ export const PREGUNTAS_HOME = {
 export const AUDIO_COMO_FUNCIONA =
   "Hola. Kánna conecta a personas de cuarenta y cinco años o más, y al talento del campo, con organizaciones que necesitan resolver retos concretos. " +
   "Si eres talento, nos cuentas tu historia hablando o escribiendo. Nosotros la ordenamos contigo en una huella de capacidades. " +
-  "Cuando una organización quiere conocerte, te avisamos por mensaje de texto y tú decides si te interesa. " +
+  "Cuando una organización quiere hablarte de un trabajo, te avisamos por mensaje de texto y tú decides si te interesa. " +
   "Tu edad nunca se muestra, y nadie te va a pedir dinero. Si necesitas ayuda, siempre hay una persona del equipo para acompañarte.";

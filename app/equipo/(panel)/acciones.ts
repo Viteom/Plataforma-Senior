@@ -624,3 +624,20 @@ export async function cambiarReglaTexto(_p: Estado, datos: FormData): Promise<Es
   revalidatePath("/equipo/semaforo");
   return { aviso: datos.get("activa") === "si" ? "Regla activada." : "Regla apagada." };
 }
+
+// ── Comunidad de emprendedores ──────────────────────────────────────────────
+
+export type EstadoContactos = Estado & { contactos?: { nombre: string; celular: string }[] };
+
+// Celulares de quienes aceptaron recibir ferias y oportunidades. El motivo es obligatorio y cada
+// persona consultada queda en el registro de accesos.
+export async function verContactosComunidad(_p: EstadoContactos, datos: FormData): Promise<EstadoContactos> {
+  const cat = texto(datos.get("categoria"), 20) || null;
+  const motivo = texto(datos.get("motivo"), 300);
+  if (motivo.length < 10) return { error: "Escribe para qué los vas a contactar (por ejemplo, la feria y la fecha)." };
+  if (MODO_DEMO) return { contactos: [{ nombre: "Gloria Muñoz (ejemplo)", celular: "573000000000" }], aviso: DEMO.aviso };
+  const { supabase } = await equipo();
+  const { data, error } = await supabase.rpc("contactos_comunidad", { cat, motivo });
+  if (error) return { error: "No pudimos traer los contactos. Revisa que tengas permiso." };
+  return { contactos: (data ?? []) as { nombre: string; celular: string }[] };
+}

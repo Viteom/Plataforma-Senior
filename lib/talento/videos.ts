@@ -20,7 +20,7 @@ export const VIDEOS_TALENTO: VideoTalento[] = [
     guion:
       "Hola. Kánna te conecta con organizaciones que necesitan resolver un reto concreto. " +
       "Primero nos cuentas lo que sabes hacer, hablando o escribiendo. Con eso armamos tu huella de experiencia. " +
-      "Cuando una organización quiere conocerte, te avisamos por mensaje de texto y en la app. " +
+      "Cuando una organización quiere hablarte de un trabajo, te avisamos por mensaje de texto y en la app. " +
       "Tú decides si te interesa. Si dices que sí, conversan, y si se ponen de acuerdo, empiezas a tu ritmo. " +
       "Tu edad nunca se muestra, y nadie te va a pedir dinero. Si necesitas ayuda, toca el botón de ayuda.",
   },
@@ -36,11 +36,11 @@ export const VIDEOS_TALENTO: VideoTalento[] = [
   },
   {
     id: "te-quieren-conocer",
-    titulo: "Qué pasa cuando te quieren conocer",
+    titulo: "Qué pasa cuando una organización quiere hablarte de un trabajo",
     minutos: 1,
     foto: "/web/home/contadora.webp",
     guion:
-      "Cuando una organización quiere conocerte, te llega un mensaje de texto. En Oportunidades ves qué necesita y dónde. " +
+      "Cuando una organización quiere hablarte de un trabajo, te llega un mensaje de texto. En Oportunidades ves qué necesita y dónde. " +
       "Si te interesa, toca Me interesa y te proponen una conversación. Si no, toca No me interesa: no pasa nada, tu perfil sigue ahí. " +
       "Antes de empezar, Kánna revisa que el acuerdo sea justo.",
   },

@@ -83,7 +83,7 @@ const PIEZAS_TALENTO = [
     ))}
   </div>,
   <p key="3" className="max-w-[22rem] rounded-t-md rounded-br-md rounded-bl-sm bg-raised px-4 py-3 text-base">
-    Kanna: una organizacion quiere conocer tu perfil. Entra a la app para ver de que se trata. Nadie te pedira dinero.
+    Kanna: una organizacion quiere hablarte de un trabajo. Entra a la app para ver de que se trata. Nadie te pedira dinero.
   </p>,
   <div key="4" className="flex flex-wrap gap-2">
     <span className="inline-flex min-h-12 items-center rounded-full bg-primary px-5 text-base font-semibold text-on-primary">Me interesa</span>

@@ -1,4 +1,4 @@
-import { ExternalLink, Pencil } from "lucide-react";
+import { ExternalLink, MessageCircle, Pencil, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -6,11 +6,14 @@ import { Pantalla } from "@/components/layout/pantalla";
 import { EscucharPantalla } from "@/components/talento/voz";
 import { buttonVariants } from "@/components/ui/button";
 import { miEmprendimiento, type MiEmprendimiento } from "@/lib/datos/emprende";
-import { etiquetaEtapa, rutaPara } from "@/lib/emprende/ruta";
+import { etiquetaCategoria, etiquetaEtapa, rutaPara } from "@/lib/emprende/ruta";
 
 import { Diagnostico, PasoRuta } from "./formulario";
 
 export const metadata: Metadata = { title: "Emprende" };
+
+const PASOS_A_LA_VEZ = 3;
+const WHATSAPP = (process.env.NEXT_PUBLIC_WHATSAPP_EQUIPO ?? "").replace(/\D/g, "");
 
 export default async function Emprende({ searchParams }: { searchParams: Promise<{ cambiar?: string }> }) {
   const { cambiar } = await searchParams;
@@ -27,14 +30,35 @@ export default async function Emprende({ searchParams }: { searchParams: Promise
 
   return (
     <Pantalla titulo="Emprende" intro="Cuéntanos en qué va tu negocio y te mostramos los pasos y cursos que te sirven. Queda guardado.">
-      <Diagnostico inicial={mio ? { etapa: mio.etapa, necesidades: mio.necesidades, idea: mio.idea, asesoria: mio.asesoria } : null} />
+      <Diagnostico inicial={mio ? {
+              etapa: mio.etapa,
+              necesidades: mio.necesidades,
+              idea: mio.idea,
+              asesoria: mio.asesoria,
+              categoria: mio.categoria,
+              oportunidades: mio.oportunidades,
+            } : null} />
     </Pantalla>
   );
 }
 
 function RutaGuardada({ mio }: { mio: MiEmprendimiento }) {
   const ruta = rutaPara(mio.etapa, mio.necesidades);
-  const hechos = ruta.filter((p) => mio.pasosHechos.includes(p.clave)).length;
+  const hechos = ruta.filter((p) => mio.pasosHechos.includes(p.clave));
+  // De a tres: los próximos pasos sin hacer. Al marcar uno, aparece el siguiente.
+  const pendientes = ruta.filter((p) => !mio.pasosHechos.includes(p.clave));
+  const proximos = pendientes.slice(0, PASOS_A_LA_VEZ);
+  const despues = pendientes.length - proximos.length;
+  const numero = (clave: string) => ruta.findIndex((p) => p.clave === clave) + 1;
+  const paso = (p: (typeof ruta)[number]) => (
+    <PasoRuta
+      key={p.clave}
+      paso={p}
+      numero={numero(p.clave)}
+      hechoInicial={mio.pasosHechos.includes(p.clave)}
+      respuestaInicial={mio.respuestas[p.clave] ?? ""}
+    />
+  );
   const fecha = (iso: string) => new Date(iso).toLocaleDateString("es-CO", { day: "numeric", month: "long", timeZone: "America/Bogota" });
 
   return (
@@ -44,7 +68,15 @@ function RutaGuardada({ mio }: { mio: MiEmprendimiento }) {
           Mi emprendimiento
         </h2>
         <p className="text-lg">{mio.idea ?? "Todavía no escribiste tu idea con tus palabras."}</p>
-        <p className="text-text-muted">En qué va: {etiquetaEtapa(mio.etapa)}</p>
+        <p className="text-text-muted">
+          {mio.categoria && `${etiquetaCategoria(mio.categoria)} · `}
+          {etiquetaEtapa(mio.etapa)}
+        </p>
+        <p className="text-base">
+          {mio.oportunidades
+            ? "Estás en el grupo de emprendedores: te escribimos cuando haya ferias o lugares para vender."
+            : "Si quieres recibir ferias y lugares para vender, actívalo en «Cambiar mis respuestas»."}
+        </p>
         <Link href="/emprende?cambiar=1" className={buttonVariants({ variant: "secundario", size: "normal", className: "mt-2 self-start" })}>
           <Pencil aria-hidden />
           Cambiar mis respuestas
@@ -56,19 +88,31 @@ function RutaGuardada({ mio }: { mio: MiEmprendimiento }) {
           Mi ruta
         </h2>
         <p className="font-bold">
-          Llevas {hechos} de {ruta.length} pasos.
+          Llevas {hechos.length} de {ruta.length} pasos.
         </p>
-        <ol className="flex flex-col gap-5">
-          {ruta.map((p, i) => (
-            <PasoRuta
-              key={p.clave}
-              paso={p}
-              numero={i + 1}
-              hechoInicial={mio.pasosHechos.includes(p.clave)}
-              respuestaInicial={mio.respuestas[p.clave] ?? ""}
-            />
-          ))}
-        </ol>
+        {proximos.length > 0 ? (
+          <>
+            <h3 className="text-lg">Tus próximos pasos</h3>
+            <ol className="flex flex-col gap-5">{proximos.map(paso)}</ol>
+            {despues > 0 && (
+              <p className="text-text-muted">
+                Cuando los termines, te mostramos {despues === 1 ? "el siguiente paso" : `los ${despues} pasos que siguen`}.
+              </p>
+            )}
+          </>
+        ) : (
+          <p role="status" className="rounded-md bg-exito-fondo p-4 text-lg font-bold text-exito-texto">
+            ¡Terminaste tu ruta! El siguiente paso es conversar con un asesor de Kánna.
+          </p>
+        )}
+        {hechos.length > 0 && (
+          <details className="rounded-lg bg-raised p-4 shadow-tarjeta">
+            <summary className="min-h-tap cursor-pointer content-center text-lg font-bold">
+              Lo que ya hiciste ({hechos.length})
+            </summary>
+            <ol className="mt-4 flex flex-col gap-5">{hechos.map(paso)}</ol>
+          </details>
+        )}
       </section>
 
       <section aria-labelledby="cursos-vistos" className="flex flex-col gap-3">
@@ -105,9 +149,24 @@ function RutaGuardada({ mio }: { mio: MiEmprendimiento }) {
         ) : (
           <p>Una persona del equipo te puede acompañar con tu ruta, por WhatsApp o por llamada.</p>
         )}
-        <Link href="/ayuda" className={buttonVariants({ variant: "secundario", size: "normal", className: "self-start" })}>
-          Hablar con un asesor
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          {WHATSAPP && (
+            // Texto fijo, sin datos personales en el enlace.
+            <a
+              href={`https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hola, quiero hablar con un asesor sobre mi ruta de Emprende en Kánna.")}`}
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ variant: pendientes.length ? "secundario" : "primario", size: "normal" })}
+            >
+              <MessageCircle aria-hidden />
+              Escribir por WhatsApp
+            </a>
+          )}
+          <Link href="/ayuda#llameme" className={buttonVariants({ variant: "secundario", size: "normal" })}>
+            <Phone aria-hidden />
+            Pedir que me llamen
+          </Link>
+        </div>
       </section>
     </>
   );

@@ -77,3 +77,18 @@ const PREGUNTA_PASO: Record<string, string> = {
   credito: "¿Qué opciones vas a averiguar?",
 };
 export const preguntaPaso = (clave: string) => PREGUNTA_PASO[clave] ?? "Escribe aquí lo que hiciste o lo que piensas hacer";
+
+// Tipo de negocio: arma los grupos internos de la comunidad de emprendedores.
+export type Categoria = "artesanias" | "comida" | "confeccion" | "campo" | "belleza" | "hogar" | "comercio" | "otro";
+export const CATEGORIAS: { valor: Categoria; etiqueta: string }[] = [
+  { valor: "artesanias", etiqueta: "Artesanías y manualidades" },
+  { valor: "comida", etiqueta: "Comida y bebidas" },
+  { valor: "confeccion", etiqueta: "Ropa y confección" },
+  { valor: "campo", etiqueta: "Productos del campo" },
+  { valor: "belleza", etiqueta: "Belleza y cuidado personal" },
+  { valor: "hogar", etiqueta: "Servicios para el hogar" },
+  { valor: "comercio", etiqueta: "Venta de productos" },
+  { valor: "otro", etiqueta: "Otro" },
+];
+export const esCategoria = (v: unknown): v is Categoria => CATEGORIAS.some((c) => c.valor === v);
+export const etiquetaCategoria = (c: Categoria) => CATEGORIAS.find((x) => x.valor === c)?.etiqueta ?? c;

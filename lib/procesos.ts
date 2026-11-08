@@ -108,7 +108,7 @@ export function situacion(p: DatosProceso, lado: Lado): Situacion {
   switch (e) {
     case "enviada_talento":
       return t
-        ? { etapa: "invitacion", turno: "tuyo", grupo: "turno", titulo: "Una organización quiere conocer tu perfil", detalle: "Dinos si te interesa." }
+        ? { etapa: "invitacion", turno: "tuyo", grupo: "turno", titulo: "Una organización quiere hablarte de un trabajo", detalle: "Dinos si te interesa." }
         : { etapa: "invitacion", turno: "otro", grupo: "proceso", titulo: "Esperando respuesta de la persona" };
     case "visible_empresa": {
       if (t) return { etapa: "interes", turno: "otro", grupo: "proceso", titulo: "Dijiste que te interesa", detalle: "Esperamos la respuesta de la organización." };

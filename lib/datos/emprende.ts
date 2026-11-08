@@ -1,7 +1,7 @@
 import "server-only";
 
 import { MODO_DEMO } from "@/lib/demo";
-import { esEtapa, esNecesidad, type Etapa, type Necesidad } from "@/lib/emprende/ruta";
+import { esCategoria, esEtapa, esNecesidad, type Categoria, type Etapa, type Necesidad } from "@/lib/emprende/ruta";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 // Perfil de emprender: lo último que la persona respondió, los pasos que ya hizo y los cursos que
@@ -13,6 +13,8 @@ export type MiEmprendimiento = {
   necesidades: Necesidad[];
   idea: string | null;
   asesoria: boolean;
+  categoria: Categoria | null;
+  oportunidades: boolean;
   pasosHechos: string[];
   respuestas: Record<string, string>;
   actualizado: string;
@@ -24,6 +26,8 @@ const EJEMPLO: MiEmprendimiento = {
   necesidades: ["precios", "digital"],
   idea: "Vender cerámica pintada a mano: materas y platos con diseños de Nariño.",
   asesoria: false,
+  categoria: "artesanias",
+  oportunidades: true,
   pasosHechos: ["idea-frase"],
   respuestas: { "idea-frase": "Materas y platos pintados a mano para quienes quieren un regalo de Nariño." },
   actualizado: "2026-11-05T15:00:00.000Z",
@@ -45,7 +49,7 @@ export async function miEmprendimiento(): Promise<MiEmprendimiento | null> {
   const [{ data: d }, { data: vistos }] = await Promise.all([
     supabase
       .from("entrepreneurship_diagnostics")
-      .select("etapa, necesidades, idea, quiere_asesoria, pasos_hechos, respuestas_pasos, actualizado_en")
+      .select("etapa, necesidades, idea, quiere_asesoria, categoria, quiere_oportunidades, pasos_hechos, respuestas_pasos, actualizado_en")
       .eq("talent_id", perfil.id)
       .order("creado_en", { ascending: false })
       .limit(1)
@@ -69,6 +73,8 @@ export async function miEmprendimiento(): Promise<MiEmprendimiento | null> {
     necesidades: ((d.necesidades as string[] | null) ?? []).filter(esNecesidad),
     idea: (d.idea as string | null) ?? null,
     asesoria: Boolean(d.quiere_asesoria),
+    categoria: esCategoria(d.categoria) ? d.categoria : null,
+    oportunidades: Boolean(d.quiere_oportunidades),
     pasosHechos: (d.pasos_hechos as string[] | null) ?? [],
     respuestas: Object.fromEntries(
       Object.entries((d.respuestas_pasos as Record<string, unknown> | null) ?? {}).filter(

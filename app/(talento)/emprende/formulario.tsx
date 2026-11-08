@@ -7,16 +7,25 @@ import { useState, useTransition } from "react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Opcion } from "@/components/ui/opcion";
 import { useAccion } from "@/components/ui/use-accion";
-import { ETAPAS, IDEA_MAX, NECESIDADES, preguntaPaso, RESPUESTA_MAX, type Etapa, type Necesidad, type Paso } from "@/lib/emprende/ruta";
+import { CATEGORIAS, ETAPAS, IDEA_MAX, NECESIDADES, preguntaPaso, RESPUESTA_MAX, type Categoria, type Etapa, type Necesidad, type Paso } from "@/lib/emprende/ruta";
 
 import { guardarDiagnostico, guardarRespuesta, marcarPaso, type EstadoDiagnostico } from "./acciones";
 
-type Inicial = { etapa: Etapa; necesidades: Necesidad[]; idea: string | null; asesoria: boolean } | null;
+type Inicial = {
+  etapa: Etapa;
+  necesidades: Necesidad[];
+  idea: string | null;
+  asesoria: boolean;
+  categoria: Categoria | null;
+  oportunidades: boolean;
+} | null;
 
 export function Diagnostico({ inicial }: { inicial?: Inicial }) {
   const [etapa, setEtapa] = useState<Etapa | null>(inicial?.etapa ?? null);
   const [necesidades, setNecesidades] = useState<Necesidad[]>(inicial?.necesidades ?? []);
   const [asesoria, setAsesoria] = useState(inicial?.asesoria ?? false);
+  const [categoria, setCategoria] = useState<Categoria | null>(inicial?.categoria ?? null);
+  const [oportunidades, setOportunidades] = useState(inicial?.oportunidades ?? false);
   const { estado, enviar, pendiente, alEnviar } = useAccion<EstadoDiagnostico>(guardarDiagnostico, {});
 
   // Con cuenta, al guardar se vuelve a la ruta guardada. Esto solo se ve en la demostración o
@@ -62,6 +71,12 @@ export function Diagnostico({ inicial }: { inicial?: Inicial }) {
         />
       </div>
       <fieldset className="flex flex-col gap-3">
+        <legend className="mb-3 text-lg font-bold">¿De qué es tu negocio?</legend>
+        {CATEGORIAS.map((c) => (
+          <Opcion key={c.valor} name="categoria" value={c.valor} checked={categoria === c.valor} onChange={() => setCategoria(c.valor)} titulo={c.etiqueta} />
+        ))}
+      </fieldset>
+      <fieldset className="flex flex-col gap-3">
         <legend className="mb-3 text-lg font-bold">¿En qué va tu negocio?</legend>
         {ETAPAS.map((e) => (
           <Opcion key={e.valor} name="etapa" value={e.valor} checked={etapa === e.valor} onChange={() => setEtapa(e.valor)} titulo={e.etiqueta} />
@@ -82,6 +97,15 @@ export function Diagnostico({ inicial }: { inicial?: Inicial }) {
           />
         ))}
       </fieldset>
+      <Opcion
+        tipo="checkbox"
+        name="oportunidades"
+        value="si"
+        checked={oportunidades}
+        onChange={() => setOportunidades(!oportunidades)}
+        titulo="Quiero recibir ferias y lugares para vender"
+        descripcion="Te sumamos al grupo de emprendedores de Kánna y te escribimos cuando haya algo para tu tipo de negocio. Puedes quitarlo cuando quieras."
+      />
       <Opcion tipo="checkbox" name="asesoria" value="si" checked={asesoria} onChange={() => setAsesoria(!asesoria)} titulo="Quiero que alguien me asesore" descripcion="Una persona del equipo te contacta." />
       {estado.error && (
         <p role="alert" className="font-bold text-danger">
