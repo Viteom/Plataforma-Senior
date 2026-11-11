@@ -435,3 +435,31 @@ html[data-enlaces="subrayados"] a {
   text-decoration: underline;
   text-underline-offset: 0.2em;
 }
+
+/* ── Páginas internas en la línea del home (Soy talento, Soy empresa) ──
+   El mismo fondo neutro, la tinta fría y los titulares en Geist del home, sin tocar las piezas:
+   dentro de .linea-home cambian los valores de los tokens y la letra del titular de marca. */
+.linea-home {
+  --color-bg: var(--color-neutro);
+  --color-surface: var(--color-neutro-2);
+  --color-surface-strong: #dcd9d1;
+  --color-border-subtle: #dcd9d1;
+  --color-text: var(--color-tinta);
+  background: var(--color-neutro);
+  color: var(--color-tinta);
+  font-family: var(--font-web);
+}
+
+@layer components {
+  .linea-home .titular-marca {
+    font-family: var(--font-web);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+  }
+  /* Los subtítulos que usaban la letra de marca también pasan a Geist. */
+  .linea-home .font-display {
+    font-family: var(--font-web);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+}

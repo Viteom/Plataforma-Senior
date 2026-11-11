@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils";
 import { MARCO } from "./marco";
 
 // Dos puertas: Soy talento y Soy empresa (Talento del campo vive dentro de la ruta de talento).
-// En el home va transparente sobre el banner y se vuelve sólida al bajar; en las demás páginas es
-// sólida desde el principio. La ayuda es el botón flotante (components/web/ayuda-flotante.tsx).
+// En el home y en las portadas oscuras (Soy talento, Soy empresa) va transparente sobre el banner y
+// se vuelve sólida al bajar; en las demás páginas es sólida desde el principio. La ayuda es el botón flotante (components/web/ayuda-flotante.tsx).
+const CON_PORTADA_OSCURA = ["/", "/talento", "/organizaciones"];
+
 export function CabeceraWeb() {
-  const enHome = usePathname() === "/";
+  const enHome = CON_PORTADA_OSCURA.includes(usePathname());
   const [solida, setSolida] = useState(!enHome);
 
   useEffect(() => {

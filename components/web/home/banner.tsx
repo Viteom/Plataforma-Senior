@@ -2,8 +2,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { RETRATOS } from "@/lib/web/home";
-
+import { FilaRetratos } from "../fila-retratos";
 import { Escuchar } from "./escuchar";
 import { FranjaOrganizaciones } from "./franja-organizaciones";
 
@@ -11,9 +10,6 @@ import { FranjaOrganizaciones } from "./franja-organizaciones";
 // 2) una fila de retratos altos que se desliza despacio, 3) la barra de organizaciones.
 // Sin fotos detrás del titular: el mensaje se lee primero y las personas llegan después.
 export function Banner() {
-  // La pista va dos veces para que el giro no tenga salto; la copia no se anuncia.
-  const pista = [...RETRATOS, ...RETRATOS];
-
   return (
     <section aria-labelledby="titulo-banner" className="overflow-hidden bg-deep text-on-deep">
       <div className="px-5 pt-36 pb-14 text-center font-web lg:pt-44 lg:pb-20">
@@ -45,33 +41,7 @@ export function Banner() {
         <Escuchar />
       </div>
 
-      {/* Retratos altos. Se detienen al pasar el mouse o al enfocarlos; con movimiento reducido
-          quedan quietos y se recorren de lado con el dedo. */}
-      <div
-        className="banda overflow-x-auto pb-14 motion-safe:overflow-x-hidden motion-reduce:snap-x motion-reduce:snap-mandatory lg:pb-20"
-        role="region"
-        aria-label="Retratos de oficios y profesiones"
-        tabIndex={0}
-      >
-        <ul className="banda-pista flex w-max gap-4 pr-4 motion-reduce:pl-4 md:gap-6 md:pr-6">
-          {pista.map(({ foto }, i) => (
-            <li
-              key={`${foto}-${i}`}
-              aria-hidden={i >= RETRATOS.length || undefined}
-              className="group relative aspect-[5/8] w-[min(58vw,17rem)] shrink-0 snap-start overflow-hidden rounded-retrato bg-primary md:w-80"
-            >
-              <Image
-                src={`/web/home/${foto}.webp`}
-                alt=""
-                fill
-                priority={i < 4}
-                sizes="(min-width: 768px) 20rem, 58vw"
-                className="object-cover object-[center_20%] transition-transform duration-700 ease-out group-hover:scale-105"
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <FilaRetratos className="pb-14 lg:pb-20" />
 
       <FranjaOrganizaciones />
     </section>
