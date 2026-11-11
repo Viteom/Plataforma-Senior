@@ -13,7 +13,9 @@ export type EstadoPerfil = { errores?: Errores; paso?: 1 | 2 | 3 };
 // Guarda el perfil en 3 pasos: talent_profiles, talent_offers y, por función, el requisito de
 // entrada y la autorización de datos en talent_private (nunca en el perfil: es dato de edad).
 export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Promise<EstadoPerfil> {
-  const resultado = validarPerfil(leerBorrador(datos.get("borrador")));
+  // «Entrar ya y completar después»: llega del botón, no del borrador.
+  const despues = datos.get("despues") === "si";
+  const resultado = validarPerfil({ ...leerBorrador(datos.get("borrador")), despues });
   if (!resultado.ok) return { errores: resultado.errores, paso: resultado.paso };
   const cv = String(datos.get("historia_cv") ?? "");
   const experienciaCv = cv ? experienciaHojaVida(cv, resultado.perfil.nombre) : "";
@@ -24,7 +26,7 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
       },
       paso: 1,
     };
-  if (MODO_DEMO) redirect("/huella");
+  if (MODO_DEMO) redirect(despues ? "/inicio" : "/huella");
 
   const p = resultado.perfil;
   const supabase = await crearClienteServidor();
@@ -70,17 +72,19 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
 
   // Formas de contratar: se reemplazan completas.
   await supabase.from("talent_offers").delete().eq("talent_id", perfil.id);
-  const { error: errorOfertas } = await supabase.from("talent_offers").insert(
-    p.formas.map((tipo) => ({
-      talent_id: perfil.id,
-      tipo,
-      horas_semana: p.horas,
-      modalidad: modalidadDeLaForma(tipo, p.modalidad, presencial, p.distancia),
-      tarifa_esperada: p.tarifas[tipo] ?? null,
-      quiere_orientacion: p.orientacion,
-    })),
-  );
-  if (errorOfertas) return general;
+  if (p.formas.length) {
+    const { error: errorOfertas } = await supabase.from("talent_offers").insert(
+      p.formas.map((tipo) => ({
+        talent_id: perfil.id,
+        tipo,
+        horas_semana: p.horas,
+        modalidad: modalidadDeLaForma(tipo, p.modalidad, presencial, p.distancia),
+        tarifa_esperada: p.tarifas[tipo] ?? null,
+        quiere_orientacion: p.orientacion,
+      })),
+    );
+    if (errorOfertas) return general;
+  }
 
   const { error: errorPrivado } = await supabase.rpc("guardar_datos_privados", {
     perfil: perfil.id,
@@ -130,5 +134,6 @@ export async function guardarPerfil(_previo: EstadoPerfil, datos: FormData): Pro
     if (errorHistoria) return general;
     redirect("/huella?fuente=hoja-vida");
   }
-  redirect("/huella");
+  // Con lo mínimo guardado entra de una vez; el inicio le muestra lo que falta.
+  redirect(despues ? "/inicio" : "/huella");
 }

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kánna · Propuesta visual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --crema:#f6efe4; --crema2:#ebe2d3; --crema3:#dcd0bd; --blanco:#fff;
+    --noche:#1e2a47; --profunda:#141d33; --maiz:#fad86a; --tinta:#141414; --suave:#5a5249;
+    --azul-claro:#b9c6e8; --borde:#7d746a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--crema);color:var(--tinta);font:18px/1.6 "Atkinson Hyperlegible",system-ui,sans-serif}
+  h1,h2,h3,.marca{font-family:"Bricolage Grotesque","Arial Black",sans-serif;font-weight:800;line-height:1.02;letter-spacing:-.02em;margin:0;text-wrap:balance}
+  .marco{max-width:1180px;margin:0 auto;padding:0 20px}
+  header{padding:28px 0 0}
+  header svg{height:44px;width:auto;color:var(--noche)}
+  .portada{padding:56px 0 72px}
+  .portada h1{font-size:clamp(2.6rem,7vw,5.4rem)}
+  .portada h1 span{color:var(--suave)}
+  .portada p{max-width:56ch;font-size:1.25rem;margin:24px 0 0}
+  .lock{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .muestra{display:flex;align-items:center;gap:10px;background:var(--blanco);border-radius:999px;padding:6px 16px 6px 6px;font-weight:700}
+  .muestra i{width:34px;height:34px;border-radius:50%;border:2px solid var(--crema3)}
+  section{padding:72px 0}
+  section.oscura{background:var(--profunda);color:var(--crema)}
+  section h2{font-size:clamp(2rem,4.6vw,3.4rem);max-width:18ch}
+  .intro{max-width:58ch;margin:18px 0 0}
+  .oscura .intro{color:var(--azul-claro)}
+
+  .hallazgos{display:grid;gap:14px;margin-top:40px}
+  .hallazgo{display:grid;gap:8px 28px;background:var(--blanco);border-radius:20px;padding:22px 24px}
+  @media(min-width:820px){.hallazgo{grid-template-columns:3.2rem 1fr 1fr;align-items:start}}
+  .hallazgo b.n{font:800 2rem/1 "Bricolage Grotesque",sans-serif;color:var(--noche)}
+  .hallazgo h3{font-size:1.3rem;line-height:1.15}
+  .hallazgo p{margin:6px 0 0}
+  .cambio{background:var(--crema);border-radius:14px;padding:14px 16px}
+  .cambio strong{display:block;font-size:1rem;color:var(--suave);letter-spacing:.02em}
+
+  .telefonos{display:grid;gap:36px;margin-top:48px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+  figure{margin:0}
+  figcaption{margin-top:18px}
+  figcaption h3{font-size:1.4rem}
+  figcaption p{margin:8px 0 0;color:var(--azul-claro)}
+  .tel{width:100%;max-width:330px;aspect-ratio:9/20.5;margin:0 auto;background:var(--crema);color:var(--tinta);border-radius:38px;border:9px solid #0b1020;overflow:hidden;display:flex;flex-direction:column;font-size:15px;line-height:1.4;position:relative}
+  .barra{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+  .barra svg{height:22px;width:auto;color:var(--noche)}
+  .ayuda{background:var(--noche);color:#fff;border-radius:999px;padding:5px 12px;font-weight:700;font-size:13px}
+  .cuerpo{flex:1;padding:8px 16px 54px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+  .saludo{font:800 30px/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+  .saludo small{display:block;font:400 15px/1.4 "Atkinson Hyperlegible",sans-serif;color:var(--suave);letter-spacing:0;margin-top:6px}
+  .heroe{background:var(--noche);color:#fff;border-radius:22px;padding:18px;position:relative;overflow:hidden;min-height:176px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
+  .heroe svg.motivo{position:absolute;right:-64px;top:-58px;width:200px;height:200px;opacity:.26}
+  .heroe .chip{align-self:flex-start;background:var(--maiz);color:var(--noche);border-radius:999px;padding:2px 12px;font-weight:700;font-size:13px}
+  .heroe b{font:800 22px/1.08 "Bricolage Grotesque",sans-serif;max-width:12ch;position:relative}
+  .boton{display:block;text-align:center;background:var(--maiz);color:var(--noche);border-radius:14px;padding:13px;font-weight:700;position:relative}
+  .boton.noche{background:var(--noche);color:#fff}
+  .boton.linea{background:transparent;border:2px solid var(--noche);color:var(--noche)}
+  .avance{background:#fff;border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center}
+  .aro{width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--noche) 0 66%,var(--crema3) 66% 100%);display:grid;place-items:center;flex:none}
+  .aro span{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+  .avance b{display:block}
+  .avance small{color:var(--suave);font-size:13px}
+  .atajos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .atajo{background:#fff;border-radius:16px;padding:12px;font-weight:700;display:flex;flex-direction:column;gap:14px}
+  .atajo i{width:34px;height:34px;border-radius:10px;background:var(--maiz);display:block}
+  .nav{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--crema3);padding:9px 6px 12px;font-size:11.5px;text-align:center;font-weight:700}
+  .nav span i{display:block;width:26px;height:26px;border-radius:9px;margin:0 auto 4px;background:var(--crema2)}
+  .nav .activo i{background:var(--maiz)}
+  .aa{position:absolute;left:10px;bottom:66px;width:40px;height:40px;border-radius:50%;background:var(--noche);color:#fff;display:grid;place-items:center;font-weight:700;border:2px solid #fff;font-size:14px}
+
+  .pasos{display:flex;gap:5px}.pasos i{flex:1;height:6px;border-radius:9px;background:var(--crema3)}.pasos i.si{background:var(--noche)}
+  .num{align-self:flex-start;flex:none;display:inline-grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--maiz);color:var(--noche);font:800 20px/1 "Bricolage Grotesque",sans-serif}
+  .pregunta{font:800 25px/1.06 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+  .opciones{display:flex;flex-direction:column;gap:9px}
+  .op{border:2px solid var(--borde);border-radius:16px;padding:13px 14px;background:var(--crema);display:flex;justify-content:space-between;align-items:center}
+  .op small{display:block;color:var(--suave);font-size:13px}
+  .op.si{border-color:var(--noche);background:var(--noche);color:#fff;font-weight:700}
+  .op.si small{color:var(--azul-claro)}
+  .op.si::after{content:"✓";font-weight:700}
+  .pie{margin-top:auto;margin-bottom:-40px;padding:0;display:flex;flex-direction:column;gap:8px}
+  .pie small{text-align:center;color:var(--suave);font-size:13px}
+
+  .tarjeta{background:#fff;border-radius:22px;overflow:hidden}
+  .tarjeta .cab{background:var(--noche);color:#fff;padding:16px;display:flex;flex-direction:column;gap:6px}
+  .tarjeta .cab small{color:var(--azul-claro);font-size:13px}
+  .tarjeta .cab b{font:800 21px/1.08 "Bricolage Grotesque",sans-serif}
+  .verif{align-self:flex-start;background:var(--maiz);color:var(--noche);border-radius:999px;padding:1px 10px;font-size:12px;font-weight:700}
+  .tarjeta .datos{padding:14px 16px;display:flex;flex-wrap:wrap;gap:7px}
+  .dato{background:var(--crema);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700}
+  .tarjeta .acc{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
+  .filtros{display:flex;gap:7px;flex-wrap:wrap}
+  .f{border:2px solid var(--borde);border-radius:999px;padding:5px 13px;font-size:13px;background:#fff}
+  .f.si{background:var(--tinta);border-color:var(--tinta);color:#fff;font-weight:700}
+  .aviso{background:var(--profunda);color:var(--azul-claro);border-radius:14px;padding:10px 12px;font-size:13px}
+  .aviso b{color:#fff}
+
+  .reglas{display:grid;gap:14px;margin-top:40px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .regla{background:var(--blanco);border-radius:20px;padding:22px}
+  .regla h3{font-size:1.25rem}
+  .regla ul{margin:12px 0 0;padding-left:20px}
+  .regla li{margin:6px 0}
+  .no{color:#b42318;font-weight:700}
+  .si-txt{font-weight:700}
+  footer{padding:40px 0 60px;color:var(--suave)}
+</style>
+</head>
+<body>
+<div class="marco">
+  <header><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -911.6 4540.76 1215.2" role="img" aria-label="Kánna"><g transform="translate(0 -871.6) scale(11.35)"><g fill="none" stroke-width="9.0" stroke-linecap="round"><path d="M50 37C50.74 36.52 52.7 34.8 54.42 34.12C56.14 33.44 58.21 32.94 60.32 32.9C62.42 32.87 64.81 33.15 67.06 33.91C69.31 34.66 71.72 35.84 73.83 37.45C75.95 39.05 78.06 41.14 79.73 43.56C81.4 45.98 82.91 48.88 83.85 51.97C84.79 55.06 85.4 58.58 85.38 62.1C85.35 65.63 84.85 69.47 83.71 73.12C82.57 76.77 79.38 82.17 78.51 83.98" stroke="#141D33"></path><path d="M62.36 45.98C63.05 46.54 65.3 47.88 66.49 49.32C67.67 50.75 68.79 52.58 69.47 54.58C70.15 56.59 70.61 58.96 70.58 61.35C70.54 63.74 70.16 66.41 69.26 68.92C68.36 71.44 67.01 74.11 65.19 76.45C63.38 78.79 61.05 81.11 58.37 82.95C55.69 84.79 52.49 86.45 49.1 87.49C45.71 88.53 39.86 88.92 38.01 89.21" stroke="#1E2A47"></path><path d="M57.64 60.52C57.33 61.34 56.74 63.9 55.74 65.47C54.75 67.04 53.35 68.66 51.66 69.93C49.96 71.2 47.85 72.37 45.57 73.08C43.28 73.78 40.62 74.24 37.95 74.16C35.28 74.09 32.33 73.62 29.54 72.62C26.76 71.62 23.82 70.12 21.25 68.14C18.67 66.16 16.11 63.63 14.07 60.73C12.03 57.82 9.85 52.38 9.01 50.72" stroke="#1E2A47"></path><path d="M42.36 60.52C41.48 60.47 38.87 60.71 37.06 60.24C35.26 59.78 33.29 58.96 31.56 57.73C29.83 56.51 28.06 54.87 26.68 52.91C25.3 50.96 24.05 48.57 23.3 46.01C22.54 43.45 22.07 40.49 22.16 37.53C22.26 34.58 22.77 31.32 23.86 28.26C24.95 25.19 26.56 21.98 28.69 19.14C30.82 16.3 35.33 12.55 36.65 11.23" stroke="#1E2A47"></path><path d="M37.64 45.98C37.41 45.13 36.38 42.72 36.26 40.86C36.15 39.01 36.32 36.87 36.94 34.85C37.57 32.83 38.59 30.64 40.02 28.72C41.46 26.81 43.34 24.88 45.54 23.37C47.75 21.86 50.41 20.5 53.25 19.67C56.1 18.85 59.35 18.33 62.6 18.42C65.85 18.51 69.41 19.05 72.76 20.2C76.12 21.35 81.08 24.47 82.74 25.33" stroke="#1E2A47"></path></g></g><g transform="translate(1415.76 0)"><g fill="#141414"><path d="M62 -720H220V0H62Z"></path><path d="M220 -168L452 -400 L600 -528H392L220 -356Z"></path><path d="M797 14Q753 14 719.0 -3.5Q685 -21 666.0 -54.5Q647 -88 647 -136Q647 -181 664.5 -210.5Q682 -240 715.5 -257.5Q749 -275 796.0 -286.5Q843 -298 903 -307Q932 -312 951.5 -316.5Q971 -321 981.0 -331.0Q991 -341 991 -360Q991 -385 973.0 -403.0Q955 -421 915 -421Q887 -421 864.5 -411.0Q842 -401 826.0 -382.0Q810 -363 802 -336L660 -378Q673 -420 696.5 -451.0Q720 -482 753.0 -502.5Q786 -523 828.5 -532.5Q871 -542 919 -542Q999 -542 1049.5 -516.5Q1100 -491 1124.5 -437.5Q1149 -384 1149 -300V-219Q1149 -183 1150.5 -146.5Q1152 -110 1154.5 -73.5Q1157 -37 1161 0H1019Q1015 -23 1011.0 -55.5Q1007 -88 1005 -122H986Q972 -84 945.5 -52.5Q919 -21 881.5 -3.5Q844 14 797 14ZM870 -100Q888 -100 906.5 -106.5Q925 -113 942.0 -124.5Q959 -136 973.0 -153.0Q987 -170 994 -190L992 -269L1014 -264Q995 -252 972.0 -245.0Q949 -238 925.5 -234.0Q902 -230 879.5 -225.5Q857 -221 839.5 -214.0Q822 -207 812.0 -195.0Q802 -183 802 -162Q802 -134 821.0 -117.0Q840 -100 870 -100Z"></path><path d="M1254 0V-318V-528H1384L1386 -373H1406Q1419 -429 1443.0 -467.0Q1467 -505 1504.0 -523.5Q1541 -542 1591 -542Q1684 -542 1732.5 -477.0Q1781 -412 1781 -270V0H1619V-252Q1619 -334 1595.5 -371.5Q1572 -409 1526 -409Q1488 -409 1463.5 -386.0Q1439 -363 1427.0 -325.0Q1415 -287 1415 -240V0Z"></path><path d="M1883 0V-318V-528H2013L2015 -373H2035Q2048 -429 2072.0 -467.0Q2096 -505 2133.0 -523.5Q2170 -542 2220 -542Q2313 -542 2361.5 -477.0Q2410 -412 2410 -270V0H2248V-252Q2248 -334 2224.5 -371.5Q2201 -409 2155 -409Q2117 -409 2092.5 -386.0Q2068 -363 2056.0 -325.0Q2044 -287 2044 -240V0Z"></path><path d="M2636 14Q2592 14 2558.0 -3.5Q2524 -21 2505.0 -54.5Q2486 -88 2486 -136Q2486 -181 2503.5 -210.5Q2521 -240 2554.5 -257.5Q2588 -275 2635.0 -286.5Q2682 -298 2742 -307Q2771 -312 2790.5 -316.5Q2810 -321 2820.0 -331.0Q2830 -341 2830 -360Q2830 -385 2812.0 -403.0Q2794 -421 2754 -421Q2726 -421 2703.5 -411.0Q2681 -401 2665.0 -382.0Q2649 -363 2641 -336L2499 -378Q2512 -420 2535.5 -451.0Q2559 -482 2592.0 -502.5Q2625 -523 2667.5 -532.5Q2710 -542 2758 -542Q2838 -542 2888.5 -516.5Q2939 -491 2963.5 -437.5Q2988 -384 2988 -300V-219Q2988 -183 2989.5 -146.5Q2991 -110 2993.5 -73.5Q2996 -37 3000 0H2858Q2854 -23 2850.0 -55.5Q2846 -88 2844 -122H2825Q2811 -84 2784.5 -52.5Q2758 -21 2720.5 -3.5Q2683 14 2636 14ZM2709 -100Q2727 -100 2745.5 -106.5Q2764 -113 2781.0 -124.5Q2798 -136 2812.0 -153.0Q2826 -170 2833 -190L2831 -269L2853 -264Q2834 -252 2811.0 -245.0Q2788 -238 2764.5 -234.0Q2741 -230 2718.5 -225.5Q2696 -221 2678.5 -214.0Q2661 -207 2651.0 -195.0Q2641 -183 2641 -162Q2641 -134 2660.0 -117.0Q2679 -100 2709 -100Z"></path></g><path d="M372 -300C462 -262 478 -92 572 -66" fill="none" stroke="#141414" stroke-width="132" stroke-linecap="round"></path><path d="M811 -628C871 -660 941 -720 983 -790" fill="none" stroke="#1E2A47" stroke-width="74" stroke-linecap="round"></path></g></svg></header>
+  <div class="portada">
+    <h1>La experiencia se ve <span>en lo que haces, no en la edad.</span></h1>
+    <p>Revisión visual de la app de Kánna y una propuesta más atractiva. Se mantienen los logos, los colores y las letras oficiales: cambia cómo se usan.</p>
+    <div class="lock" aria-label="Marca que se mantiene">
+      <span class="muestra"><i style="background:#1e2a47"></i>Azul noche</span>
+      <span class="muestra"><i style="background:#fad86a"></i>Maíz</span>
+      <span class="muestra"><i style="background:#f6efe4"></i>Crema</span>
+      <span class="muestra"><i style="background:#141d33"></i>Noche profunda</span>
+      <span class="muestra" style="padding-left:16px">Atkinson Hyperlegible · Bricolage Grotesque</span>
+    </div>
+  </div>
+</div>
+
+<section style="background:var(--crema2)">
+  <div class="marco">
+    <h2>Lo que hoy le resta a la app</h2>
+    <p class="intro">Cinco cosas que vi al recorrer inicio, registro y oportunidades, y qué propongo para cada una.</p>
+    <div class="hallazgos">
+      <div class="hallazgo"><b class="n">1</b>
+        <div><h3>Las imágenes cuentan la edad</h3><p>El inicio abre con fotos de rostros con canas y gafas. Antes de leer, la persona ya fue clasificada por su edad.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Mostrar el oficio: manos trabajando, herramientas, el resultado. Y usar el símbolo de Kánna como motivo gráfico, sin fotos de «persona mayor».</div></div>
+      <div class="hallazgo"><b class="n">2</b>
+        <div><h3>Íconos que señalan una condición</h3><p>El botón de letra usaba la figura de accesibilidad. Marca a quien lo toca como alguien «con un problema».</p></div>
+        <div class="cambio"><strong>YA CAMBIADO</strong>Ahora dice «Aa»: nombra lo que hace (letra y contraste), no a quién va dirigido.</div></div>
+      <div class="hallazgo"><b class="n">3</b>
+        <div><h3>Todo pesa lo mismo</h3><p>En el registro, cada pregunta es una caja crema con borde gris. Nada le dice al ojo por dónde empezar ni cuánto falta.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Una pregunta protagonista por pantalla, con su número en maíz y titular en Bricolage. La opción elegida se llena de azul noche.</div></div>
+      <div class="hallazgo"><b class="n">4</b>
+        <div><h3>La marca casi no aparece</h3><p>Mucho crema y poco azul noche y maíz. La app se siente como un formulario, no como Kánna.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Un bloque azul noche por pantalla para lo que le toca a la persona, y el maíz solo en la acción principal y en lo que ya logró.</div></div>
+      <div class="hallazgo"><b class="n">5</b>
+        <div><h3>No se ve el avance</h3><p>Quien entra con lo mínimo no sabe qué tan cerca está de recibir oportunidades.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Un aro de avance en el inicio («vas en 2 de 3») y la siguiente tarea con su tiempo: «3 preguntas», «5 minutos hablando».</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="oscura">
+  <div class="marco">
+    <h2>Así se vería</h2>
+    <p class="intro">Tres pantallas con la propuesta. Son maquetas: el contenido es de ejemplo.</p>
+    <div class="telefonos">
+      <figure>
+        <div class="tel">
+          <div class="barra"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -911.6 4540.76 1215.2" role="img" aria-label="Kánna"><g transform="translate(0 -871.6) scale(11.35)"><g fill="none" stroke-width="9.0" stroke-linecap="round"><path d="M50 37C50.74 36.52 52.7 34.8 54.42 34.12C56.14 33.44 58.21 32.94 60.32 32.9C62.42 32.87 64.81 33.15 67.06 33.91C69.31 34.66 71.72 35.84 73.83 37.45C75.95 39.05 78.06 41.14 79.73 43.56C81.4 45.98 82.91 48.88 83.85 51.97C84.79 55.06 85.4 58.58 85.38 62.1C85.35 65.63 84.85 69.47 83.71 73.12C82.57 76.77 79.38 82.17 78.51 83.98" stroke="#141D33"></path><path d="M62.36 45.98C63.05 46.54 65.3 47.88 66.49 49.32C67.67 50.75 68.79 52.58 69.47 54.58C70.15 56.59 70.61 58.96 70.58 61.35C70.54 63.74 70.16 66.41 69.26 68.92C68.36 71.44 67.01 74.11 65.19 76.45C63.38 78.79 61.05 81.11 58.37 82.95C55.69 84.79 52.49 86.45 49.1 87.49C45.71 88.53 39.86 88.92 38.01 89.21" stroke="#1E2A47"></path><path d="M57.64 60.52C57.33 61.34 56.74 63.9 55.74 65.47C54.75 67.04 53.35 68.66 51.66 69.93C49.96 71.2 47.85 72.37 45.57 73.08C43.28 73.78 40.62 74.24 37.95 74.16C35.28 74.09 32.33 73.62 29.54 72.62C26.76 71.62 23.82 70.12 21.25 68.14C18.67 66.16 16.11 63.63 14.07 60.73C12.03 57.82 9.85 52.38 9.01 50.72" stroke="#1E2A47"></path><path d="M42.36 60.52C41.48 60.47 38.87 60.71 37.06 60.24C35.26 59.78 33.29 58.96 31.56 57.73C29.83 56.51 28.06 54.87 26.68 52.91C25.3 50.96 24.05 48.57 23.3 46.01C22.54 43.45 22.07 40.49 22.16 37.53C22.26 34.58 22.77 31.32 23.86 28.26C24.95 25.19 26.56 21.98 28.69 19.14C30.82 16.3 35.33 12.55 36.65 11.23" stroke="#1E2A47"></path><path d="M37.64 45.98C37.41 45.13 36.38 42.72 36.26 40.86C36.15 39.01 36.32 36.87 36.94 34.85C37.57 32.83 38.59 30.64 40.02 28.72C41.46 26.81 43.34 24.88 45.54 23.37C47.75 21.86 50.41 20.5 53.25 19.67C56.1 18.85 59.35 18.33 62.6 18.42C65.85 18.51 69.41 19.05 72.76 20.2C76.12 21.35 81.08 24.47 82.74 25.33" stroke="#1E2A47"></path></g></g><g transform="translate(1415.76 0)"><g fill="#141414"><path d="M62 -720H220V0H62Z"></path><path d="M220 -168L452 -400 L600 -528H392L220 -356Z"></path><path d="M797 14Q753 14 719.0 -3.5Q685 -21 666.0 -54.5Q647 -88 647 -136Q647 -181 664.5 -210.5Q682 -240 715.5 -257.5Q749 -275 796.0 -286.5Q843 -298 903 -307Q932 -312 951.5 -316.5Q971 -321 981.0 -331.0Q991 -341 991 -360Q991 -385 973.0 -403.0Q955 -421 915 -421Q887 -421 864.5 -411.0Q842 -401 826.0 -382.0Q810 -363 802 -336L660 -378Q673 -420 696.5 -451.0Q720 -482 753.0 -502.5Q786 -523 828.5 -532.5Q871 -542 919 -542Q999 -542 1049.5 -516.5Q1100 -491 1124.5 -437.5Q1149 -384 1149 -300V-219Q1149 -183 1150.5 -146.5Q1152 -110 1154.5 -73.5Q1157 -37 1161 0H1019Q1015 -23 1011.0 -55.5Q1007 -88 1005 -122H986Q972 -84 945.5 -52.5Q919 -21 881.5 -3.5Q844 14 797 14ZM870 -100Q888 -100 906.5 -106.5Q925 -113 942.0 -124.5Q959 -136 973.0 -153.0Q987 -170 994 -190L992 -269L1014 -264Q995 -252 972.0 -245.0Q949 -238 925.5 -234.0Q902 -230 879.5 -225.5Q857 -221 839.5 -214.0Q822 -207 812.0 -195.0Q802 -183 802 -162Q802 -134 821.0 -117.0Q840 -100 870 -100Z"></path><path d="M1254 0V-318V-528H1384L1386 -373H1406Q1419 -429 1443.0 -467.0Q1467 -505 1504.0 -523.5Q1541 -542 1591 -542Q1684 -542 1732.5 -477.0Q1781 -412 1781 -270V0H1619V-252Q1619 -334 1595.5 -371.5Q1572 -409 1526 -409Q1488 -409 1463.5 -386.0Q1439 -363 1427.0 -325.0Q1415 -287 1415 -240V0Z"></path><path d="M1883 0V-318V-528H2013L2015 -373H2035Q2048 -429 2072.0 -467.0Q2096 -505 2133.0 -523.5Q2170 -542 2220 -542Q2313 -542 2361.5 -477.0Q2410 -412 2410 -270V0H2248V-252Q2248 -334 2224.5 -371.5Q2201 -409 2155 -409Q2117 -409 2092.5 -386.0Q2068 -363 2056.0 -325.0Q2044 -287 2044 -240V0Z"></path><path d="M2636 14Q2592 14 2558.0 -3.5Q2524 -21 2505.0 -54.5Q2486 -88 2486 -136Q2486 -181 2503.5 -210.5Q2521 -240 2554.5 -257.5Q2588 -275 2635.0 -286.5Q2682 -298 2742 -307Q2771 -312 2790.5 -316.5Q2810 -321 2820.0 -331.0Q2830 -341 2830 -360Q2830 -385 2812.0 -403.0Q2794 -421 2754 -421Q2726 -421 2703.5 -411.0Q2681 -401 2665.0 -382.0Q2649 -363 2641 -336L2499 -378Q2512 -420 2535.5 -451.0Q2559 -482 2592.0 -502.5Q2625 -523 2667.5 -532.5Q2710 -542 2758 -542Q2838 -542 2888.5 -516.5Q2939 -491 2963.5 -437.5Q2988 -384 2988 -300V-219Q2988 -183 2989.5 -146.5Q2991 -110 2993.5 -73.5Q2996 -37 3000 0H2858Q2854 -23 2850.0 -55.5Q2846 -88 2844 -122H2825Q2811 -84 2784.5 -52.5Q2758 -21 2720.5 -3.5Q2683 14 2636 14ZM2709 -100Q2727 -100 2745.5 -106.5Q2764 -113 2781.0 -124.5Q2798 -136 2812.0 -153.0Q2826 -170 2833 -190L2831 -269L2853 -264Q2834 -252 2811.0 -245.0Q2788 -238 2764.5 -234.0Q2741 -230 2718.5 -225.5Q2696 -221 2678.5 -214.0Q2661 -207 2651.0 -195.0Q2641 -183 2641 -162Q2641 -134 2660.0 -117.0Q2679 -100 2709 -100Z"></path></g><path d="M372 -300C462 -262 478 -92 572 -66" fill="none" stroke="#141414" stroke-width="132" stroke-linecap="round"></path><path d="M811 -628C871 -660 941 -720 983 -790" fill="none" stroke="#1E2A47" stroke-width="74" stroke-linecap="round"></path></g></svg><span class="ayuda">Ayuda</span></div>
+          <div class="cuerpo">
+            <div class="saludo">Hola, Gloria<small>Esto es lo que sigue para ti.</small></div>
+            <div class="heroe"><svg class="motivo" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 108 108" role="img" aria-label="Kánna"><g fill="none" stroke-width="9.0" stroke-linecap="round"><path d="M50 37C50.74 36.52 52.7 34.8 54.42 34.12C56.14 33.44 58.21 32.94 60.32 32.9C62.42 32.87 64.81 33.15 67.06 33.91C69.31 34.66 71.72 35.84 73.83 37.45C75.95 39.05 78.06 41.14 79.73 43.56C81.4 45.98 82.91 48.88 83.85 51.97C84.79 55.06 85.4 58.58 85.38 62.1C85.35 65.63 84.85 69.47 83.71 73.12C82.57 76.77 79.38 82.17 78.51 83.98" stroke="#FAD86A"></path><path d="M62.36 45.98C63.05 46.54 65.3 47.88 66.49 49.32C67.67 50.75 68.79 52.58 69.47 54.58C70.15 56.59 70.61 58.96 70.58 61.35C70.54 63.74 70.16 66.41 69.26 68.92C68.36 71.44 67.01 74.11 65.19 76.45C63.38 78.79 61.05 81.11 58.37 82.95C55.69 84.79 52.49 86.45 49.1 87.49C45.71 88.53 39.86 88.92 38.01 89.21" stroke="#F6EFE4"></path><path d="M57.64 60.52C57.33 61.34 56.74 63.9 55.74 65.47C54.75 67.04 53.35 68.66 51.66 69.93C49.96 71.2 47.85 72.37 45.57 73.08C43.28 73.78 40.62 74.24 37.95 74.16C35.28 74.09 32.33 73.62 29.54 72.62C26.76 71.62 23.82 70.12 21.25 68.14C18.67 66.16 16.11 63.63 14.07 60.73C12.03 57.82 9.85 52.38 9.01 50.72" stroke="#F6EFE4"></path><path d="M42.36 60.52C41.48 60.47 38.87 60.71 37.06 60.24C35.26 59.78 33.29 58.96 31.56 57.73C29.83 56.51 28.06 54.87 26.68 52.91C25.3 50.96 24.05 48.57 23.3 46.01C22.54 43.45 22.07 40.49 22.16 37.53C22.26 34.58 22.77 31.32 23.86 28.26C24.95 25.19 26.56 21.98 28.69 19.14C30.82 16.3 35.33 12.55 36.65 11.23" stroke="#F6EFE4"></path><path d="M37.64 45.98C37.41 45.13 36.38 42.72 36.26 40.86C36.15 39.01 36.32 36.87 36.94 34.85C37.57 32.83 38.59 30.64 40.02 28.72C41.46 26.81 43.34 24.88 45.54 23.37C47.75 21.86 50.41 20.5 53.25 19.67C56.1 18.85 59.35 18.33 62.6 18.42C65.85 18.51 69.41 19.05 72.76 20.2C76.12 21.35 81.08 24.47 82.74 25.33" stroke="#F6EFE4"></path></g></svg><span class="chip">Te toca a ti</span><b>Una organización quiere hablarte de un trabajo</b><span class="boton">Ver de qué se trata</span></div>
+            <div class="avance"><div class="aro"><span>2/3</span></div><div><b>Tu perfil va en 2 de 3</b><small>Falta decir cómo quieres trabajar · 3 preguntas</small></div></div>
+            <div class="atajos"><div class="atajo"><i></i>Mi perfil</div><div class="atajo"><i></i>Emprende</div></div>
+          </div>
+          <span class="aa">Aa</span>
+          <div class="nav"><span class="activo"><i></i>Inicio</span><span><i></i>Oportunidades</span><span><i></i>Mi perfil</span><span><i></i>Aprende</span></div>
+        </div>
+        <figcaption><h3>Inicio</h3><p>Un solo bloque azul noche dice qué le toca. El símbolo de Kánna reemplaza la foto. El aro muestra el avance.</p></figcaption>
+      </figure>
+      <figure>
+        <div class="tel">
+          <div class="barra"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -911.6 4540.76 1215.2" role="img" aria-label="Kánna"><g transform="translate(0 -871.6) scale(11.35)"><g fill="none" stroke-width="9.0" stroke-linecap="round"><path d="M50 37C50.74 36.52 52.7 34.8 54.42 34.12C56.14 33.44 58.21 32.94 60.32 32.9C62.42 32.87 64.81 33.15 67.06 33.91C69.31 34.66 71.72 35.84 73.83 37.45C75.95 39.05 78.06 41.14 79.73 43.56C81.4 45.98 82.91 48.88 83.85 51.97C84.79 55.06 85.4 58.58 85.38 62.1C85.35 65.63 84.85 69.47 83.71 73.12C82.57 76.77 79.38 82.17 78.51 83.98" stroke="#141D33"></path><path d="M62.36 45.98C63.05 46.54 65.3 47.88 66.49 49.32C67.67 50.75 68.79 52.58 69.47 54.58C70.15 56.59 70.61 58.96 70.58 61.35C70.54 63.74 70.16 66.41 69.26 68.92C68.36 71.44 67.01 74.11 65.19 76.45C63.38 78.79 61.05 81.11 58.37 82.95C55.69 84.79 52.49 86.45 49.1 87.49C45.71 88.53 39.86 88.92 38.01 89.21" stroke="#1E2A47"></path><path d="M57.64 60.52C57.33 61.34 56.74 63.9 55.74 65.47C54.75 67.04 53.35 68.66 51.66 69.93C49.96 71.2 47.85 72.37 45.57 73.08C43.28 73.78 40.62 74.24 37.95 74.16C35.28 74.09 32.33 73.62 29.54 72.62C26.76 71.62 23.82 70.12 21.25 68.14C18.67 66.16 16.11 63.63 14.07 60.73C12.03 57.82 9.85 52.38 9.01 50.72" stroke="#1E2A47"></path><path d="M42.36 60.52C41.48 60.47 38.87 60.71 37.06 60.24C35.26 59.78 33.29 58.96 31.56 57.73C29.83 56.51 28.06 54.87 26.68 52.91C25.3 50.96 24.05 48.57 23.3 46.01C22.54 43.45 22.07 40.49 22.16 37.53C22.26 34.58 22.77 31.32 23.86 28.26C24.95 25.19 26.56 21.98 28.69 19.14C30.82 16.3 35.33 12.55 36.65 11.23" stroke="#1E2A47"></path><path d="M37.64 45.98C37.41 45.13 36.38 42.72 36.26 40.86C36.15 39.01 36.32 36.87 36.94 34.85C37.57 32.83 38.59 30.64 40.02 28.72C41.46 26.81 43.34 24.88 45.54 23.37C47.75 21.86 50.41 20.5 53.25 19.67C56.1 18.85 59.35 18.33 62.6 18.42C65.85 18.51 69.41 19.05 72.76 20.2C76.12 21.35 81.08 24.47 82.74 25.33" stroke="#1E2A47"></path></g></g><g transform="translate(1415.76 0)"><g fill="#141414"><path d="M62 -720H220V0H62Z"></path><path d="M220 -168L452 -400 L600 -528H392L220 -356Z"></path><path d="M797 14Q753 14 719.0 -3.5Q685 -21 666.0 -54.5Q647 -88 647 -136Q647 -181 664.5 -210.5Q682 -240 715.5 -257.5Q749 -275 796.0 -286.5Q843 -298 903 -307Q932 -312 951.5 -316.5Q971 -321 981.0 -331.0Q991 -341 991 -360Q991 -385 973.0 -403.0Q955 -421 915 -421Q887 -421 864.5 -411.0Q842 -401 826.0 -382.0Q810 -363 802 -336L660 -378Q673 -420 696.5 -451.0Q720 -482 753.0 -502.5Q786 -523 828.5 -532.5Q871 -542 919 -542Q999 -542 1049.5 -516.5Q1100 -491 1124.5 -437.5Q1149 -384 1149 -300V-219Q1149 -183 1150.5 -146.5Q1152 -110 1154.5 -73.5Q1157 -37 1161 0H1019Q1015 -23 1011.0 -55.5Q1007 -88 1005 -122H986Q972 -84 945.5 -52.5Q919 -21 881.5 -3.5Q844 14 797 14ZM870 -100Q888 -100 906.5 -106.5Q925 -113 942.0 -124.5Q959 -136 973.0 -153.0Q987 -170 994 -190L992 -269L1014 -264Q995 -252 972.0 -245.0Q949 -238 925.5 -234.0Q902 -230 879.5 -225.5Q857 -221 839.5 -214.0Q822 -207 812.0 -195.0Q802 -183 802 -162Q802 -134 821.0 -117.0Q840 -100 870 -100Z"></path><path d="M1254 0V-318V-528H1384L1386 -373H1406Q1419 -429 1443.0 -467.0Q1467 -505 1504.0 -523.5Q1541 -542 1591 -542Q1684 -542 1732.5 -477.0Q1781 -412 1781 -270V0H1619V-252Q1619 -334 1595.5 -371.5Q1572 -409 1526 -409Q1488 -409 1463.5 -386.0Q1439 -363 1427.0 -325.0Q1415 -287 1415 -240V0Z"></path><path d="M1883 0V-318V-528H2013L2015 -373H2035Q2048 -429 2072.0 -467.0Q2096 -505 2133.0 -523.5Q2170 -542 2220 -542Q2313 -542 2361.5 -477.0Q2410 -412 2410 -270V0H2248V-252Q2248 -334 2224.5 -371.5Q2201 -409 2155 -409Q2117 -409 2092.5 -386.0Q2068 -363 2056.0 -325.0Q2044 -287 2044 -240V0Z"></path><path d="M2636 14Q2592 14 2558.0 -3.5Q2524 -21 2505.0 -54.5Q2486 -88 2486 -136Q2486 -181 2503.5 -210.5Q2521 -240 2554.5 -257.5Q2588 -275 2635.0 -286.5Q2682 -298 2742 -307Q2771 -312 2790.5 -316.5Q2810 -321 2820.0 -331.0Q2830 -341 2830 -360Q2830 -385 2812.0 -403.0Q2794 -421 2754 -421Q2726 -421 2703.5 -411.0Q2681 -401 2665.0 -382.0Q2649 -363 2641 -336L2499 -378Q2512 -420 2535.5 -451.0Q2559 -482 2592.0 -502.5Q2625 -523 2667.5 -532.5Q2710 -542 2758 -542Q2838 -542 2888.5 -516.5Q2939 -491 2963.5 -437.5Q2988 -384 2988 -300V-219Q2988 -183 2989.5 -146.5Q2991 -110 2993.5 -73.5Q2996 -37 3000 0H2858Q2854 -23 2850.0 -55.5Q2846 -88 2844 -122H2825Q2811 -84 2784.5 -52.5Q2758 -21 2720.5 -3.5Q2683 14 2636 14ZM2709 -100Q2727 -100 2745.5 -106.5Q2764 -113 2781.0 -124.5Q2798 -136 2812.0 -153.0Q2826 -170 2833 -190L2831 -269L2853 -264Q2834 -252 2811.0 -245.0Q2788 -238 2764.5 -234.0Q2741 -230 2718.5 -225.5Q2696 -221 2678.5 -214.0Q2661 -207 2651.0 -195.0Q2641 -183 2641 -162Q2641 -134 2660.0 -117.0Q2679 -100 2709 -100Z"></path></g><path d="M372 -300C462 -262 478 -92 572 -66" fill="none" stroke="#141414" stroke-width="132" stroke-linecap="round"></path><path d="M811 -628C871 -660 941 -720 983 -790" fill="none" stroke="#1E2A47" stroke-width="74" stroke-linecap="round"></path></g></svg><span class="ayuda">Ayuda</span></div>
+          <div class="cuerpo">
+            <div class="pasos"><i class="si"></i><i class="si"></i><i></i></div>
+            <span class="num">1</span>
+            <div class="pregunta">¿Cuántas horas a la semana puedes trabajar?</div>
+            <div class="opciones">
+              <div class="op"><span>Unas pocas<small>Hasta 10 horas</small></span></div>
+              <div class="op si"><span>Medio tiempo<small>Unas 20 horas</small></span></div>
+              <div class="op"><span>Casi todo el día<small>Unas 40 horas</small></span></div>
+              <div class="op"><span>Otro número</span></div>
+            </div>
+            <div class="pie"><span class="boton noche">Continuar</span><span class="boton linea">Entrar ya y completar después</span><small>Pregunta 1 de 3</small></div>
+          </div>
+        </div>
+        <figcaption><h3>Registro</h3><p>Una pregunta por pantalla, con su número en maíz. La respuesta elegida se llena de azul noche y lleva una marca.</p></figcaption>
+      </figure>
+      <figure>
+        <div class="tel">
+          <div class="barra"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -911.6 4540.76 1215.2" role="img" aria-label="Kánna"><g transform="translate(0 -871.6) scale(11.35)"><g fill="none" stroke-width="9.0" stroke-linecap="round"><path d="M50 37C50.74 36.52 52.7 34.8 54.42 34.12C56.14 33.44 58.21 32.94 60.32 32.9C62.42 32.87 64.81 33.15 67.06 33.91C69.31 34.66 71.72 35.84 73.83 37.45C75.95 39.05 78.06 41.14 79.73 43.56C81.4 45.98 82.91 48.88 83.85 51.97C84.79 55.06 85.4 58.58 85.38 62.1C85.35 65.63 84.85 69.47 83.71 73.12C82.57 76.77 79.38 82.17 78.51 83.98" stroke="#141D33"></path><path d="M62.36 45.98C63.05 46.54 65.3 47.88 66.49 49.32C67.67 50.75 68.79 52.58 69.47 54.58C70.15 56.59 70.61 58.96 70.58 61.35C70.54 63.74 70.16 66.41 69.26 68.92C68.36 71.44 67.01 74.11 65.19 76.45C63.38 78.79 61.05 81.11 58.37 82.95C55.69 84.79 52.49 86.45 49.1 87.49C45.71 88.53 39.86 88.92 38.01 89.21" stroke="#1E2A47"></path><path d="M57.64 60.52C57.33 61.34 56.74 63.9 55.74 65.47C54.75 67.04 53.35 68.66 51.66 69.93C49.96 71.2 47.85 72.37 45.57 73.08C43.28 73.78 40.62 74.24 37.95 74.16C35.28 74.09 32.33 73.62 29.54 72.62C26.76 71.62 23.82 70.12 21.25 68.14C18.67 66.16 16.11 63.63 14.07 60.73C12.03 57.82 9.85 52.38 9.01 50.72" stroke="#1E2A47"></path><path d="M42.36 60.52C41.48 60.47 38.87 60.71 37.06 60.24C35.26 59.78 33.29 58.96 31.56 57.73C29.83 56.51 28.06 54.87 26.68 52.91C25.3 50.96 24.05 48.57 23.3 46.01C22.54 43.45 22.07 40.49 22.16 37.53C22.26 34.58 22.77 31.32 23.86 28.26C24.95 25.19 26.56 21.98 28.69 19.14C30.82 16.3 35.33 12.55 36.65 11.23" stroke="#1E2A47"></path><path d="M37.64 45.98C37.41 45.13 36.38 42.72 36.26 40.86C36.15 39.01 36.32 36.87 36.94 34.85C37.57 32.83 38.59 30.64 40.02 28.72C41.46 26.81 43.34 24.88 45.54 23.37C47.75 21.86 50.41 20.5 53.25 19.67C56.1 18.85 59.35 18.33 62.6 18.42C65.85 18.51 69.41 19.05 72.76 20.2C76.12 21.35 81.08 24.47 82.74 25.33" stroke="#1E2A47"></path></g></g><g transform="translate(1415.76 0)"><g fill="#141414"><path d="M62 -720H220V0H62Z"></path><path d="M220 -168L452 -400 L600 -528H392L220 -356Z"></path><path d="M797 14Q753 14 719.0 -3.5Q685 -21 666.0 -54.5Q647 -88 647 -136Q647 -181 664.5 -210.5Q682 -240 715.5 -257.5Q749 -275 796.0 -286.5Q843 -298 903 -307Q932 -312 951.5 -316.5Q971 -321 981.0 -331.0Q991 -341 991 -360Q991 -385 973.0 -403.0Q955 -421 915 -421Q887 -421 864.5 -411.0Q842 -401 826.0 -382.0Q810 -363 802 -336L660 -378Q673 -420 696.5 -451.0Q720 -482 753.0 -502.5Q786 -523 828.5 -532.5Q871 -542 919 -542Q999 -542 1049.5 -516.5Q1100 -491 1124.5 -437.5Q1149 -384 1149 -300V-219Q1149 -183 1150.5 -146.5Q1152 -110 1154.5 -73.5Q1157 -37 1161 0H1019Q1015 -23 1011.0 -55.5Q1007 -88 1005 -122H986Q972 -84 945.5 -52.5Q919 -21 881.5 -3.5Q844 14 797 14ZM870 -100Q888 -100 906.5 -106.5Q925 -113 942.0 -124.5Q959 -136 973.0 -153.0Q987 -170 994 -190L992 -269L1014 -264Q995 -252 972.0 -245.0Q949 -238 925.5 -234.0Q902 -230 879.5 -225.5Q857 -221 839.5 -214.0Q822 -207 812.0 -195.0Q802 -183 802 -162Q802 -134 821.0 -117.0Q840 -100 870 -100Z"></path><path d="M1254 0V-318V-528H1384L1386 -373H1406Q1419 -429 1443.0 -467.0Q1467 -505 1504.0 -523.5Q1541 -542 1591 -542Q1684 -542 1732.5 -477.0Q1781 -412 1781 -270V0H1619V-252Q1619 -334 1595.5 -371.5Q1572 -409 1526 -409Q1488 -409 1463.5 -386.0Q1439 -363 1427.0 -325.0Q1415 -287 1415 -240V0Z"></path><path d="M1883 0V-318V-528H2013L2015 -373H2035Q2048 -429 2072.0 -467.0Q2096 -505 2133.0 -523.5Q2170 -542 2220 -542Q2313 -542 2361.5 -477.0Q2410 -412 2410 -270V0H2248V-252Q2248 -334 2224.5 -371.5Q2201 -409 2155 -409Q2117 -409 2092.5 -386.0Q2068 -363 2056.0 -325.0Q2044 -287 2044 -240V0Z"></path><path d="M2636 14Q2592 14 2558.0 -3.5Q2524 -21 2505.0 -54.5Q2486 -88 2486 -136Q2486 -181 2503.5 -210.5Q2521 -240 2554.5 -257.5Q2588 -275 2635.0 -286.5Q2682 -298 2742 -307Q2771 -312 2790.5 -316.5Q2810 -321 2820.0 -331.0Q2830 -341 2830 -360Q2830 -385 2812.0 -403.0Q2794 -421 2754 -421Q2726 -421 2703.5 -411.0Q2681 -401 2665.0 -382.0Q2649 -363 2641 -336L2499 -378Q2512 -420 2535.5 -451.0Q2559 -482 2592.0 -502.5Q2625 -523 2667.5 -532.5Q2710 -542 2758 -542Q2838 -542 2888.5 -516.5Q2939 -491 2963.5 -437.5Q2988 -384 2988 -300V-219Q2988 -183 2989.5 -146.5Q2991 -110 2993.5 -73.5Q2996 -37 3000 0H2858Q2854 -23 2850.0 -55.5Q2846 -88 2844 -122H2825Q2811 -84 2784.5 -52.5Q2758 -21 2720.5 -3.5Q2683 14 2636 14ZM2709 -100Q2727 -100 2745.5 -106.5Q2764 -113 2781.0 -124.5Q2798 -136 2812.0 -153.0Q2826 -170 2833 -190L2831 -269L2853 -264Q2834 -252 2811.0 -245.0Q2788 -238 2764.5 -234.0Q2741 -230 2718.5 -225.5Q2696 -221 2678.5 -214.0Q2661 -207 2651.0 -195.0Q2641 -183 2641 -162Q2641 -134 2660.0 -117.0Q2679 -100 2709 -100Z"></path></g><path d="M372 -300C462 -262 478 -92 572 -66" fill="none" stroke="#141414" stroke-width="132" stroke-linecap="round"></path><path d="M811 -628C871 -660 941 -720 983 -790" fill="none" stroke="#1E2A47" stroke-width="74" stroke-linecap="round"></path></g></svg><span class="ayuda">Ayuda</span></div>
+          <div class="cuerpo">
+            <div class="saludo" style="font-size:26px">Oportunidades</div>
+            <div class="filtros"><span class="f si">Todas</span><span class="f">Presencial</span><span class="f">Desde mi casa</span></div>
+            <div class="tarjeta">
+              <div class="cab"><span class="verif">Organización verificada</span><b>Quieren mejorar cómo atienden a sus clientes</b><small>Comercio · Pasto</small></div>
+              <div class="datos"><span class="dato">Por horas</span><span class="dato">Presencial</span><span class="dato">10 horas a la semana</span></div>
+              <div class="acc"><span class="boton">Me interesa</span><span class="boton linea">No por ahora</span></div>
+            </div>
+            <div class="aviso"><b>Nadie te va a pedir dinero.</b> Ni códigos ni pagos por exámenes o cursos.</div>
+          </div>
+          <span class="aa">Aa</span>
+          <div class="nav"><span><i></i>Inicio</span><span class="activo"><i></i>Oportunidades</span><span><i></i>Mi perfil</span><span><i></i>Aprende</span></div>
+        </div>
+        <figcaption><h3>Oportunidades</h3><p>La tarjeta abre con lo que la organización necesita. Los datos clave van en píldoras y la acción principal en maíz.</p></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="marco">
+    <h2>Reglas para no caer en estereotipos</h2>
+    <p class="intro">Para fotos, íconos y textos de aquí en adelante.</p>
+    <div class="reglas">
+      <div class="regla"><h3>Imágenes</h3><ul>
+        <li><span class="si-txt">Sí:</span> manos y oficio en acción, el trabajo terminado, espacios de trabajo reales de Colombia.</li>
+        <li><span class="no">No:</span> canas, bastones, gafas o arrugas como tema de la foto.</li>
+        <li><span class="no">No:</span> personas mirando una pantalla con cara de confusión.</li></ul></div>
+      <div class="regla"><h3>Íconos</h3><ul>
+        <li><span class="si-txt">Sí:</span> íconos que nombran la acción: «Aa», una lupa, un sol para el contraste.</li>
+        <li><span class="no">No:</span> pictogramas de persona, silla de ruedas, bastón o corazón con cruz.</li>
+        <li><span class="si-txt">Siempre</span> con texto visible al lado o debajo.</li></ul></div>
+      <div class="regla"><h3>Color y letra</h3><ul>
+        <li>Un bloque azul noche por pantalla: lo que le toca a la persona.</li>
+        <li>Maíz solo en la acción principal y en logros. Nunca como texto sobre crema o blanco.</li>
+        <li>Bricolage para la pregunta o el titular; Atkinson para todo lo que se lee.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="marco"><footer>Propuesta para revisión · Kánna · Los logos son los oficiales de <code>public/marca/</code>, sin redibujar.</footer></div>
+</body>
+</html>

@@ -5,11 +5,13 @@ import Link from "next/link";
 import { FRANJA } from "@/lib/web/home";
 
 import { Escuchar } from "./escuchar";
+import { FranjaOrganizaciones } from "./franja-organizaciones";
 
 // El banner a pantalla completa: nueve oficios y profesiones, el titular con el símbolo de Kánna
 // en medio y las dos puertas. En tablet quedan seis columnas y en celular cuatro.
 export function Banner() {
   return (
+    <>
     <section aria-labelledby="titulo-banner" className="relative h-svh min-h-[640px] overflow-hidden bg-tinta text-white">
       <div aria-hidden className="absolute inset-0 grid grid-cols-4 gap-[3px] md:grid-cols-6 xl:grid-cols-9">
         {/* Sin oficio ni ciudad encima: en las pruebas se leían como «lo que Kánna está buscando». */}
@@ -63,6 +65,9 @@ export function Banner() {
           <Escuchar />
         </div>
       </div>
+      <FranjaOrganizaciones variante="banner" />
     </section>
+    <FranjaOrganizaciones variante="debajo" />
+    </>
   );
 }

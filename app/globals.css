@@ -399,3 +399,39 @@
     animation: none;
   }
 }
+
+/*
+  Botón de accesibilidad (components/layout/accesibilidad.tsx). Todo se mide en rem, así que
+  agrandar la letra de <html> agranda textos, botones y espacios a la vez, como una lupa.
+*/
+html[data-letra="grande"] {
+  font-size: 112.5%;
+}
+html[data-letra="muy-grande"] {
+  font-size: 125%;
+}
+
+/* Alto contraste: fondo blanco, tinta negra y bordes fuertes. El maíz deja de ser fondo de texto. */
+html[data-contraste="alto"] {
+  --color-bg: #ffffff;
+  --color-surface: #f2f2f2;
+  --color-surface-strong: #dedede;
+  --color-raised: #ffffff;
+  --color-text: #000000;
+  --color-text-muted: #1f1f1f;
+  --color-border: #000000;
+  --color-border-subtle: #4d4d4d;
+  --color-primary: #000a2e;
+  --color-primary-hover: #000000;
+  --color-focus: #000000;
+  --color-neutro: #ffffff;
+  --color-neutro-2: #f2f2f2;
+  --color-tinta: #000000;
+  --color-tinta-suave: #1f1f1f;
+  --color-danger: #8f1209;
+}
+
+html[data-enlaces="subrayados"] a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}

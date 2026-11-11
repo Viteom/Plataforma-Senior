@@ -197,6 +197,7 @@ export default async function InicioOrganizacion() {
           <nav aria-label="Atajos" className="flex flex-col">
             {[
               { href: "/empresa/campo", texto: "Talento del campo", Icono: Sprout },
+              { href: "/empresa/beneficios", texto: "Beneficios en impuestos y preguntas", Icono: BadgeCheck },
               { href: "/empresa/equipo", texto: "Equipo de la organización", Icono: UsersRound },
             ].map(({ href, texto, Icono }) => (
               <Link key={href} href={href} className="flex min-h-action items-center gap-3 border-b border-border-subtle font-bold">

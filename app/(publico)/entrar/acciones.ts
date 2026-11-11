@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { enmascarar, hashDestino, normalizarCelular, normalizarCorreo } from "@/lib/auth/destino";
+import { dominioRecibeCorreo, sugerenciaCorreo } from "@/lib/auth/dominio";
 import { borrarPendiente, guardarPendiente, leerPendiente, type Para, type Pendiente } from "@/lib/auth/pendiente";
 import { inicioDe, type Rol } from "@/lib/auth/rutas";
 import { crearClienteServidor } from "@/lib/supabase/server";
@@ -37,6 +38,14 @@ async function pedirCodigo(p: Pendiente): Promise<EstadoEntrar | null> {
     return {
       error:
         "Ya pediste 5 códigos en la última hora. Espera un rato o pide ayuda y te colaboramos.",
+    };
+  }
+
+  // El dominio debe existir y recibir correo; si no, el código nunca llega. Se consulta después de
+  // contar el intento, para que nadie use este formulario para lanzar consultas sin límite.
+  if (p.tipo === "correo" && !(await dominioRecibeCorreo(p.valor))) {
+    return {
+      error: `No encontramos «${p.valor.split("@")[1]}». Revisa lo que va después de la @, por ejemplo gmail.com u hotmail.com.`,
     };
   }
 
@@ -77,6 +86,12 @@ export async function enviarCodigo(_previo: EstadoEntrar, datos: FormData): Prom
           ? "Escribe los 10 números del celular. Empieza por 3, por ejemplo 300 123 4567."
           : "Revisa el correo. Debe tener una @ y terminar en algo como .com o .co.",
     };
+  }
+
+  // Error de dedo conocido («@gamil.com»): se avisa de una vez, sin consultar nada ni gastar un intento.
+  if (medio === "correo") {
+    const sugerido = sugerenciaCorreo(valor);
+    if (sugerido) return { error: `Revisa el correo: ¿quisiste escribir ${sugerido}?` };
   }
 
   const pendiente: Pendiente = { tipo: medio, valor, para };

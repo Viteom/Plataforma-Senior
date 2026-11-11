@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { actividadVigente, crearActividad, COOKIE_ACTIVIDAD, opcionesCookieActividad } from "@/lib/auth/inactividad";
 import { decidirRuta, ENTRADA_EQUIPO, esPublica, esRolEquipo, type Rol } from "@/lib/auth/rutas";
+import { politicaContenido } from "@/lib/privacidad/cabeceras";
 import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseConfigurado } from "@/lib/supabase/config";
 
 // Refresca la sesión de Supabase y manda a cada rol a su área (lib/auth/rutas.ts).
@@ -10,20 +11,32 @@ import { SUPABASE_ANON_KEY, SUPABASE_URL, supabaseConfigurado } from "@/lib/supa
 // Las páginas públicas (web, ayuda, privacidad) no necesitan sesión: pasan sin consultar nada.
 // Solo las de entrar la revisan, para mandar a su inicio a quien ya entró.
 export async function middleware(request: NextRequest) {
-  if (!supabaseConfigurado) return NextResponse.next();
   const pathname = request.nextUrl.pathname;
   const esEntrada = pathname === "/entrar" || pathname.startsWith("/entrar/");
   if (esPublica(pathname) && !esEntrada) return NextResponse.next();
 
-  let respuesta = NextResponse.next({ request });
-  respuesta.headers.set("Cache-Control", "private, no-store, max-age=0");
+  // Páginas privadas: política de contenido con un identificador de un solo uso (nonce). Next lo
+  // lee de la petición y lo pone en sus propios scripts; cualquier otro script en línea no corre.
+  const nonce = btoa(crypto.randomUUID());
+  const politica = politicaContenido(process.env.NODE_ENV === "production", SUPABASE_URL, nonce);
+  const siguiente = () => {
+    const cabeceras = new Headers(request.headers);
+    cabeceras.set("x-nonce", nonce);
+    cabeceras.set("Content-Security-Policy", politica);
+    const r = NextResponse.next({ request: { headers: cabeceras } });
+    r.headers.set("Content-Security-Policy", politica);
+    r.headers.set("Cache-Control", "private, no-store, max-age=0");
+    return r;
+  };
+  if (!supabaseConfigurado) return siguiente();
+
+  let respuesta = siguiente();
   const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (lista) => {
         lista.forEach(({ name, value }) => request.cookies.set(name, value));
-        respuesta = NextResponse.next({ request });
-        respuesta.headers.set("Cache-Control", "private, no-store, max-age=0");
+        respuesta = siguiente();
         lista.forEach(({ name, value, options }) => respuesta.cookies.set(name, value, options));
       },
     },
@@ -75,6 +88,6 @@ export const config = {
   // Todo menos archivos estáticos, íconos, manifest, service worker e imágenes y fuentes de public/:
   // un archivo no necesita sesión, y cada foto de la web consultaba la sesión por su cuenta.
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|manifest.webmanifest|sw.js|swe-worker|iconos/|.*\\.(?:svg|png|jpe?g|webp|avif|gif|ico|txt|xml|woff2?)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.png|apple-icon.png|manifest.webmanifest|sw.js|letra-y-contraste.js|swe-worker|iconos/|.*\\.(?:svg|png|jpe?g|webp|avif|gif|ico|txt|xml|woff2?)$).*)",
   ],
 };

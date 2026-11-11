@@ -65,7 +65,9 @@ export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[];
   }, [estado]);
 
   function continuar(e: React.FormEvent) {
-    const encontrados = erroresDelPaso(b, paso);
+    // «Entrar ya y completar después» envía con lo que hay: solo revisa lo de este paso.
+    const despues = ((e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null)?.name === "despues";
+    const encontrados = erroresDelPaso({ ...b, despues }, paso);
     setErrores(encontrados);
     if (Object.keys(encontrados).length) {
       e.preventDefault();
@@ -80,7 +82,7 @@ export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[];
       return;
     }
     // Pasos 1 y 2 avanzan en el navegador; el 3 envía todo al servidor (POST).
-    if (paso < 3) {
+    if (paso < 3 && !despues) {
       e.preventDefault();
       setPaso((paso + 1) as 2 | 3);
     }
@@ -237,6 +239,28 @@ export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[];
                 </p>
               </div>
             )}
+            <div className="flex flex-col gap-2">
+              <Opcion
+                tipo="checkbox"
+                name="autorizo"
+                value="si"
+                checked={b.autorizo}
+                onChange={() => cambiar("autorizo", !b.autorizo)}
+                titulo={`Autorizo a ${MARCA.nombre} a usar mis datos para crear mi perfil y conectarme con empresas.`}
+                descripcion="Nunca le mostramos tu edad a una empresa. Puedes descargar o borrar tus datos cuando quieras."
+              />
+              <Link
+                href="/privacidad"
+                className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4"
+              >
+                Cómo cuidamos tus datos
+              </Link>
+              {errores.autorizo && (
+                <p role="alert" className="font-bold text-danger">
+                  {errores.autorizo}
+                </p>
+              )}
+            </div>
           </>
         )}
 
@@ -436,28 +460,6 @@ export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[];
               />
             </section>
 
-            <div className="flex flex-col gap-2">
-              <Opcion
-                tipo="checkbox"
-                name="autorizo"
-                value="si"
-                checked={b.autorizo}
-                onChange={() => cambiar("autorizo", !b.autorizo)}
-                titulo={`Autorizo a ${MARCA.nombre} a usar mis datos para crear mi perfil y conectarme con empresas.`}
-                descripcion="Nunca le mostramos tu edad a una empresa. Puedes descargar o borrar tus datos cuando quieras."
-              />
-              <Link
-                href="/privacidad"
-                className="inline-flex min-h-tap items-center self-start font-bold underline underline-offset-4"
-              >
-                Cómo cuidamos tus datos
-              </Link>
-              {errores.autorizo && (
-                <p role="alert" className="font-bold text-danger">
-                  {errores.autorizo}
-                </p>
-              )}
-            </div>
           </>
         )}
 
@@ -465,6 +467,16 @@ export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[];
           <Button type="submit" ancho="completo" disabled={noCumple || guardando}>
             {guardando ? "Guardando…" : paso < 3 ? "Continuar" : "Guardar y seguir"}
           </Button>
+          {paso < 3 && !noCumple && (
+            <div className="flex flex-col gap-1">
+              <Button type="submit" name="despues" value="si" variant="secundario" ancho="completo" disabled={guardando}>
+                Entrar ya y completar después
+              </Button>
+              <p className="text-center text-base text-text-muted">
+                Guardamos lo que llevas. Lo demás lo llenas cuando quieras desde el inicio.
+              </p>
+            </div>
+          )}
           {paso > 1 && (
             <Button type="button" variant="enlace" size="normal" onClick={() => setPaso((paso - 1) as 1 | 2)}>
               Volver al paso {paso - 1}
@@ -480,8 +492,14 @@ export function FormularioPerfil({ guias, presenciales }: { guias: GuiaTarifa[];
 function Pregunta({ numero, titulo, ayuda, children }: { numero: number; titulo: string; ayuda?: string; children: React.ReactNode }) {
   return (
     <fieldset className="flex flex-col gap-3">
-      <legend className="mb-1 flex items-baseline gap-2 text-lg font-bold">
-        <span className="text-text-muted">{numero} de 3 ·</span> {titulo}
+      <legend className="mb-2 flex flex-col items-start gap-3">
+        <span aria-hidden className="grid size-11 place-items-center rounded-md bg-accent font-display text-xl font-extrabold text-on-accent">
+          {numero}
+        </span>
+        <span className="font-display text-2xl leading-tight font-extrabold">
+          <span className="sr-only">Pregunta {numero} de 3: </span>
+          {titulo}
+        </span>
       </legend>
       {ayuda && <p className="mb-2 text-text-muted">{ayuda}</p>}
       {children}
@@ -511,7 +529,7 @@ function Chips({
             key={o.valor}
             className={cn(
               "inline-flex min-h-action cursor-pointer items-center gap-2 rounded-full border-2 px-5 text-lg transition-[background-color,transform] duration-100 active:scale-[0.98] has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-focus",
-              activa ? "border-text bg-surface-strong font-bold" : "border-border bg-bg hover:bg-surface",
+              activa ? "border-primary bg-primary font-bold text-on-primary" : "border-border bg-bg hover:bg-surface",
             )}
           >
             <input

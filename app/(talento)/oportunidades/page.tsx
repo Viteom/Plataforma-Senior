@@ -15,7 +15,8 @@ import type { CargaAcuerdo } from "@/lib/bienestar/resumen";
 import { listarOportunidades } from "@/lib/datos/consultas";
 import type { Oportunidad } from "@/lib/datos/tipos";
 import { MODO_DEMO } from "@/lib/demo";
-import { etiquetaForma, modalidades } from "@/lib/formas";
+import { esForma, etiquetaForma, modalidades, type FormaContratar } from "@/lib/formas";
+import { cn } from "@/lib/utils";
 import { avisoDemo, leerAvisos, textoAviso, type AvisoIngresos } from "@/lib/ingresos";
 import { fechaLarga, situacion, type Situacion } from "@/lib/procesos";
 
@@ -36,8 +37,20 @@ export const metadata: Metadata = { title: "Oportunidades" };
 
 const enlace = "inline-flex min-h-tap items-center gap-2 font-bold underline underline-offset-4";
 
-export default async function Oportunidades() {
-  const filas = await listarOportunidades();
+type Busqueda = { donde?: string; forma?: string };
+
+export default async function Oportunidades({ searchParams }: { searchParams: Promise<Busqueda> }) {
+  const todas = await listarOportunidades();
+  // Filtros: dónde es el trabajo y de qué forma. Van en la dirección (no son datos personales).
+  const { donde: dondeCrudo, forma: formaCruda } = await searchParams;
+  const donde = dondeCrudo === "presencial" || dondeCrudo === "remoto" ? dondeCrudo : undefined;
+  const forma = esForma(formaCruda) ? formaCruda : undefined;
+  const formasQueHay = [...new Set(todas.flatMap((o) => o.formatos ?? []))].filter(esForma);
+  const filas = todas.filter(
+    (o) =>
+      (!donde || o.modalidad === donde || o.modalidad === "mixto") &&
+      (!forma || (o.formatos ?? []).includes(forma)),
+  );
   const supabase = MODO_DEMO ? null : await crearClienteServidor();
   const cargas = new Map<string, CargaAcuerdo>();
   // Avisos por pensión o subsidio: los calcula la base con lo que la persona contó en privado.
@@ -105,7 +118,18 @@ export default async function Oportunidades() {
         </span>
       </p>
 
-      {oportunidades.length === 0 && (
+      {todas.length > 1 && <Filtros donde={donde} forma={forma} formas={formasQueHay} />}
+
+      {todas.length > 0 && oportunidades.length === 0 && (
+        <div role="status" className="flex flex-col items-start gap-2 rounded-lg bg-raised p-5 shadow-tarjeta">
+          <p className="font-bold">Ninguna oportunidad coincide con lo que elegiste.</p>
+          <Link href="/oportunidades" className={enlace}>
+            Ver todas
+          </Link>
+        </div>
+      )}
+
+      {todas.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-lg bg-raised px-5 py-10 text-center shadow-tarjeta">
           <Handshake aria-hidden className="size-12" />
           <h2 className="text-xl">Todavía no hay oportunidades</h2>
@@ -191,16 +215,16 @@ function TarjetaProceso({
 
   return (
     <article className="flex flex-col gap-4 rounded-lg bg-raised p-5 shadow-tarjeta">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-2xl">{o.empresa}</h3>
+      <div className="-mx-5 -mt-5 flex flex-col items-start gap-2 rounded-t-lg bg-primary p-5 text-on-primary">
         {o.empresa_verificada && (
-          <p className="flex items-center gap-2 font-bold">
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-0.5 text-base font-bold text-on-accent">
             <BadgeCheck aria-hidden className="size-5" />
-            Empresa verificada
+            Organización verificada
           </p>
         )}
+        <h3 className="text-2xl">{o.empresa}</h3>
         {!nueva && (o.sector || o.ciudad) && (
-          <p className="flex items-center gap-1 text-base text-text-muted">
+          <p className="flex items-center gap-1 text-base text-azul-claro">
             <MapPin aria-hidden className="size-4" />
             {[o.sector, o.ciudad].filter(Boolean).join(" · ")}
           </p>
@@ -433,5 +457,56 @@ function AvisosIngresos({ avisos }: { avisos: AvisoIngresos[] }) {
         Lo calculamos con lo que contaste en Mi perfil. La organización no lo ve.
       </p>
     </div>
+  );
+}
+
+// Filtros como enlaces grandes: funcionan sin JavaScript y el lector de pantalla dice cuál está elegido.
+function Filtros({ donde, forma, formas }: { donde?: string; forma?: FormaContratar; formas: FormaContratar[] }) {
+  const href = (d?: string, f?: string) => {
+    const q = new URLSearchParams();
+    if (d) q.set("donde", d);
+    if (f) q.set("forma", f);
+    const texto = q.toString();
+    return texto ? `/oportunidades?${texto}` : "/oportunidades";
+  };
+  const chip = (activo: boolean) =>
+    cn(
+      "inline-flex min-h-tap items-center rounded-full border-2 px-4 text-base transition-[background-color,transform] duration-100 active:scale-[0.97]",
+      activo ? "border-text bg-text font-bold text-bg" : "border-border bg-raised hover:bg-surface",
+    );
+  return (
+    <nav aria-label="Filtrar oportunidades" className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        <p className="font-bold">¿Dónde?</p>
+        <ul className="flex flex-wrap gap-2">
+          {[{ valor: undefined, etiqueta: "Todas" }, { valor: "presencial", etiqueta: "Presencial" }, { valor: "remoto", etiqueta: "Desde mi casa" }].map((d) => (
+            <li key={d.etiqueta}>
+              <Link href={href(d.valor, forma)} aria-current={donde === d.valor ? "true" : undefined} className={chip(donde === d.valor)}>
+                {d.etiqueta}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {formas.length > 1 && (
+        <div className="flex flex-col gap-2">
+          <p className="font-bold">¿De qué forma?</p>
+          <ul className="flex flex-wrap gap-2">
+            <li>
+              <Link href={href(donde)} aria-current={!forma ? "true" : undefined} className={chip(!forma)}>
+                Todas
+              </Link>
+            </li>
+            {formas.map((f) => (
+              <li key={f}>
+                <Link href={href(donde, f)} aria-current={forma === f ? "true" : undefined} className={chip(forma === f)}>
+                  {etiquetaForma(f)}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </nav>
   );
 }

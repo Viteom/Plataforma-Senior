@@ -31,7 +31,7 @@ export function Opcion({
     <label
       className={cn(
         "flex min-h-action items-start gap-3 rounded-md border-2 p-4 transition-[background-color,border-color,transform] duration-100 ease-out active:scale-[0.99] has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-offset-3 has-[:focus-visible]:outline-focus",
-        checked ? "border-text bg-surface-strong" : "border-border hover:bg-surface active:bg-surface-strong",
+        checked ? "border-primary bg-primary text-on-primary" : "border-border hover:bg-surface active:bg-surface-strong",
         className,
       )}
     >
@@ -41,12 +41,16 @@ export function Opcion({
         value={value}
         checked={checked}
         onChange={onChange}
-        className="mt-1 size-6 shrink-0 accent-[var(--color-primary)] focus-visible:outline-none"
+        className={cn(
+          "mt-1 size-6 shrink-0 focus-visible:outline-none",
+          // Sobre azul noche la marca va en maíz: se ve elegida sin depender solo del fondo.
+          checked ? "accent-[var(--color-accent)]" : "accent-[var(--color-primary)]",
+        )}
       />
       {icono}
       <span className="flex flex-col gap-1">
         <span className={cn("text-lg", checked && "font-bold")}>{titulo}</span>
-        {descripcion && <span className="text-base text-text-muted">{descripcion}</span>}
+        {descripcion && <span className={cn("text-base", checked ? "text-azul-claro" : "text-text-muted")}>{descripcion}</span>}
       </span>
     </label>
   );

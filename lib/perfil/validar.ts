@@ -31,6 +31,8 @@ export type BorradorPerfil = {
   distancia: boolean;
   visibilidad: string;
   autorizo: boolean;
+  // «Entrar ya y completar después»: guarda con lo mínimo (paso 1) y lo demás se llena en Mi perfil.
+  despues: boolean;
 };
 
 export type Postura = "de_pie" | "con_silla" | "igual";
@@ -113,6 +115,7 @@ export const borradorVacio: BorradorPerfil = {
   cedula: "",
   sexo: "",
   distancia: false,
+  despues: false,
   visibilidad: "reservado",
   autorizo: false,
 };
@@ -133,9 +136,12 @@ export function erroresDelPaso(b: BorradorPerfil, paso: 1 | 2 | 3): Errores {
     if (b.requisito !== "edad" && b.requisito !== "experiencia") {
       e.requisito = b.requisito === "ninguno" ? "Por ahora no podemos seguir." : "Elige una opción.";
     }
+    // La autorización va en el paso 1: sin ella no se guarda nada, ni siquiera el perfil mínimo.
+    if (!b.autorizo) e.autorizo = "Para crear tu perfil necesitamos tu autorización.";
   }
   if (paso === 2) {
-    if (!b.formas.length || !b.formas.every(esForma)) e.formas = "Elige al menos una forma de trabajar.";
+    // Quien entra ya y completa después puede dejar las formas en blanco.
+    if (!b.formas.every(esForma) || (!b.formas.length && !b.despues)) e.formas = "Elige al menos una forma de trabajar.";
     if (b.horas.trim()) {
       const h = Number(b.horas);
       if (!Number.isInteger(h) || h < 1 || h > 48) e.horas = "Escribe un número de horas entre 1 y 48.";
@@ -152,7 +158,6 @@ export function erroresDelPaso(b: BorradorPerfil, paso: 1 | 2 | 3): Errores {
     if (b.visibilidad !== "reservado" && b.visibilidad !== "visible") e.visibilidad = "Elige una opción.";
     const cedula = limpiarCedula(b.cedula);
     if (cedula && !cedulaValida(cedula)) e.cedula = "Revisa el número: solo números (y letras si es un documento de otro país).";
-    if (!b.autorizo) e.autorizo = "Para crear tu perfil necesitamos tu autorización.";
   }
   return e;
 }
@@ -229,5 +234,6 @@ export function leerBorrador(crudo: unknown): BorradorPerfil {
     distancia: datos.distancia === true,
     visibilidad: s(datos.visibilidad),
     autorizo: datos.autorizo === true,
+    despues: datos.despues === true,
   };
 }

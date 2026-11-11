@@ -28,9 +28,9 @@ import {
   type Estado,
 } from "./acciones";
 
-export function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+export function Seccion({ titulo, id, children }: { titulo: string; id?: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 border-b-2 border-border-subtle pb-8">
+    <section id={id} className="flex scroll-mt-24 flex-col gap-4 border-b-2 border-border-subtle pb-8">
       <h2 className="text-xl">{titulo}</h2>
       {children}
     </section>
@@ -321,7 +321,7 @@ export function SeccionFormas({ ofertas, guias }: { ofertas: Oferta[]; guias: Gu
 
   if (!editando) {
     return (
-      <Seccion titulo="Cómo me pueden contratar">
+      <Seccion titulo="Cómo me pueden contratar" id="formas">
         {ofertas.length ? (
           <ul className="flex flex-col gap-2">
             {ofertas.map((o) => (

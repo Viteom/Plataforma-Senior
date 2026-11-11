@@ -75,6 +75,23 @@ export const OFICIOS_HOME = [
   { nombre: "Carpintería", foto: foto("carpintero", 640, 853, "Retrato de un carpintero trabajando la madera"), pie: "Carpintero · Cali" },
 ];
 
+// Franja de organizaciones al pie del banner. Solo se listan organizaciones reales que dieron
+// permiso por escrito para aparecer: mostrar nombres inventados como si confiaran en Kánna sería
+// engañar. Mientras esté vacía, la franja no sale en el sitio público.
+//   logo: archivo en public/web/organizaciones/ (SVG de un solo color); sin logo se escribe el nombre.
+export type Organizacion = { nombre: string; logo?: string };
+export const ORGANIZACIONES: Organizacion[] = [];
+
+// Solo para la demostración: nombres ficticios para ver cómo quedaría la franja.
+export const ORGANIZACIONES_EJEMPLO: Organizacion[] = [
+  { nombre: "Cooperativa La Esperanza" },
+  { nombre: "Tejidos Guambía" },
+  { nombre: "Alimentos del Valle" },
+  { nombre: "Fundación Raíces" },
+  { nombre: "Ferretería El Roble" },
+  { nombre: "Café Montaña Alta" },
+];
+
 export const GARANTIAS = [
   { titulo: "NIT verificado", texto: "Revisamos el NIT de cada organización en el RUES antes de que pueda contactar a alguien." },
   { titulo: "Trabajo digno", texto: "Un semáforo revisa pago, jornada y descansos de cada reto y cada acuerdo." },

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kánna · Propuesta visual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --crema:#f6efe4; --crema2:#ebe2d3; --crema3:#dcd0bd; --blanco:#fff;
+    --noche:#1e2a47; --profunda:#141d33; --maiz:#fad86a; --tinta:#141414; --suave:#5a5249;
+    --azul-claro:#b9c6e8; --borde:#7d746a;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--crema);color:var(--tinta);font:18px/1.6 "Atkinson Hyperlegible",system-ui,sans-serif}
+  h1,h2,h3,.marca{font-family:"Bricolage Grotesque","Arial Black",sans-serif;font-weight:800;line-height:1.02;letter-spacing:-.02em;margin:0;text-wrap:balance}
+  .marco{max-width:1180px;margin:0 auto;padding:0 20px}
+  header{padding:28px 0 0}
+  header svg{height:44px;width:auto;color:var(--noche)}
+  .portada{padding:56px 0 72px}
+  .portada h1{font-size:clamp(2.6rem,7vw,5.4rem)}
+  .portada h1 span{color:var(--suave)}
+  .portada p{max-width:56ch;font-size:1.25rem;margin:24px 0 0}
+  .lock{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .muestra{display:flex;align-items:center;gap:10px;background:var(--blanco);border-radius:999px;padding:6px 16px 6px 6px;font-weight:700}
+  .muestra i{width:34px;height:34px;border-radius:50%;border:2px solid var(--crema3)}
+  section{padding:72px 0}
+  section.oscura{background:var(--profunda);color:var(--crema)}
+  section h2{font-size:clamp(2rem,4.6vw,3.4rem);max-width:18ch}
+  .intro{max-width:58ch;margin:18px 0 0}
+  .oscura .intro{color:var(--azul-claro)}
+
+  .hallazgos{display:grid;gap:14px;margin-top:40px}
+  .hallazgo{display:grid;gap:8px 28px;background:var(--blanco);border-radius:20px;padding:22px 24px}
+  @media(min-width:820px){.hallazgo{grid-template-columns:3.2rem 1fr 1fr;align-items:start}}
+  .hallazgo b.n{font:800 2rem/1 "Bricolage Grotesque",sans-serif;color:var(--noche)}
+  .hallazgo h3{font-size:1.3rem;line-height:1.15}
+  .hallazgo p{margin:6px 0 0}
+  .cambio{background:var(--crema);border-radius:14px;padding:14px 16px}
+  .cambio strong{display:block;font-size:1rem;color:var(--suave);letter-spacing:.02em}
+
+  .telefonos{display:grid;gap:36px;margin-top:48px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+  figure{margin:0}
+  figcaption{margin-top:18px}
+  figcaption h3{font-size:1.4rem}
+  figcaption p{margin:8px 0 0;color:var(--azul-claro)}
+  .tel{width:100%;max-width:330px;aspect-ratio:9/20.5;margin:0 auto;background:var(--crema);color:var(--tinta);border-radius:38px;border:9px solid #0b1020;overflow:hidden;display:flex;flex-direction:column;font-size:15px;line-height:1.4;position:relative}
+  .barra{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+  .barra svg{height:22px;width:auto;color:var(--noche)}
+  .ayuda{background:var(--noche);color:#fff;border-radius:999px;padding:5px 12px;font-weight:700;font-size:13px}
+  .cuerpo{flex:1;padding:8px 16px 54px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+  .saludo{font:800 30px/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+  .saludo small{display:block;font:400 15px/1.4 "Atkinson Hyperlegible",sans-serif;color:var(--suave);letter-spacing:0;margin-top:6px}
+  .heroe{background:var(--noche);color:#fff;border-radius:22px;padding:18px;position:relative;overflow:hidden;min-height:176px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
+  .heroe svg.motivo{position:absolute;right:-64px;top:-58px;width:200px;height:200px;opacity:.26}
+  .heroe .chip{align-self:flex-start;background:var(--maiz);color:var(--noche);border-radius:999px;padding:2px 12px;font-weight:700;font-size:13px}
+  .heroe b{font:800 22px/1.08 "Bricolage Grotesque",sans-serif;max-width:12ch;position:relative}
+  .boton{display:block;text-align:center;background:var(--maiz);color:var(--noche);border-radius:14px;padding:13px;font-weight:700;position:relative}
+  .boton.noche{background:var(--noche);color:#fff}
+  .boton.linea{background:transparent;border:2px solid var(--noche);color:var(--noche)}
+  .avance{background:#fff;border-radius:18px;padding:14px;display:flex;gap:12px;align-items:center}
+  .aro{width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--noche) 0 66%,var(--crema3) 66% 100%);display:grid;place-items:center;flex:none}
+  .aro span{width:40px;height:40px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+  .avance b{display:block}
+  .avance small{color:var(--suave);font-size:13px}
+  .atajos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .atajo{background:#fff;border-radius:16px;padding:12px;font-weight:700;display:flex;flex-direction:column;gap:14px}
+  .atajo i{width:34px;height:34px;border-radius:10px;background:var(--maiz);display:block}
+  .nav{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border-top:1px solid var(--crema3);padding:9px 6px 12px;font-size:11.5px;text-align:center;font-weight:700}
+  .nav span i{display:block;width:26px;height:26px;border-radius:9px;margin:0 auto 4px;background:var(--crema2)}
+  .nav .activo i{background:var(--maiz)}
+  .aa{position:absolute;left:10px;bottom:66px;width:40px;height:40px;border-radius:50%;background:var(--noche);color:#fff;display:grid;place-items:center;font-weight:700;border:2px solid #fff;font-size:14px}
+
+  .pasos{display:flex;gap:5px}.pasos i{flex:1;height:6px;border-radius:9px;background:var(--crema3)}.pasos i.si{background:var(--noche)}
+  .num{align-self:flex-start;flex:none;display:inline-grid;place-items:center;width:44px;height:44px;border-radius:14px;background:var(--maiz);color:var(--noche);font:800 20px/1 "Bricolage Grotesque",sans-serif}
+  .pregunta{font:800 25px/1.06 "Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+  .opciones{display:flex;flex-direction:column;gap:9px}
+  .op{border:2px solid var(--borde);border-radius:16px;padding:13px 14px;background:var(--crema);display:flex;justify-content:space-between;align-items:center}
+  .op small{display:block;color:var(--suave);font-size:13px}
+  .op.si{border-color:var(--noche);background:var(--noche);color:#fff;font-weight:700}
+  .op.si small{color:var(--azul-claro)}
+  .op.si::after{content:"✓";font-weight:700}
+  .pie{margin-top:auto;margin-bottom:-40px;padding:0;display:flex;flex-direction:column;gap:8px}
+  .pie small{text-align:center;color:var(--suave);font-size:13px}
+
+  .tarjeta{background:#fff;border-radius:22px;overflow:hidden}
+  .tarjeta .cab{background:var(--noche);color:#fff;padding:16px;display:flex;flex-direction:column;gap:6px}
+  .tarjeta .cab small{color:var(--azul-claro);font-size:13px}
+  .tarjeta .cab b{font:800 21px/1.08 "Bricolage Grotesque",sans-serif}
+  .verif{align-self:flex-start;background:var(--maiz);color:var(--noche);border-radius:999px;padding:1px 10px;font-size:12px;font-weight:700}
+  .tarjeta .datos{padding:14px 16px;display:flex;flex-wrap:wrap;gap:7px}
+  .dato{background:var(--crema);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700}
+  .tarjeta .acc{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
+  .filtros{display:flex;gap:7px;flex-wrap:wrap}
+  .f{border:2px solid var(--borde);border-radius:999px;padding:5px 13px;font-size:13px;background:#fff}
+  .f.si{background:var(--tinta);border-color:var(--tinta);color:#fff;font-weight:700}
+  .aviso{background:var(--profunda);color:var(--azul-claro);border-radius:14px;padding:10px 12px;font-size:13px}
+  .aviso b{color:#fff}
+
+  .reglas{display:grid;gap:14px;margin-top:40px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .regla{background:var(--blanco);border-radius:20px;padding:22px}
+  .regla h3{font-size:1.25rem}
+  .regla ul{margin:12px 0 0;padding-left:20px}
+  .regla li{margin:6px 0}
+  .no{color:#b42318;font-weight:700}
+  .si-txt{font-weight:700}
+  footer{padding:40px 0 60px;color:var(--suave)}
+</style>
+</head>
+<body>
+<div class="marco">
+  <header>{{LOGO}}</header>
+  <div class="portada">
+    <h1>La experiencia se ve <span>en lo que haces, no en la edad.</span></h1>
+    <p>Revisión visual de la app de Kánna y una propuesta más atractiva. Se mantienen los logos, los colores y las letras oficiales: cambia cómo se usan.</p>
+    <div class="lock" aria-label="Marca que se mantiene">
+      <span class="muestra"><i style="background:#1e2a47"></i>Azul noche</span>
+      <span class="muestra"><i style="background:#fad86a"></i>Maíz</span>
+      <span class="muestra"><i style="background:#f6efe4"></i>Crema</span>
+      <span class="muestra"><i style="background:#141d33"></i>Noche profunda</span>
+      <span class="muestra" style="padding-left:16px">Atkinson Hyperlegible · Bricolage Grotesque</span>
+    </div>
+  </div>
+</div>
+
+<section style="background:var(--crema2)">
+  <div class="marco">
+    <h2>Lo que hoy le resta a la app</h2>
+    <p class="intro">Cinco cosas que vi al recorrer inicio, registro y oportunidades, y qué propongo para cada una.</p>
+    <div class="hallazgos">
+      <div class="hallazgo"><b class="n">1</b>
+        <div><h3>Las imágenes cuentan la edad</h3><p>El inicio abre con fotos de rostros con canas y gafas. Antes de leer, la persona ya fue clasificada por su edad.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Mostrar el oficio: manos trabajando, herramientas, el resultado. Y usar el símbolo de Kánna como motivo gráfico, sin fotos de «persona mayor».</div></div>
+      <div class="hallazgo"><b class="n">2</b>
+        <div><h3>Íconos que señalan una condición</h3><p>El botón de letra usaba la figura de accesibilidad. Marca a quien lo toca como alguien «con un problema».</p></div>
+        <div class="cambio"><strong>YA CAMBIADO</strong>Ahora dice «Aa»: nombra lo que hace (letra y contraste), no a quién va dirigido.</div></div>
+      <div class="hallazgo"><b class="n">3</b>
+        <div><h3>Todo pesa lo mismo</h3><p>En el registro, cada pregunta es una caja crema con borde gris. Nada le dice al ojo por dónde empezar ni cuánto falta.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Una pregunta protagonista por pantalla, con su número en maíz y titular en Bricolage. La opción elegida se llena de azul noche.</div></div>
+      <div class="hallazgo"><b class="n">4</b>
+        <div><h3>La marca casi no aparece</h3><p>Mucho crema y poco azul noche y maíz. La app se siente como un formulario, no como Kánna.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Un bloque azul noche por pantalla para lo que le toca a la persona, y el maíz solo en la acción principal y en lo que ya logró.</div></div>
+      <div class="hallazgo"><b class="n">5</b>
+        <div><h3>No se ve el avance</h3><p>Quien entra con lo mínimo no sabe qué tan cerca está de recibir oportunidades.</p></div>
+        <div class="cambio"><strong>PROPUESTA</strong>Un aro de avance en el inicio («vas en 2 de 3») y la siguiente tarea con su tiempo: «3 preguntas», «5 minutos hablando».</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="oscura">
+  <div class="marco">
+    <h2>Así se vería</h2>
+    <p class="intro">Tres pantallas con la propuesta. Son maquetas: el contenido es de ejemplo.</p>
+    <div class="telefonos">
+      <figure>
+        <div class="tel">
+          <div class="barra">{{LOGO}}<span class="ayuda">Ayuda</span></div>
+          <div class="cuerpo">
+            <div class="saludo">Hola, Gloria<small>Esto es lo que sigue para ti.</small></div>
+            <div class="heroe">{{SIMBOLO_MOTIVO}}<span class="chip">Te toca a ti</span><b>Una organización quiere hablarte de un trabajo</b><span class="boton">Ver de qué se trata</span></div>
+            <div class="avance"><div class="aro"><span>2/3</span></div><div><b>Tu perfil va en 2 de 3</b><small>Falta decir cómo quieres trabajar · 3 preguntas</small></div></div>
+            <div class="atajos"><div class="atajo"><i></i>Mi perfil</div><div class="atajo"><i></i>Emprende</div></div>
+          </div>
+          <span class="aa">Aa</span>
+          <div class="nav"><span class="activo"><i></i>Inicio</span><span><i></i>Oportunidades</span><span><i></i>Mi perfil</span><span><i></i>Aprende</span></div>
+        </div>
+        <figcaption><h3>Inicio</h3><p>Un solo bloque azul noche dice qué le toca. El símbolo de Kánna reemplaza la foto. El aro muestra el avance.</p></figcaption>
+      </figure>
+      <figure>
+        <div class="tel">
+          <div class="barra">{{LOGO}}<span class="ayuda">Ayuda</span></div>
+          <div class="cuerpo">
+            <div class="pasos"><i class="si"></i><i class="si"></i><i></i></div>
+            <span class="num">1</span>
+            <div class="pregunta">¿Cuántas horas a la semana puedes trabajar?</div>
+            <div class="opciones">
+              <div class="op"><span>Unas pocas<small>Hasta 10 horas</small></span></div>
+              <div class="op si"><span>Medio tiempo<small>Unas 20 horas</small></span></div>
+              <div class="op"><span>Casi todo el día<small>Unas 40 horas</small></span></div>
+              <div class="op"><span>Otro número</span></div>
+            </div>
+            <div class="pie"><span class="boton noche">Continuar</span><span class="boton linea">Entrar ya y completar después</span><small>Pregunta 1 de 3</small></div>
+          </div>
+        </div>
+        <figcaption><h3>Registro</h3><p>Una pregunta por pantalla, con su número en maíz. La respuesta elegida se llena de azul noche y lleva una marca.</p></figcaption>
+      </figure>
+      <figure>
+        <div class="tel">
+          <div class="barra">{{LOGO}}<span class="ayuda">Ayuda</span></div>
+          <div class="cuerpo">
+            <div class="saludo" style="font-size:26px">Oportunidades</div>
+            <div class="filtros"><span class="f si">Todas</span><span class="f">Presencial</span><span class="f">Desde mi casa</span></div>
+            <div class="tarjeta">
+              <div class="cab"><span class="verif">Organización verificada</span><b>Quieren mejorar cómo atienden a sus clientes</b><small>Comercio · Pasto</small></div>
+              <div class="datos"><span class="dato">Por horas</span><span class="dato">Presencial</span><span class="dato">10 horas a la semana</span></div>
+              <div class="acc"><span class="boton">Me interesa</span><span class="boton linea">No por ahora</span></div>
+            </div>
+            <div class="aviso"><b>Nadie te va a pedir dinero.</b> Ni códigos ni pagos por exámenes o cursos.</div>
+          </div>
+          <span class="aa">Aa</span>
+          <div class="nav"><span><i></i>Inicio</span><span class="activo"><i></i>Oportunidades</span><span><i></i>Mi perfil</span><span><i></i>Aprende</span></div>
+        </div>
+        <figcaption><h3>Oportunidades</h3><p>La tarjeta abre con lo que la organización necesita. Los datos clave van en píldoras y la acción principal en maíz.</p></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="marco">
+    <h2>Reglas para no caer en estereotipos</h2>
+    <p class="intro">Para fotos, íconos y textos de aquí en adelante.</p>
+    <div class="reglas">
+      <div class="regla"><h3>Imágenes</h3><ul>
+        <li><span class="si-txt">Sí:</span> manos y oficio en acción, el trabajo terminado, espacios de trabajo reales de Colombia.</li>
+        <li><span class="no">No:</span> canas, bastones, gafas o arrugas como tema de la foto.</li>
+        <li><span class="no">No:</span> personas mirando una pantalla con cara de confusión.</li></ul></div>
+      <div class="regla"><h3>Íconos</h3><ul>
+        <li><span class="si-txt">Sí:</span> íconos que nombran la acción: «Aa», una lupa, un sol para el contraste.</li>
+        <li><span class="no">No:</span> pictogramas de persona, silla de ruedas, bastón o corazón con cruz.</li>
+        <li><span class="si-txt">Siempre</span> con texto visible al lado o debajo.</li></ul></div>
+      <div class="regla"><h3>Color y letra</h3><ul>
+        <li>Un bloque azul noche por pantalla: lo que le toca a la persona.</li>
+        <li>Maíz solo en la acción principal y en logros. Nunca como texto sobre crema o blanco.</li>
+        <li>Bricolage para la pregunta o el titular; Atkinson para todo lo que se lee.</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<div class="marco"><footer>Propuesta para revisión · Kánna · Los logos son los oficiales de <code>public/marca/</code>, sin redibujar.</footer></div>
+</body>
+</html>

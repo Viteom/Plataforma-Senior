@@ -30,7 +30,7 @@ describe("validarPerfil", () => {
   it("devuelve el primer paso con errores", () => {
     expect(validarPerfil({ ...completo, oficio: "" })).toMatchObject({ ok: false, paso: 1 });
     expect(validarPerfil({ ...completo, formas: [] })).toMatchObject({ ok: false, paso: 2 });
-    expect(validarPerfil({ ...completo, autorizo: false })).toMatchObject({ ok: false, paso: 3 });
+    expect(validarPerfil({ ...completo, autorizo: false })).toMatchObject({ ok: false, paso: 1 });
   });
 
   it("no deja seguir sin cumplir el requisito de entrada", () => {

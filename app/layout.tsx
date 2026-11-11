@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
+import { Accesibilidad } from "@/components/layout/accesibilidad";
 import { ToqueActivo } from "@/components/layout/toque-activo";
 import { esProduccion } from "@/lib/ambiente";
 import { MARCA } from "@/lib/marca";
@@ -59,6 +60,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es-CO" className={`${atkinson.variable} ${bricolage.variable} ${geist.variable} ${instrument.variable}`}>
       <body className="min-h-dvh antialiased">
+        {/* Aplica la letra grande y el contraste guardados antes de pintar, para que no parpadee.
+            Es un archivo propio y no un script en línea: así la política de contenido lo deja pasar. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/letra-y-contraste.js" />
         <a
           href="#contenido"
           className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-3 focus:text-on-primary"
@@ -72,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </p>
         )}
         {children}
+        <Accesibilidad />
         <ToqueActivo />
       </body>
     </html>
