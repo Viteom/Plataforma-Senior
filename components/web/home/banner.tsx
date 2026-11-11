@@ -2,72 +2,78 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { FRANJA } from "@/lib/web/home";
+import { RETRATOS } from "@/lib/web/home";
 
 import { Escuchar } from "./escuchar";
 import { FranjaOrganizaciones } from "./franja-organizaciones";
 
-// El banner a pantalla completa: nueve oficios y profesiones, el titular con el símbolo de Kánna
-// en medio y las dos puertas. En tablet quedan seis columnas y en celular cuatro.
+// El banner en tres tiempos sobre noche profunda: 1) solo los títulos y las dos puertas,
+// 2) una fila de retratos altos que se desliza despacio, 3) la barra de organizaciones.
+// Sin fotos detrás del titular: el mensaje se lee primero y las personas llegan después.
 export function Banner() {
-  return (
-    <>
-    <section aria-labelledby="titulo-banner" className="relative h-svh min-h-[640px] overflow-hidden bg-tinta text-white">
-      <div aria-hidden className="absolute inset-0 grid grid-cols-4 gap-[3px] md:grid-cols-6 xl:grid-cols-9">
-        {/* Sin oficio ni ciudad encima: en las pruebas se leían como «lo que Kánna está buscando». */}
-        {FRANJA.map(({ foto, oficio }, i) => (
-          <div key={oficio} className={`relative overflow-hidden ${i >= 6 ? "hidden xl:block" : i >= 4 ? "hidden md:block" : ""}`}>
-            <Image
-              src={foto.src}
-              alt=""
-              fill
-              priority={i < 4}
-              sizes="(min-width: 1280px) 11vw, (min-width: 768px) 17vw, 25vw"
-              className="respira object-cover object-[center_22%]"
-              style={{ animationDelay: `${-(i % 3) * 5}s` }}
-            />
-          </div>
-        ))}
-      </div>
-      <div aria-hidden className="velo-banner pointer-events-none absolute inset-0" />
+  // La pista va dos veces para que el giro no tenga salto; la copia no se anuncia.
+  const pista = [...RETRATOS, ...RETRATOS];
 
-      <div className="relative z-10 grid h-full place-items-center px-5 pt-24 pb-32 text-center font-web">
-        <div>
-          <h1
-            id="titulo-banner"
-            className="grid items-center justify-items-center gap-1.5 text-banner font-semibold tracking-[-0.045em] text-balance md:grid-cols-[auto_auto_auto] md:gap-x-[0.28em]"
+  return (
+    <section aria-labelledby="titulo-banner" className="overflow-hidden bg-deep text-on-deep">
+      <div className="px-5 pt-36 pb-14 text-center font-web lg:pt-44 lg:pb-20">
+        <Image src="/marca/kanna-simbolo-negativo.svg" alt="" width={96} height={96} unoptimized className="mx-auto w-14 lg:w-20" />
+        <h1 id="titulo-banner" className="mt-6 text-banner font-semibold tracking-[-0.045em] text-balance">
+          Tu experiencia <span className="block font-editorial font-normal tracking-[-0.02em] text-accent">abre caminos</span>
+        </h1>
+        <p className="mx-auto mt-6 max-w-[40ch] text-lg text-azul-claro sm:text-xl">
+          Para personas de 45 años o más y talento del campo colombiano. Oficios y profesiones, al mismo nivel.
+        </p>
+        {/* Una talento de 60 años tocó «Buscar talento» creyendo que era para ella: la pregunta va
+            explícita y cada botón dice quién es la persona, no qué busca la plataforma. */}
+        <p className="mt-8 text-xl font-semibold">¿Buscas trabajo o buscas talento?</p>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/entrar"
+            className="inline-flex min-h-action items-center gap-2 rounded-full bg-accent px-7 text-lg font-semibold text-on-accent transition-colors hover:bg-accent-hover active:scale-[0.97]"
           >
-            <span>Tu experiencia</span>
-            <Image src="/marca/kanna-simbolo-negativo.svg" alt="" width={140} height={140} unoptimized className="order-first w-16 md:order-none md:w-[clamp(4.5rem,9vw,8.75rem)]" />
-            <span>abre caminos</span>
-          </h1>
-          <p className="mx-auto mt-6 max-w-[40ch] text-lg opacity-95 sm:text-xl">
-            Para personas de 45 años o más y talento del campo colombiano. Oficios y profesiones, al mismo nivel.
-          </p>
-          {/* Una talento de 60 años tocó «Buscar talento» creyendo que era para ella: la pregunta va
-              explícita y cada botón dice quién es la persona, no qué busca la plataforma. */}
-          <p className="mt-8 text-xl font-semibold">¿Buscas trabajo o buscas talento?</p>
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/entrar"
-              className="inline-flex min-h-action items-center gap-2 rounded-full bg-accent px-7 text-lg font-semibold text-on-accent transition-colors hover:bg-accent-hover active:scale-[0.97]"
-            >
-              Busco trabajo: crear mi perfil
-              <ArrowRight aria-hidden className="size-5" />
-            </Link>
-            <Link
-              href="/organizaciones"
-              className="inline-flex min-h-action items-center rounded-full bg-white px-7 text-lg font-semibold text-tinta active:scale-[0.97]"
-            >
-              Busco talento para mi organización
-            </Link>
-          </div>
-          <Escuchar />
+            Busco trabajo: crear mi perfil
+            <ArrowRight aria-hidden className="size-5" />
+          </Link>
+          <Link
+            href="/organizaciones"
+            className="inline-flex min-h-action items-center rounded-full border-2 border-on-deep px-7 text-lg font-semibold transition-colors hover:bg-on-deep hover:text-deep active:scale-[0.97]"
+          >
+            Busco talento para mi organización
+          </Link>
         </div>
+        <Escuchar />
       </div>
-      <FranjaOrganizaciones variante="banner" />
+
+      {/* Retratos altos. Se detienen al pasar el mouse o al enfocarlos; con movimiento reducido
+          quedan quietos y se recorren de lado con el dedo. */}
+      <div
+        className="banda overflow-x-auto pb-14 motion-safe:overflow-x-hidden motion-reduce:snap-x motion-reduce:snap-mandatory lg:pb-20"
+        role="region"
+        aria-label="Retratos de oficios y profesiones"
+        tabIndex={0}
+      >
+        <ul className="banda-pista flex w-max gap-4 pr-4 motion-reduce:pl-4 md:gap-6 md:pr-6">
+          {pista.map(({ foto }, i) => (
+            <li
+              key={`${foto}-${i}`}
+              aria-hidden={i >= RETRATOS.length || undefined}
+              className="group relative aspect-[5/8] w-[min(58vw,17rem)] shrink-0 snap-start overflow-hidden rounded-retrato bg-primary md:w-80"
+            >
+              <Image
+                src={`/web/home/${foto}.webp`}
+                alt=""
+                fill
+                priority={i < 4}
+                sizes="(min-width: 768px) 20rem, 58vw"
+                className="object-cover object-[center_20%] transition-transform duration-700 ease-out group-hover:scale-105"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <FranjaOrganizaciones />
     </section>
-    <FranjaOrganizaciones variante="debajo" />
-    </>
   );
 }

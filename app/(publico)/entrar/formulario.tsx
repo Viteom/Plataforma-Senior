@@ -6,6 +6,7 @@ import { useActionState, useEffect, useId, useLayoutEffect, useRef, useState } f
 import { Button } from "@/components/ui/button";
 import { Campo, Input } from "@/components/ui/campo";
 import { CasillasCodigo, LlegadaCodigo, PasosEntrada, type MedioCodigo } from "@/components/ui/entrada-codigo";
+import type { Proveedor } from "@/lib/auth/proveedores";
 import { cn } from "@/lib/utils";
 
 import { codigoDemo, entrarDemo, enviarCodigo, reenviarCodigo, verificarCodigo, type EstadoEntrar } from "./acciones";
@@ -27,11 +28,15 @@ type Props = {
   enviadoAntes: Enviado | null;
   /** Hay proveedor de SMS: el talento empieza por celular. Si no, por correo. */
   smsActivo: boolean;
+  /** Google o Microsoft, si ya están configurados en Supabase. */
+  proveedores: Proveedor[];
+  /** Volvió de Google o Microsoft sin poder entrar. */
+  falloProveedor: boolean;
 };
 
 // Entrada sin contraseña en una sola tarjeta: 1) a dónde enviar el código, 2) escribirlo.
 // Todo va por acciones de servidor (POST): el celular y el correo nunca viajan en la URL.
-export function FormularioEntrar({ para, demo, enviadoAntes, smsActivo }: Props) {
+export function FormularioEntrar({ para, demo, enviadoAntes, smsActivo, proveedores, falloProveedor }: Props) {
   // Las empresas suelen entrar con correo; el talento, con celular (brief), si hay SMS.
   const [medio, setMedio] = useState<MedioCodigo>(enviadoAntes?.medio ?? (para === "talento" && smsActivo ? "celular" : "correo"));
   const [paso, setPaso] = useState<1 | 2>(enviadoAntes ? 2 : 1);
@@ -69,6 +74,10 @@ export function FormularioEntrar({ para, demo, enviadoAntes, smsActivo }: Props)
       <div ref={tarjeta} className="flex max-w-xl flex-col gap-8 rounded-lg border border-border-subtle bg-raised p-5 shadow-tarjeta sm:p-8">
         <PasosEntrada paso={paso} medio={medio} />
 
+        {paso === 1 && proveedores.length > 0 && (
+          <ConProveedor para={para} proveedores={proveedores} fallo={falloProveedor} />
+        )}
+
         {paso === 1 ? (
           <PasoDestino
             para={para}
@@ -92,6 +101,59 @@ export function FormularioEntrar({ para, demo, enviadoAntes, smsActivo }: Props)
         )}
       </div>
     </div>
+  );
+}
+
+const NOMBRE_PROVEEDOR: Record<Proveedor, string> = { google: "Google", microsoft: "Microsoft" };
+
+// Entrar con la cuenta de Google o de Microsoft, sin esperar un código. Son enlaces (no envían el
+// correo ni ningún dato por la dirección). Debajo sigue la entrada con código para quien la prefiera.
+function ConProveedor({ para, proveedores, fallo }: { para: "talento" | "empresa"; proveedores: Proveedor[]; fallo: boolean }) {
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-lg font-bold">Entra con tu cuenta</p>
+      {fallo && (
+        <p role="alert" className="font-bold text-danger">
+          No pudimos entrar con esa cuenta. Intenta de nuevo o pide un código.
+        </p>
+      )}
+      {proveedores.map((pr) => (
+        <a
+          key={pr}
+          href={`/entrar/proveedor?p=${pr}${para === "empresa" ? "&para=empresa" : ""}`}
+          className="flex min-h-action items-center justify-center gap-3 rounded-md border-2 border-text bg-bg px-4 text-lg font-bold transition-[background-color,transform] duration-100 hover:bg-surface active:scale-[0.99]"
+        >
+          <LogoProveedor proveedor={pr} />
+          Continuar con {NOMBRE_PROVEEDOR[pr]}
+        </a>
+      ))}
+      <p className="flex items-center gap-3 pt-2 text-base text-text-muted">
+        <span aria-hidden className="h-px flex-1 bg-border-subtle" />
+        o recibe un código
+        <span aria-hidden className="h-px flex-1 bg-border-subtle" />
+      </p>
+    </div>
+  );
+}
+
+// Logos de cada proveedor, con sus colores oficiales (los piden así sus guías de marca).
+function LogoProveedor({ proveedor }: { proveedor: Proveedor }) {
+  if (proveedor === "microsoft")
+    return (
+      <svg aria-hidden viewBox="0 0 21 21" className="size-6 shrink-0">
+        <path fill="#f25022" d="M1 1h9v9H1z" />
+        <path fill="#7fba00" d="M11 1h9v9h-9z" />
+        <path fill="#00a4ef" d="M1 11h9v9H1z" />
+        <path fill="#ffb900" d="M11 11h9v9h-9z" />
+      </svg>
+    );
+  return (
+    <svg aria-hidden viewBox="0 0 48 48" className="size-6 shrink-0">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+    </svg>
   );
 }
 
