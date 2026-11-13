@@ -21,7 +21,12 @@ export type ProveedorIA = {
   modelo: string;
   // Devuelve la salida ya validada contra EsquemaExtraccion, o lanza FalloIA.
   extraer: (sistema: string, texto: string) => Promise<Extraccion>;
+  // Conversación corta (chat de ayuda). Devuelve el texto de la respuesta, o lanza FalloIA.
+  // Opcional: el proveedor que no lo tenga deja el chat en sus respuestas sin IA.
+  conversar?: (sistema: string, mensajes: TurnoIA[]) => Promise<string>;
 };
+
+export type TurnoIA = { rol: "persona" | "asistente"; texto: string };
 
 export type MotivoFallo = "red" | "proveedor" | "forma" | "rechazo" | "cortada";
 

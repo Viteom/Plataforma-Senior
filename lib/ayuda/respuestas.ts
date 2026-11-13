@@ -71,7 +71,7 @@ const PREGUNTAS: { claves: string[]; texto: string; enlace?: Enlace }[] = [
   },
   {
     claves: ["cobrar", "tarifa", "cuanto", "precio"],
-    texto: "Tú pones tu tarifa al crear tu perfil y la puedes cambiar en Mi perfil. Si no sabes cuánto cobrar, marca «Prefiero que el equipo me oriente» y te ayudamos.",
+    texto: "Tú pones tu tarifa al crear tu perfil y la puedes cambiar en Mi perfil. Si no sabes cuánto cobrar, toca «Cuánto debo cobrar» en las opciones y lo calculamos con 2 preguntas.",
     enlace: { href: "/mi-perfil", texto: "Ir a Mi perfil" },
   },
   {
@@ -132,3 +132,8 @@ export function responder(mensaje: string): Respuesta {
 
 export const MAX_TURNOS = 12;
 export const MAX_CARACTERES = 600;
+
+// Lo que sabe la ayuda, en texto, para dárselo a la IA cuando esté encendida (hoy apagada).
+export function baseDeConocimiento(): string {
+  return PREGUNTAS.map((p) => `Tema: ${p.claves.slice(0, 3).join(", ")}\nRespuesta: ${p.texto}`).join("\n\n");
+}

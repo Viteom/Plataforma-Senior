@@ -8,7 +8,7 @@ import { normalizarCelular } from "@/lib/auth/destino";
 
 import type { Enlace } from "./respuestas";
 
-export type FlujoId = "codigo" | "llamada" | "estafa" | "historia";
+export type FlujoId = "codigo" | "llamada" | "estafa" | "historia" | "cobrar";
 
 export type Opcion = { valor: string; texto: string };
 
@@ -113,6 +113,37 @@ export const FLUJOS: Record<FlujoId, Flujo> = {
       },
     ],
   },
+  cobrar: {
+    id: "cobrar",
+    titulo: "Cuánto debo cobrar",
+    intro: "Te ayudo a calcularlo con 2 preguntas. Es una guía: la tarifa la pones tú.",
+    accion: "ninguna",
+    pasos: [
+      {
+        id: "mensual",
+        tipo: "opciones",
+        pregunta: "¿Cuánto te gustaría ganar al mes con este trabajo?",
+        opciones: [
+          { valor: "1000000", texto: "1 millón" },
+          { valor: "1500000", texto: "1 millón y medio" },
+          { valor: "2000000", texto: "2 millones" },
+          { valor: "3000000", texto: "3 millones" },
+          { valor: "4000000", texto: "4 millones o más" },
+        ],
+      },
+      {
+        id: "horas",
+        tipo: "opciones",
+        pregunta: "¿Cuántas horas a la semana quieres trabajar?",
+        opciones: [
+          { valor: "10", texto: "Unas 10 horas" },
+          { valor: "20", texto: "Unas 20 horas" },
+          { valor: "30", texto: "Unas 30 horas" },
+          { valor: "40", texto: "Unas 40 horas" },
+        ],
+      },
+    ],
+  },
   historia: {
     id: "historia",
     titulo: "Cómo contar mi historia",
@@ -133,7 +164,15 @@ export const FLUJOS: Record<FlujoId, Flujo> = {
   },
 };
 
-export const MENU: FlujoId[] = ["codigo", "llamada", "estafa", "historia"];
+export const MENU: FlujoId[] = ["codigo", "llamada", "cobrar", "estafa", "historia"];
+
+// Valor de la hora para llegar a una meta mensual: 4,33 semanas por mes, redondeado a mil pesos.
+export function valorHora(mensual: number, horasSemana: number): number {
+  return Math.round(mensual / (horasSemana * 4.33) / 1000) * 1000;
+}
+
+const enPesos = (n: number) =>
+  new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 }).format(n);
 
 // Valida una respuesta. Devuelve el mensaje de error o null si está bien.
 export function validar(paso: Paso, valor: string): string | null {
@@ -181,6 +220,19 @@ export function resultado(flujo: Flujo, r: Respuestas): Resultado {
             texto: "Si ya esperaste y pediste otro, lo mejor es que te llamemos y lo resolvamos juntos.",
             ofrecer: "llamada",
           };
+    case "cobrar": {
+      const mensual = Number(r.mensual);
+      const horas = Number(r.horas);
+      const hora = valorHora(mensual, horas);
+      return {
+        texto:
+          `Para ganar ${enPesos(mensual)} al mes trabajando ${horas} horas a la semana, tu hora vale cerca de ${enPesos(hora)}. ` +
+          "Para un proyecto, multiplica ese valor por las horas que calculas y súmale un poco para imprevistos. " +
+          "Tú pones tu tarifa, y Kánna revisa que ningún acuerdo quede por debajo de un pago justo.",
+        enlace: { href: "/mi-perfil", texto: "Poner mi tarifa en Mi perfil" },
+        ofrecer: "llamada",
+      };
+    }
     case "historia":
       if (r.como === "llamada") return { texto: "Perfecto, te llamamos y la contamos juntos.", ofrecer: "llamada" };
       return {

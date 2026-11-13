@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Send, UserRound } from "lucide-react";
+import { ArrowLeft, Mic, Send, Square, UserRound } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -20,6 +20,29 @@ import { MAX_CARACTERES, responder, type Enlace } from "@/lib/ayuda/respuestas";
 import { cn } from "@/lib/utils";
 
 import { escalarChat, pedirLlamada } from "./acciones";
+import { responderConIA } from "./chat-acciones";
+
+// La IA del chat está apagada. Con NEXT_PUBLIC_AYUDA_IA=si (y IA_PROVEEDOR en el servidor), lo que
+// las respuestas preparadas no entienden se le pregunta a la IA; los temas de riesgo nunca.
+const IA_ACTIVA = process.env.NEXT_PUBLIC_AYUDA_IA === "si";
+
+// Dictado del navegador (gratis, sin guardar el audio). No todos los navegadores lo tienen.
+type Reconocimiento = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((e: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+function crearReconocimiento(): Reconocimiento | null {
+  if (typeof window === "undefined") return null;
+  const w = window as unknown as Record<string, (new () => Reconocimiento) | undefined>;
+  const Clase = w.SpeechRecognition ?? w.webkitSpeechRecognition;
+  return Clase ? new Clase() : null;
+}
 
 type Turno = { de: "persona" | "asistente"; texto: string; etiqueta?: string; enlace?: Enlace; lista?: string[] };
 
@@ -43,6 +66,38 @@ export function ChatAyuda() {
   const [entrada, setEntrada] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [fallas, setFallas] = useState(0);
+  const [pensando, setPensando] = useState(false);
+  // Micrófono: null mientras no se sabe si el navegador lo permite.
+  const [hayDictado, setHayDictado] = useState<boolean | null>(null);
+  const [escuchando, setEscuchando] = useState(false);
+  const rec = useRef<Reconocimiento | null>(null);
+  useEffect(() => {
+    setHayDictado(crearReconocimiento() !== null);
+    return () => rec.current?.stop();
+  }, []);
+
+  function dictar() {
+    if (escuchando) {
+      rec.current?.stop();
+      return;
+    }
+    const r = crearReconocimiento();
+    if (!r) return;
+    r.lang = "es-CO";
+    r.continuous = false;
+    r.interimResults = false;
+    r.onresult = (e) => {
+      let dicho = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) dicho += e.results[i][0].transcript;
+      if (dicho.trim()) setEntrada((actual) => `${actual} ${dicho}`.trim().slice(0, MAX_CARACTERES));
+    };
+    r.onerror = () => setError("No pudimos escucharte. Revisa el permiso del micrófono o escribe tu pregunta.");
+    r.onend = () => setEscuchando(false);
+    rec.current = r;
+    setError(null);
+    r.start();
+    setEscuchando(true);
+  }
   const final = useRef<HTMLLIElement>(null);
   const controles = useRef<HTMLDivElement>(null);
 
@@ -161,6 +216,23 @@ export function ChatAyuda() {
       return;
     }
     if (r.tipo === "no_entendi") {
+      // Con la IA encendida, lo que no se entendió se le pregunta a ella (con sesión y cupo).
+      if (IA_ACTIVA) {
+        decir({ de: "persona", texto });
+        setPensando(true);
+        const previos = turnos.slice(-8).map((t) => ({ de: t.de, texto: t.texto }));
+        const deIA = await responderConIA([...previos, { de: "persona", texto }]).catch(() => null);
+        setPensando(false);
+        if (deIA) {
+          setFallas(0);
+          decir({ de: "asistente", texto: deIA, etiqueta: "Respuesta con inteligencia artificial" });
+          return;
+        }
+        setFallas((n) => n + 1);
+        decir({ de: "asistente", texto: r.texto });
+        if (fallas >= 1) setOfrecer("llamada");
+        return;
+      }
       setFallas((n) => n + 1);
       decir({ de: "persona", texto }, { de: "asistente", texto: r.texto });
       if (fallas >= 1) setOfrecer("llamada");
@@ -302,6 +374,7 @@ export function ChatAyuda() {
         )}
 
         {modo.tipo === "enviando" && <p role="status">Enviando…</p>}
+        {pensando && <p role="status">Buscando la respuesta…</p>}
 
         {modo.tipo === "libre" && (
           <>
@@ -318,11 +391,31 @@ export function ChatAyuda() {
                 autoComplete="off"
                 className="min-h-action flex-1 rounded-sm border-2 border-border bg-bg px-4 text-base placeholder:text-text-muted focus-visible:border-text"
               />
-              <Button type="submit" variant="secundario">
+              {hayDictado && (
+                <Button type="button" variant={escuchando ? "primario" : "secundario"} aria-pressed={escuchando} onClick={dictar}>
+                  {escuchando ? <Square aria-hidden className="fill-current" /> : <Mic aria-hidden />}
+                  {escuchando ? "Parar" : "Hablar"}
+                </Button>
+              )}
+              <Button type="submit" variant="secundario" disabled={pensando}>
                 <Send aria-hidden />
                 Enviar
               </Button>
             </form>
+            <p className="text-base text-text-muted" aria-live="polite">
+              {escuchando
+                ? "Te escuchamos… lo que digas aparece en la casilla."
+                : hayDictado
+                  ? "Puedes escribir o tocar «Hablar» y decir tu pregunta. No guardamos el audio."
+                  : hayDictado === false
+                    ? "Este navegador no permite dictar. Escribe tu pregunta o pide que te llamemos."
+                    : ""}
+            </p>
+            {error && (
+              <p role="alert" className="font-bold text-danger">
+                {error}
+              </p>
+            )}
             {ofrecer && (
               <Button variant="primario" ancho="completo" onClick={() => empezar(ofrecer)}>
                 <UserRound aria-hidden />

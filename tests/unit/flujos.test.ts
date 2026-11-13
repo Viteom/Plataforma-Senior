@@ -5,8 +5,8 @@ import { FLUJOS, MENU, motivoParaEquipo, resultado, resumen, textoRespuesta, val
 // Chat guiado: una pregunta a la vez, confirmando cada respuesta, sin pedir datos sensibles.
 
 describe("chat guiado", () => {
-  it("el menú ofrece los cuatro temas y cada flujo pregunta de a una cosa", () => {
-    expect(MENU).toEqual(["codigo", "llamada", "estafa", "historia"]);
+  it("el menú ofrece los cinco temas y cada flujo pregunta de a una cosa", () => {
+    expect(MENU).toEqual(["codigo", "llamada", "cobrar", "estafa", "historia"]);
     for (const id of MENU) {
       const f = FLUJOS[id];
       expect(f.pasos.length).toBeGreaterThan(0);
